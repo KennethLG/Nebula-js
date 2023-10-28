@@ -15,7 +15,7 @@ export default class SceneManager {
 
   update() {
     this.instances.forEach(instance => {
-      instance.update();
+      instance.update && instance.update();
     })
   }
 }
