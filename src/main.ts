@@ -22,23 +22,22 @@ class Main {
     this.renderer = new THREE.WebGLRenderer();
     this.eventManager = new EventManager();
     this.keyboardManager = new KeyboardManager(this.eventManager);
-    this.animate = this.animate.bind(this);
   }
 
   init() {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
-    const player = new Player(this.keyboardManager);
     const planet = new Planet();
+    const player = new Player(this.keyboardManager);
     this.sceneManager.add(player);
     this.sceneManager.add(planet);
     this.animate();
+    this.sceneManager.animate();
   }
 
-  private animate() {
-    requestAnimationFrame(this.animate);
-    this.sceneManager.update();
+  animate() {
     this.renderer.render(this.sceneManager.scene, this.camera);
+    window.requestAnimationFrame(this.animate.bind(this));
   }
 }
 

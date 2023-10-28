@@ -6,13 +6,13 @@ export default class Planet extends Instance {
   constructor() {
     super({
       name: "Planet",
-      position: new THREE.Vector3(0, -2, 0),
+      position: new THREE.Vector3(0, 0, 0),
     });
 
     this.geometry = new THREE.CircleGeometry(1, 32);
     this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
-    this.mesh.position.y = -2;
+    // this.mesh.position.y = -2;
     this.boundingSphere = new THREE.Sphere(this.mesh.position, 1);
     // Planet-specific setup and behavior.
   }
