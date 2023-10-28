@@ -8,17 +8,16 @@ export default class Player {
   mesh: THREE.Mesh;
   private readonly moveSpeed = 0.1;
 
-  constructor(private eventManager: EventManager, scene: THREE.Scene) {
-    this.texture = new THREE.TextureLoader().load("../assets/player.png");
+  constructor(private eventManager: EventManager) {
+    this.texture = new THREE.TextureLoader().load("../../assets/player.png");
     this.material = new THREE.MeshBasicMaterial({
       map: this.texture,
     });
-    this.texture.minFilter = THREE.NearestFilter;
     this.texture.magFilter = THREE.NearestFilter;
+    this.texture.minFilter = THREE.NearestFilter;
     this.geometry = new THREE.PlaneGeometry(1, 1);
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.set(0, 0, 0);
-    scene.add(this.mesh);
     this.eventManager.subscribe('keydown', this.handleKeyDown.bind(this));
   }
 

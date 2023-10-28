@@ -16,15 +16,17 @@ class Main {
       0.1,
       1000
     );
+    this.camera.position.z = 5;
     this.renderer = new THREE.WebGLRenderer();
     this.eventManager = new EventManager();
+    this.animate = this.animate.bind(this);
   }
 
   init() {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
 
-    const player = new Player(this.eventManager, this.scene);
+    const player = new Player(this.eventManager);
     this.scene.add(player.mesh);
 
     this.animate();
