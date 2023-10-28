@@ -1,4 +1,6 @@
-class KeyboardManager {
+import EventManager from "./EventManager";
+
+export default class KeyboardManager {
   private eventBus: EventManager;
   private keys: { [key: string]: boolean } = {};
 

@@ -1,4 +1,4 @@
-class EventManager {
+export default class EventManager {
   private subscribers: { [event: string]: Function[] } = {};
 
   subscribe(event: string, callback: Function) {

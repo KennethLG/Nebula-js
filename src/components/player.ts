@@ -1,4 +1,7 @@
-class Player {
+import * as THREE from 'three';
+import EventManager from '../systems/EventManager';
+
+export default class Player {
   texture: THREE.Texture;
   material: THREE.MeshBasicMaterial;
   geometry: THREE.PlaneGeometry;

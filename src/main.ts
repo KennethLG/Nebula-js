@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import EventManager from "./systems/EventManager";
+import Player from "./components/player";
 
 class Main {
   private readonly scene: THREE.Scene;
