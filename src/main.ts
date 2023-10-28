@@ -1,40 +1,43 @@
 import * as THREE from "three";
-import EventManager from "./systems/EventManager";
 import Player from "./components/player";
+import { EventManager, KeyboardManager, SceneManager } from "./systems";
+import Planet from "./components/planet";
 
 class Main {
-  private readonly scene: THREE.Scene;
+  private readonly sceneManager: SceneManager;
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.WebGLRenderer;
   private readonly eventManager: EventManager;
+  private readonly keyboardManager: KeyboardManager;
 
   constructor() {
-    this.scene = new THREE.Scene();
+    this.sceneManager = new SceneManager();
     this.camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
     );
-    this.camera.position.z = 5;
+    this.camera.position.z = 10;
     this.renderer = new THREE.WebGLRenderer();
     this.eventManager = new EventManager();
-    this.animate = this.animate.bind(this);
+    this.keyboardManager = new KeyboardManager(this.eventManager);
   }
 
   init() {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
-
-    const player = new Player(this.eventManager);
-    this.scene.add(player.mesh);
-
+    const planet = new Planet();
+    const player = new Player(this.keyboardManager);
+    this.sceneManager.add(player);
+    this.sceneManager.add(planet);
     this.animate();
+    this.sceneManager.animate();
   }
 
-  private animate() {
-    requestAnimationFrame(this.animate);
-    this.renderer.render(this.scene, this.camera);
+  animate() {
+    this.renderer.render(this.sceneManager.scene, this.camera);
+    window.requestAnimationFrame(this.animate.bind(this));
   }
 }
 

@@ -1,16 +1,27 @@
-export default class EventManager {
-  private subscribers: { [event: string]: Function[] } = {};
+export default class EventManager<T extends string = string> {
+  eventMap = {} as Record<T, Set<(...args: any[]) => void>>;
 
-  subscribe(event: string, callback: Function) {
-    if (!this.subscribers[event]) {
-      this.subscribers[event] = [];
+  on(event: T, callback: (...args: any[]) => void) {
+    if (!this.eventMap[event]) {
+      this.eventMap[event] = new Set();
     }
-    this.subscribers[event].push(callback);
+
+    this.eventMap[event].add(callback);
   }
 
-  dispatch(event: string, data?: any) {
-    if (this.subscribers[event]) {
-      this.subscribers[event].forEach((callback) => callback(data));
+  off(event: T, callback: (...args: any[]) => void) {
+    if (!this.eventMap[event]) {
+      return;
     }
+
+    this.eventMap[event].delete(callback);
+  }
+
+  emit(event: T, ...args: any[]) {
+    if (!this.eventMap[event]) {
+      return;
+    }
+
+    this.eventMap[event].forEach((cb: any) => cb(...args));
   }
 }
