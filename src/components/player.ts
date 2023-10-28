@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import EventManager from '../systems/EventManager';
+import KeyboardManager from 'src/systems/KeyboardManager';
 
 export default class Player {
   texture: THREE.Texture;
@@ -8,7 +8,7 @@ export default class Player {
   mesh: THREE.Mesh;
   private readonly moveSpeed = 0.1;
 
-  constructor(private eventManager: EventManager) {
+  constructor(private keyboardManager: KeyboardManager) {
     this.texture = new THREE.TextureLoader().load("../../assets/player.png");
     this.material = new THREE.MeshBasicMaterial({
       map: this.texture,
@@ -18,12 +18,11 @@ export default class Player {
     this.geometry = new THREE.PlaneGeometry(1, 1);
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.set(0, 0, 0);
-    this.eventManager.subscribe('keydown', this.handleKeyDown.bind(this));
   }
 
-  private handleKeyDown(key: string) {
-    if (key === 'ArrowUp') {
-      this.mesh.position.y -= this.moveSpeed;
+  update() {
+    if (this.keyboardManager.keys["ArrowUp"]) {
+      this.mesh.position.y += this.moveSpeed;
     }
   }
 }
