@@ -18,7 +18,7 @@ class Main {
       0.1,
       1000
     );
-    this.camera.position.z = 5;
+    this.camera.position.z = 10;
     this.renderer = new THREE.WebGLRenderer();
     this.eventManager = new EventManager();
     this.keyboardManager = new KeyboardManager(this.eventManager);
