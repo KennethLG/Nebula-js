@@ -1,28 +1,38 @@
-import * as THREE from 'three';
-import KeyboardManager from 'src/systems/KeyboardManager';
+import * as THREE from "three";
+import Instance from "./instance";
+import { SceneManager, KeyboardManager} from "../systems";
+import Planet from "./planet";
 
-export default class Player {
-  texture: THREE.Texture;
-  material: THREE.MeshBasicMaterial;
-  geometry: THREE.PlaneGeometry;
-  mesh: THREE.Mesh;
+export default class Player extends Instance {
   private readonly moveSpeed = 0.1;
+  private readonly velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+  private readonly keyboardManager: KeyboardManager;
+  private readonly gravity: number = -0.01;
+  private readonly boundingSphere: THREE.Sphere;
 
-  constructor(private keyboardManager: KeyboardManager) {
-    this.texture = new THREE.TextureLoader().load("../../assets/player.png");
-    this.material = new THREE.MeshBasicMaterial({
-      map: this.texture,
+  constructor(keyboardManager: KeyboardManager) {
+    super({
+      name: "Player",
+      texturePath: "../../assets/player.png",
+      position: new THREE.Vector3(0, 0, 0),
     });
-    this.texture.magFilter = THREE.NearestFilter;
-    this.texture.minFilter = THREE.NearestFilter;
-    this.geometry = new THREE.PlaneGeometry(1, 1);
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
-    this.mesh.position.set(0, 0, 0);
+    this.keyboardManager = keyboardManager;
+    this.boundingSphere = new THREE.Sphere(this.mesh.position, 0.5);
   }
 
-  update() {
-    if (this.keyboardManager.keys["ArrowUp"]) {
-      this.mesh.position.y += this.moveSpeed;
+  update(): void {
+
+    const planet = SceneManager.instances.find(instance => instance.name === 'Planet') as Planet;
+    if (planet.boundingSphere.intersectsSphere(this.boundingSphere)) {
+      this.velocity.y = 0;
+    } else {
+      this.velocity.y += this.gravity;
     }
+
+    if (this.keyboardManager.keys["ArrowUp"]) {
+      this.velocity.y = this.moveSpeed;
+    }
+    this.mesh.position.add(this.velocity);
+    this.boundingSphere.center.copy(this.mesh.position);
   }
 }

@@ -1,21 +1,21 @@
+import Instance from 'src/components/instance';
 import * as THREE from 'three';
 
 export default class SceneManager {
-  instances: any[];
+  static instances: Instance[] = [];
   scene: THREE.Scene;
   constructor() {
     this.scene = new THREE.Scene();
-    this.instances = [];
   }
 
   add(instance) {
     this.scene.add(instance.mesh)
-    this.instances.push(instance);
+    SceneManager.instances.push(instance);
   }
 
   update() {
-    this.instances.forEach(instance => {
+    SceneManager.instances.forEach((instance) => {
       instance.update && instance.update();
-    })
+    });
   }
 }
