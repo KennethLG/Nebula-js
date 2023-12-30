@@ -1,8 +1,7 @@
 import * as THREE from "three";
 import Instance from "./instance";
-import { SceneManager, KeyboardManager } from "../systems";
-import Planet from "./planet";
-import { Vector3, threeVec3 } from "../systems/util/vector";
+import { KeyboardManager } from "../systems";
+import { Vector3 } from "../systems/util/vector";
 
 export default class Player extends Instance {
   private readonly keyboardManager: KeyboardManager;
@@ -21,17 +20,9 @@ export default class Player extends Instance {
     });
     this.keyboardManager = keyboardManager;
     this.boundingSphere = new THREE.Sphere(this.mesh.position, 0.5);
-    this.body.addEventListener('collide', (event) => {
-
-    })
   }
 
   update(): void {
-    const planet = SceneManager.instances.find(
-      (instance) => instance.name === "Planet"
-    ) as Planet;
 
-    this.mesh.position.copy(threeVec3(this.body.position));
-    this.boundingSphere.center.copy(this.mesh.position);
   }
 }
