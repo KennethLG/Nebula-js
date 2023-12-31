@@ -76,8 +76,11 @@ export default class Player extends Instance {
       planet.boundingSphere.radius;
 
     if (distanceToPlanet <= 0) {
-      this.onGround = true;
-      this.velocity.set(0, 0, 0);
+      if (!this.onGround) {
+        this.onGround = true;
+        this.velocity.set(0, 0, 0);
+
+      }
     } else {
       this.onGround = false;
     }

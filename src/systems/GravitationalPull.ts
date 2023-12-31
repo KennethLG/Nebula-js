@@ -6,7 +6,7 @@ export default class GravitationalPull {
     instanceTo: Instance,
     velocity: THREE.Vector3
   ): THREE.Vector3 {
-    const gravity = 0.005;
+    const gravity = 0.01;
     const toInstanceCenter = new THREE.Vector3().subVectors(
       instanceTo.mesh.position,
       instance.mesh.position
