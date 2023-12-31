@@ -19,10 +19,12 @@ export default class Instance {
     this.texture = new THREE.TextureLoader().load(config.texturePath || "");
     this.material = new THREE.MeshBasicMaterial({
       map: this.texture,
+      transparent: true
     });
     this.texture.magFilter = THREE.NearestFilter;
     this.texture.minFilter = THREE.NearestFilter;
     this.geometry = new THREE.PlaneGeometry(1, 1);
+    this.geometry.translate(0, 0.5, 0);
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.set(config.position.x, config.position.y, config.position.z);
   }
