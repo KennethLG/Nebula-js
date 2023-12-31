@@ -76,11 +76,13 @@ export default class Player extends Instance {
       planet.boundingSphere.radius;
 
     if (distanceToPlanet <= 0) {
-      if (!this.onGround) {
-        this.onGround = true;
-        this.velocity.set(0, 0, 0);
+      this.onGround = true;
 
-      }
+      // Remove the component of the velocity going into the planet
+      const velocityComponentIntoPlanet = toPlanetCenter
+        .normalize()
+        .multiplyScalar(toPlanetCenter.normalize().dot(this.velocity));
+      this.velocity.sub(velocityComponentIntoPlanet);
     } else {
       this.onGround = false;
     }
