@@ -10,7 +10,7 @@ export default class MovementController {
   constructor(private readonly keyboardManager: KeyboardManager) {}
 
   apply(object: Player): void {
-    const { velocity, gravity, onGround } = object;
+    const { velocity, gravity, onGround, xVel, onPlanet } = object;
     const moveLeftKey = "a";
     const moveRightKey = "d";
     const jumpKey = "w";
@@ -23,27 +23,36 @@ export default class MovementController {
 
     if (this.keyboardManager.keys[moveLeftKey]) {
       const moveLeft = right.clone().multiplyScalar(-this.moveSpeed);
-      velocity.add(moveLeft);
-    }
-    if (this.keyboardManager.keys[moveRightKey]) {
+      xVel.add(moveLeft);
+    } else if (this.keyboardManager.keys[moveRightKey]) {
       const moveRight = right.clone().multiplyScalar(this.moveSpeed);
-      velocity.add(moveRight);
+      xVel.add(moveRight);
+    } else if (onPlanet) {
+      this.applyFriction(xVel, .001);
     }
 
     if (onGround && this.keyboardManager.keys[jumpKey]) {
       this.jump(gravity, velocity);
     }
-    this.clampVelocity(velocity);
+    this.clampVelocity(xVel, this.maxVelocity);
   }
+
+  private applyFriction(velocity: THREE.Vector3, friction: number) {
+    const threshold = 0.01;
+    velocity.multiplyScalar(friction);
+    if (velocity.lengthSq() < (threshold**2)) {
+      velocity.set(0, 0, 0);
+    }
+  };
 
   private jump(gravity: THREE.Vector3, velocity: THREE.Vector3) {
     const jumpDirection = gravity.clone().negate().normalize();
     velocity.add(jumpDirection.multiplyScalar(this.jumpForce));
   }
 
-  private clampVelocity(velocity: THREE.Vector3) {
-    if (velocity.lengthSq() > this.maxVelocity * this.maxVelocity) {
-      velocity.clampLength(0, this.maxVelocity);
+  private clampVelocity(velocity: THREE.Vector3, maxVel: number) {
+    if (velocity.lengthSq() > maxVel ** 2) {
+      velocity.clampLength(0, maxVel);
     }
   }
 }

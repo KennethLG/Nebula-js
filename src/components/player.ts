@@ -17,13 +17,15 @@ export default class Player extends Instance {
   private readonly movementController: MovementController;
   velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
   onGround: boolean = false;
+  onPlanet: boolean = false;
   gravity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+  xVel: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
 
   constructor({ movementController }: PlayerConfig) {
     super({
       name: "Player",
       texturePath: "../../assets/player.png",
-      position: new Vector3(3, 8, 0),
+      position: new Vector3(3, 3, 0),
     });
     this.movementController = movementController;
   }
@@ -49,6 +51,7 @@ export default class Player extends Instance {
     this.movementController.apply(this);
 
     this.mesh.position.add(this.velocity);
+    this.mesh.position.add(this.xVel);
 
     this.checkCollisionWithPlanet(planet);
     this.rotate(planet);
@@ -61,13 +64,11 @@ export default class Player extends Instance {
     );
     const distanceToPlanet =
       toPlanetCenter.length() -
-      // this.boundingSphere.radius -
       planet.boundingSphere.radius;
 
     if (distanceToPlanet <= 0) {
       this.onGround = true;
 
-      // Remove the component of the velocity going into the planet
       const velocityComponentIntoPlanet = toPlanetCenter
         .normalize()
         .multiplyScalar(toPlanetCenter.normalize().dot(this.velocity));
@@ -75,6 +76,8 @@ export default class Player extends Instance {
     } else {
       this.onGround = false;
     }
+
+    this.onPlanet = distanceToPlanet <= .5;
   }
 
   private rotate(planet: Planet) {

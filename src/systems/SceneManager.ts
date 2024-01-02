@@ -17,11 +17,6 @@ export default class SceneManager {
     SceneManager.instances.forEach((instance) => {
       instance.update && instance.update();
     });
-    SceneManager.instances.forEach((instance) => {
-      const mesh = instance.mesh;
-      const { x, y, z } = mesh.position;
-      mesh.position.set(x, y, z);
-    });
   }
 
   animate() {
