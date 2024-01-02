@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Player from "./components/player";
+import Player from "./components/Player";
 import { EventManager, KeyboardManager, MovementController, SceneManager } from "./systems";
 import Planet from "./components/planet";
 
@@ -28,12 +28,9 @@ class Main {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
     const planet = new Planet();
-    const player = new Player({
-      keyboardManager: this.keyboardManager,
-      movementController: new MovementController(this.keyboardManager)
-    });
-    this.sceneManager.add(player);
     this.sceneManager.add(planet);
+    const player = new Player();
+    this.sceneManager.add(player);
     this.animate();
     this.sceneManager.animate();
   }
