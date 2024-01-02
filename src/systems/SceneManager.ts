@@ -17,6 +17,7 @@ export default class SceneManager {
     SceneManager.instances.forEach((instance) => {
       instance.update && instance.update();
     });
+
   }
 
   animate() {

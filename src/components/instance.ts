@@ -1,31 +1,34 @@
 import * as THREE from "three";
-import { Vector3 } from "../systems/util/vector";
 
 interface InstanceConfig {
-  texturePath?: string;
   name: string;
-  position: Vector3;
+  position: THREE.Vector3;
+  texturePath?: string;
+  mesh?: THREE.Mesh;
+  geometry?: THREE.CircleGeometry;
+  material?: THREE.MeshBasicMaterial;
 }
 
 export default class Instance {
   name: string;
   texture: THREE.Texture;
   material: THREE.MeshBasicMaterial;
-  geometry: THREE.BufferGeometry;
+  geometry: THREE.CircleGeometry;
   mesh: THREE.Mesh;
 
   constructor(config: InstanceConfig) {
     this.name = config.name;
     this.texture = new THREE.TextureLoader().load(config.texturePath || "");
-    this.material = new THREE.MeshBasicMaterial({
+    this.texture.magFilter = THREE.NearestFilter;
+    this.texture.minFilter = THREE.NearestFilter;
+
+    this.material = config.material || new THREE.MeshBasicMaterial({
       map: this.texture,
       transparent: true
     });
-    this.texture.magFilter = THREE.NearestFilter;
-    this.texture.minFilter = THREE.NearestFilter;
-    this.geometry = new THREE.PlaneGeometry(1, 1);
-    this.geometry.translate(0, 0.5, 0);
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
+    this.geometry = config.geometry || new THREE.CircleGeometry(1);
+    this.mesh = config.mesh || new THREE.Mesh(this.geometry, this.material);
+    this.geometry.translate(0, 0, 0);
     this.mesh.position.set(config.position.x, config.position.y, config.position.z);
   }
 
