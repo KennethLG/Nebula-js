@@ -30,7 +30,7 @@ class Main {
     const planet = new Planet();
     const player = new Player({
       keyboardManager: this.keyboardManager,
-      movementController: new MovementController()
+      movementController: new MovementController(this.keyboardManager)
     });
     this.sceneManager.add(player);
     this.sceneManager.add(planet);
