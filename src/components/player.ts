@@ -10,24 +10,21 @@ import Planet from "./planet";
 import { Vector3 } from "../systems/util/vector";
 
 interface PlayerConfig {
-  keyboardManager: KeyboardManager;
   movementController: MovementController;
 }
 
 export default class Player extends Instance {
-  private readonly keyboardManager: KeyboardManager;
   private readonly movementController: MovementController;
   velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
   onGround: boolean = false;
   gravity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
 
-  constructor({ keyboardManager, movementController }: PlayerConfig) {
+  constructor({ movementController }: PlayerConfig) {
     super({
       name: "Player",
       texturePath: "../../assets/player.png",
       position: new Vector3(3, 8, 0),
     });
-    this.keyboardManager = keyboardManager;
     this.movementController = movementController;
   }
 
