@@ -17,10 +17,9 @@ interface PlayerConfig {
 export default class Player extends Instance {
   private readonly keyboardManager: KeyboardManager;
   private readonly movementController: MovementController;
-  private readonly boundingSphere: THREE.Sphere;
-  private readonly velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
-  private onGround: boolean = false;
-  private readonly gravity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+  velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+  onGround: boolean = false;
+  gravity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
 
   constructor({ keyboardManager, movementController }: PlayerConfig) {
     super({
@@ -30,7 +29,6 @@ export default class Player extends Instance {
     });
     this.keyboardManager = keyboardManager;
     this.movementController = movementController;
-    this.boundingSphere = new THREE.Sphere(this.mesh.position, 0.5);
   }
 
   update(): void {
@@ -51,13 +49,7 @@ export default class Player extends Instance {
       );
     }
 
-    this.movementController.apply(
-      this.keyboardManager,
-      this,
-      this.onGround,
-      this.gravity,
-      this.velocity
-    );
+    this.movementController.apply(this);
 
     this.mesh.position.add(this.velocity);
 
