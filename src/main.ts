@@ -1,24 +1,15 @@
 import * as THREE from 'three'
-import Player from './components/Player'
 import {
-  EventManager,
-  KeyboardManager,
-  MovementController,
   SceneManager
 } from './systems'
-import Planet from './components/planet'
-import OrientationController from './components/Player/OrientationController'
-import CollisionController from './components/Player/CollisionController'
+import type IScene from './entities/IScene'
+import GameScene from './scenes/GameScene'
 
 class Main {
   private readonly sceneManager: SceneManager
   private readonly camera: THREE.PerspectiveCamera
   private readonly renderer: THREE.WebGLRenderer
-  private readonly eventManager: EventManager
-  private readonly keyboardManager: KeyboardManager
-  private readonly movementController: MovementController
-  private readonly orientationController: OrientationController
-  private readonly collisionController: CollisionController
+  private readonly currentScene: IScene
 
   constructor () {
     this.sceneManager = new SceneManager()
@@ -30,28 +21,13 @@ class Main {
     )
     this.camera.position.z = 10
     this.renderer = new THREE.WebGLRenderer()
-    this.eventManager = new EventManager()
-    this.keyboardManager = new KeyboardManager(this.eventManager)
-    this.movementController = new MovementController(
-      this.keyboardManager,
-      this.eventManager
-    )
-    this.orientationController = new OrientationController(this.eventManager)
-    this.collisionController = new CollisionController()
+    this.currentScene = new GameScene(this.sceneManager)
   }
 
   init (): void {
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     document.body.appendChild(this.renderer.domElement)
-    this.sceneManager.add(new Planet(new THREE.Vector3(-1, 0, 0)))
-    this.sceneManager.add(new Planet(new THREE.Vector3(3, 0, 0)))
-    const player = new Player(
-      this.movementController,
-      this.orientationController,
-      this.collisionController,
-      this.sceneManager
-    )
-    this.sceneManager.add(player)
+    this.currentScene.init()
     this.animate()
     this.sceneManager.animate()
   }
@@ -59,6 +35,7 @@ class Main {
   animate (): void {
     this.renderer.render(this.sceneManager.scene, this.camera)
     window.requestAnimationFrame(this.animate.bind(this))
+    this.currentScene.update()
   }
 }
 
