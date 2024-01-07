@@ -52,7 +52,7 @@ class Main {
     this.sceneManager.animate()
   }
 
-  animate () {
+  animate (): void {
     this.renderer.render(this.sceneManager.scene, this.camera)
     window.requestAnimationFrame(this.animate.bind(this))
   }

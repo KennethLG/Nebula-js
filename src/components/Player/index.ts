@@ -2,10 +2,9 @@ import * as THREE from 'three'
 import Instance from '../instance'
 import {
   SceneManager,
-  GravitationalPull
+  applyGravitationalPull
 } from '../../systems'
 import type Planet from '../planet'
-import { Vector3 } from '../../systems/util/vector'
 import type OrientationController from './OrientationController'
 import type CollisionController from './CollisionController'
 import type MovementController from '../../systems/MovementController'
@@ -27,7 +26,7 @@ export default class Player extends Instance {
     super({
       name: 'Player',
       texturePath: '../../assets/player.png',
-      position: new Vector3(5, 2, 0),
+      position: new THREE.Vector3(5, 2, 0),
       geometry: new THREE.CircleGeometry(0.5)
     })
     this.planet = SceneManager.instances.find(
@@ -47,7 +46,7 @@ export default class Player extends Instance {
       mesh: this.mesh
     })
     if (!this.onGround) {
-      GravitationalPull.apply(
+      applyGravitationalPull(
         this.gravityDirection,
         this.gravity
       )
@@ -63,11 +62,11 @@ export default class Player extends Instance {
     this.applyForces()
   }
 
-  private getGravityDirection (from: THREE.Vector3, to: THREE.Vector3) {
+  private getGravityDirection (from: THREE.Vector3, to: THREE.Vector3): THREE.Vector3 {
     return new THREE.Vector3().subVectors(to, from).normalize()
   }
 
-  private applyForces () {
+  private applyForces (): void {
     this.mesh.position.add(this.gravity)
     this.mesh.position.add(this.xVel)
   }

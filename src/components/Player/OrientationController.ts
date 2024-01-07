@@ -6,7 +6,7 @@ interface Config {
 }
 
 export default class OrientationController {
-  apply ({ gravityDirection, mesh }: Config) {
+  apply ({ gravityDirection, mesh }: Config): void {
     const fallDirection = gravityDirection.clone().normalize()
     const desiredUp = fallDirection.negate()
     const currentUp = new THREE.Vector3(0, 1, 0)

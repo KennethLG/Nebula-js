@@ -17,5 +17,5 @@
   },
   "files": ["src/main.ts"],
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "**/node_modules/*", ".eslintrc.js"]
+  "exclude": ["node_modules", "**/node_modules/*"]
 }

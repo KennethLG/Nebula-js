@@ -8,7 +8,7 @@ interface Config {
 }
 
 export default class CollisionController {
-  handleCircularCollision ({ from, to, velocity }: Config) {
+  handleCircularCollision ({ from, to, velocity }: Config): void {
     const directionToSurface = from.mesh.position
       .clone()
       .sub(to.mesh.position)
