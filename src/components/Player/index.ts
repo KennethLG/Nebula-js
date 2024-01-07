@@ -12,10 +12,6 @@ import OrientationController from "./OrientationController";
 import CollisionController from "./CollisionController";
 import MovementController from "./MovementController";
 
-interface PlayerConfig {
-  movementController: MovementController;
-}
-
 export default class Player extends Instance {
   private readonly movementController: MovementController;
   private readonly orientationController: OrientationController;
