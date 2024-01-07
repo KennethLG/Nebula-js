@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import Instance from '../instance'
 import {
-  SceneManager,
+  type SceneManager,
   applyGravitationalPull
 } from '../../systems'
 import type Planet from '../planet'
@@ -21,7 +21,8 @@ export default class Player extends Instance {
   constructor (
     private readonly movementController: MovementController,
     private readonly orientationController: OrientationController,
-    private readonly collisionController: CollisionController
+    private readonly collisionController: CollisionController,
+    private readonly sceneManager: SceneManager
   ) {
     super({
       name: 'Player',
@@ -58,7 +59,7 @@ export default class Player extends Instance {
   }
 
   private getNearestPlanet (): Planet {
-    const planets = SceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
+    const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
 
     const nearestPlanet = planets.reduce((nearest, planet) => {
       const nearestDistance = nearest.mesh.position.distanceTo(this.mesh.position)

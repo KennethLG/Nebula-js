@@ -48,7 +48,8 @@ class Main {
     const player = new Player(
       this.movementController,
       this.orientationController,
-      this.collisionController
+      this.collisionController,
+      this.sceneManager
     )
     this.sceneManager.add(player)
     this.animate()
