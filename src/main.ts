@@ -43,8 +43,8 @@ class Main {
   init (): void {
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     document.body.appendChild(this.renderer.domElement)
-    const planet = new Planet()
-    this.sceneManager.add(planet)
+    this.sceneManager.add(new Planet(new THREE.Vector3(-1, 0, 0)))
+    this.sceneManager.add(new Planet(new THREE.Vector3(3, 0, 0)))
     const player = new Player(
       this.movementController,
       this.orientationController,

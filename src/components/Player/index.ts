@@ -15,7 +15,7 @@ export default class Player extends Instance {
   xVel = new THREE.Vector3(0, 0, 0)
   yVel = new THREE.Vector3(0, 0, 0)
   velocity = new THREE.Vector3(0, 0, 0)
-  planet: Planet
+  planet: Planet | undefined
   gravityDirection = new THREE.Vector3(0, 0, 0)
 
   constructor (
@@ -29,12 +29,10 @@ export default class Player extends Instance {
       position: new THREE.Vector3(5, 2, 0),
       geometry: new THREE.CircleGeometry(0.5)
     })
-    this.planet = SceneManager.instances.find(
-      (inst) => inst.name === 'Planet'
-    ) as Planet
   }
 
   update (): void {
+    this.planet = this.getNearestPlanet()
     this.gravityDirection = this.getGravityDirection(
       this.mesh.position,
       this.planet.mesh.position
@@ -75,5 +73,17 @@ export default class Player extends Instance {
   private updateFacing (): void {
     const orientation = this.orientationController.getXOrientation()
     this.mesh.scale.x = orientation
+  }
+
+  private getNearestPlanet (): Planet {
+    const planets = SceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
+
+    const nearestPlanet = planets.reduce((nearest, planet) => {
+      const nearestDistance = nearest.mesh.position.distanceTo(this.mesh.position)
+      const currentDistance = planet.mesh.position.distanceTo(this.mesh.position)
+      return currentDistance < nearestDistance ? planet : nearest
+    }, planets[0])
+
+    return nearestPlanet
   }
 }
