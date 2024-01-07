@@ -37,26 +37,8 @@ export default class Player extends Instance {
       this.mesh.position,
       this.planet.mesh.position
     )
-    this.onGround = this.collisionController.areColliding(this, this.planet)
-
-    this.orientationController.alignWithGravity({
-      gravityDirection: this.gravityDirection,
-      mesh: this.mesh
-    })
-    if (!this.onGround) {
-      applyGravitationalPull(
-        this.gravityDirection,
-        this.gravity
-      )
-    } else {
-      this.collisionController.handleCircularCollision({
-        from: this,
-        to: this.planet,
-        velocity: this.gravity
-      })
-      this.movementController.handleJump(this.gravityDirection, this.gravity)
-    }
-    this.movementController.handleXMovement(this.mesh.quaternion, this.xVel)
+    this.manageOrientation()
+    this.manageGrounding()
     this.applyForces()
     this.updateFacing()
   }
@@ -85,5 +67,32 @@ export default class Player extends Instance {
     }, planets[0])
 
     return nearestPlanet
+  }
+
+  private manageOrientation (): void {
+    this.orientationController.alignWithGravity({
+      gravityDirection: this.gravityDirection,
+      mesh: this.mesh
+    })
+    this.movementController.handleXMovement(this.mesh.quaternion, this.xVel)
+  }
+
+  private manageGrounding (): void {
+    if (this.planet == null) return
+
+    this.onGround = this.collisionController.areColliding(this, this.planet)
+    if (!this.onGround) {
+      applyGravitationalPull(
+        this.gravityDirection,
+        this.gravity
+      )
+    } else {
+      this.collisionController.handleCircularCollision({
+        from: this,
+        to: this.planet,
+        velocity: this.gravity
+      })
+      this.movementController.handleJump(this.gravityDirection, this.gravity)
+    }
   }
 }
