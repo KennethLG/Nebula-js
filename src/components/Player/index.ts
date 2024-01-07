@@ -1,81 +1,74 @@
-import * as THREE from "three";
-import Instance from "../instance";
+import * as THREE from 'three'
+import Instance from '../instance'
 import {
   SceneManager,
-  GravitationalPull,
-  KeyboardManager,
-  EventManager,
-} from "../../systems";
-import Planet from "../planet";
-import { Vector3 } from "../../systems/util/vector";
-import OrientationController from "./OrientationController";
-import CollisionController from "./CollisionController";
-import MovementController from "./MovementController";
+  GravitationalPull
+} from '../../systems'
+import type Planet from '../planet'
+import { Vector3 } from '../../systems/util/vector'
+import type OrientationController from './OrientationController'
+import type CollisionController from './CollisionController'
+import type MovementController from '../../systems/MovementController'
 
 export default class Player extends Instance {
-  private readonly movementController: MovementController;
-  private readonly orientationController: OrientationController;
-  private readonly collisionController: CollisionController;
+  onGround = false
+  gravity = new THREE.Vector3(0, 0, 0)
+  xVel = new THREE.Vector3(0, 0, 0)
+  yVel = new THREE.Vector3(0, 0, 0)
+  velocity = new THREE.Vector3(0, 0, 0)
+  planet: Planet
+  gravityDirection = new THREE.Vector3(0, 0, 0)
 
-  onGround = false;
-  gravity = new THREE.Vector3(0, 0, 0);
-  xVel = new THREE.Vector3(0, 0, 0);
-  yVel = new THREE.Vector3(0, 0, 0);
-  velocity = new THREE.Vector3(0, 0, 0);
-  planet: Planet;
-  gravityDirection = new THREE.Vector3(0, 0, 0);
-
-  constructor() {
+  constructor (
+    private readonly movementController: MovementController,
+    private readonly orientationController: OrientationController,
+    private readonly collisionController: CollisionController
+  ) {
     super({
-      name: "Player",
-      texturePath: "../../assets/player.png",
+      name: 'Player',
+      texturePath: '../../assets/player.png',
       position: new Vector3(5, 2, 0),
-      geometry: new THREE.CircleGeometry(0.5),
-    });
-    const eventManager = new EventManager();
-    const keyboardManager = new KeyboardManager(eventManager);
-    this.movementController = new MovementController(keyboardManager);
-    this.orientationController = new OrientationController();
-    this.collisionController = new CollisionController();
+      geometry: new THREE.CircleGeometry(0.5)
+    })
     this.planet = SceneManager.instances.find(
-      (inst) => inst.name === "Planet"
-    ) as Planet;
+      (inst) => inst.name === 'Planet'
+    ) as Planet
   }
 
-  update(): void {
+  update (): void {
     this.gravityDirection = this.getGravityDirection(
       this.mesh.position,
       this.planet.mesh.position
-    );
-    this.onGround = this.collisionController.areColliding(this, this.planet);
+    )
+    this.onGround = this.collisionController.areColliding(this, this.planet)
 
     this.orientationController.apply({
       gravityDirection: this.gravityDirection,
-      mesh: this.mesh,
-    });
+      mesh: this.mesh
+    })
     if (!this.onGround) {
       GravitationalPull.apply(
         this.gravityDirection,
         this.gravity
-      );
+      )
     } else {
       this.collisionController.handleCircularCollision({
         from: this,
         to: this.planet,
-        velocity: this.gravity,
-      });
-      this.movementController.handleJump(this);
+        velocity: this.gravity
+      })
+      this.movementController.handleJump(this.gravityDirection)
     }
-    this.movementController.handleXMovement(this);
-    this.applyForces();
+    this.movementController.handleXMovement(this.mesh.quaternion, this.xVel)
+    this.applyForces()
   }
 
-  private getGravityDirection(from: THREE.Vector3, to: THREE.Vector3) {
-    return new THREE.Vector3().subVectors(to, from).normalize();
+  private getGravityDirection (from: THREE.Vector3, to: THREE.Vector3) {
+    return new THREE.Vector3().subVectors(to, from).normalize()
   }
 
-  private applyForces() {
-    this.mesh.position.add(this.gravity);
-    this.mesh.position.add(this.xVel);
+  private applyForces () {
+    this.mesh.position.add(this.gravity)
+    this.mesh.position.add(this.xVel)
   }
 }

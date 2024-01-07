@@ -1,16 +1,16 @@
-import * as THREE from "three";
+import type * as THREE from 'three'
 export default class GravitationalPull {
-  static gravityForce = 0.01;
+  static gravityForce = 0.01
 
-  static apply(
+  static apply (
     gravityDirection: THREE.Vector3,
     velocity: THREE.Vector3
   ) {
-    const gravityForce = this.getGravity(gravityDirection);
-    velocity.add(gravityForce);
+    const gravityForce = this.getGravity(gravityDirection)
+    velocity.add(gravityForce)
   }
 
-  static getGravity(gravityDirection: THREE.Vector3) {
-    return gravityDirection.multiplyScalar(this.gravityForce);
+  static getGravity (gravityDirection: THREE.Vector3) {
+    return gravityDirection.multiplyScalar(this.gravityForce)
   }
 }
