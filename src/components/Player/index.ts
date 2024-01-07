@@ -86,13 +86,13 @@ export default class Player extends Instance {
         this.gravityDirection,
         this.gravity
       )
-    } else {
-      this.collisionController.handleCircularCollision({
-        from: this,
-        to: this.planet,
-        velocity: this.gravity
-      })
-      this.movementController.handleJump(this.gravityDirection, this.gravity)
+      return
     }
+    this.collisionController.handleCircularCollision({
+      from: this,
+      to: this.planet,
+      velocity: this.gravity
+    })
+    this.movementController.handleJump(this.gravityDirection, this.gravity)
   }
 }
