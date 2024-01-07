@@ -1,27 +1,27 @@
 export default class EventManager<T extends string = string> {
-  eventMap = {} as Record<T, Set<(...args: any[]) => void>>;
+  eventMap = {} as Record<T, Set<(...args: any[]) => void>>
 
-  on(event: T, callback: (...args: any[]) => void) {
-    if (!this.eventMap[event]) {
-      this.eventMap[event] = new Set();
+  on (event: T, callback: (...args: any[]) => void): void {
+    if (this.eventMap[event] === undefined) {
+      this.eventMap[event] = new Set()
     }
 
-    this.eventMap[event].add(callback);
+    this.eventMap[event].add(callback)
   }
 
-  off(event: T, callback: (...args: any[]) => void) {
-    if (!this.eventMap[event]) {
-      return;
+  off (event: T, callback: (...args: any[]) => void): void {
+    if (this.eventMap[event] === undefined) {
+      return
     }
 
-    this.eventMap[event].delete(callback);
+    this.eventMap[event].delete(callback)
   }
 
-  emit(event: T, ...args: any[]) {
-    if (!this.eventMap[event]) {
-      return;
+  emit (event: T, ...args: any[]): void {
+    if (this.eventMap[event] === undefined) {
+      return
     }
 
-    this.eventMap[event].forEach((cb: any) => cb(...args));
+    this.eventMap[event].forEach((cb: any) => cb(...args))
   }
 }

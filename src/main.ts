@@ -1,45 +1,39 @@
-import * as THREE from "three";
-import Player from "./components/Player";
-import { EventManager, KeyboardManager, MovementController, SceneManager } from "./systems";
-import Planet from "./components/planet";
+import * as THREE from 'three'
+import {
+  SceneManager
+} from './systems'
+import type IScene from './entities/IScene'
+import GameScene from './scenes/GameScene'
+import CameraController from './systems/CameraController'
 
 class Main {
-  private readonly sceneManager: SceneManager;
-  private readonly camera: THREE.PerspectiveCamera;
-  private readonly renderer: THREE.WebGLRenderer;
-  private readonly eventManager: EventManager;
-  private readonly keyboardManager: KeyboardManager;
+  private readonly sceneManager: SceneManager
+  private readonly cameraController: CameraController
+  private readonly renderer: THREE.WebGLRenderer
+  private readonly currentScene: IScene
 
-  constructor() {
-    this.sceneManager = new SceneManager();
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    this.camera.position.z = 10;
-    this.renderer = new THREE.WebGLRenderer();
-    this.eventManager = new EventManager();
-    this.keyboardManager = new KeyboardManager(this.eventManager);
+  constructor () {
+    this.sceneManager = new SceneManager()
+    this.cameraController = new CameraController()
+    this.renderer = new THREE.WebGLRenderer()
+    this.currentScene = new GameScene(this.sceneManager, this.cameraController)
   }
 
-  init() {
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(this.renderer.domElement);
-    const planet = new Planet();
-    this.sceneManager.add(planet);
-    const player = new Player();
-    this.sceneManager.add(player);
-    this.animate();
-    this.sceneManager.animate();
+  init (): void {
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    document.body.appendChild(this.renderer.domElement)
+    this.currentScene.init()
+    this.animate()
+    this.sceneManager.animate()
   }
 
-  animate() {
-    this.renderer.render(this.sceneManager.scene, this.camera);
-    window.requestAnimationFrame(this.animate.bind(this));
+  animate (): void {
+    this.renderer.render(this.sceneManager.scene, this.cameraController.camera)
+    window.requestAnimationFrame(this.animate.bind(this))
+    this.currentScene.update()
+    this.cameraController.update()
   }
 }
 
-const main = new Main();
-main.init();
+const main = new Main()
+main.init()

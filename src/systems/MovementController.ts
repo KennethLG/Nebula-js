@@ -1,55 +1,47 @@
-import * as THREE from "three";
-import { KeyboardManager } from ".";
-import Player from "src/components/Player";
+import { type EventManager, type KeyboardManager } from 'src/systems'
+import * as THREE from 'three'
 
 export default class MovementController {
-  private readonly moveSpeed = 0.005;
-  private readonly jumpForce = 0.1;
-  private readonly maxVelocity = 0.2;
+  private readonly moveLeftKey = 'a'
+  private readonly moveRightKey = 'd'
+  private readonly jumpKey = 'w'
+  private readonly jumpForce = 0.2
+  private readonly moveVel = 0.01
+  private readonly friction = 0.95
 
-  constructor(private readonly keyboardManager: KeyboardManager) {}
+  constructor (
+    private readonly keyboardManager: KeyboardManager,
+    private readonly eventManager: EventManager
+  ) {}
 
-  apply(object: Player): void {
-    const { velocity, gravity, onGround, xVel } = object;
-    const moveLeftKey = "a";
-    const moveRightKey = "d";
-    const jumpKey = "w";
+  handleXMovement (
+    quaternion: THREE.Quaternion,
+    xVelocity: THREE.Vector3
+  ): THREE.Vector3 {
+    const right = new THREE.Vector3(1, 0, 0)
+    right.applyQuaternion(quaternion)
 
-    const forward = new THREE.Vector3(0, 0, 1);
-    forward.applyQuaternion(object.mesh.quaternion);
-    const right = new THREE.Vector3()
-      .crossVectors(object.mesh.up, forward)
-      .normalize();
-
-    if (this.keyboardManager.keys[moveLeftKey]) {
-      const moveLeft = right.clone().multiplyScalar(-this.moveSpeed);
-      xVel.add(moveLeft);
-    } else if (this.keyboardManager.keys[moveRightKey]) {
-      const moveRight = right.clone().multiplyScalar(this.moveSpeed);
-      xVel.add(moveRight);
+    if (this.keyboardManager.keys[this.moveRightKey]) {
+      xVelocity.add(right.clone().normalize().multiplyScalar(this.moveVel))
+      this.eventManager.emit('movementKeydown', 'right')
+    } else if (this.keyboardManager.keys[this.moveLeftKey]) {
+      xVelocity.add(right.clone().normalize().multiplyScalar(-this.moveVel))
+      this.eventManager.emit('movementKeydown', 'left')
+    } else {
+      xVelocity.multiplyScalar(this.friction)
     }
 
-    if (onGround && this.keyboardManager.keys[jumpKey]) {
-      this.jump(gravity, velocity);
+    xVelocity.clampLength(0, 0.1)
+    if (xVelocity.length() < 0.01) {
+      xVelocity.set(0, 0, 0)
     }
+    return xVelocity
   }
 
-  private applyFriction(velocity: THREE.Vector3, friction: number) {
-    const threshold = 0.01;
-    velocity.multiplyScalar(friction);
-    if (velocity.lengthSq() < (threshold**2)) {
-      velocity.set(0, 0, 0);
-    }
-  };
-
-  private jump(gravity: THREE.Vector3, velocity: THREE.Vector3) {
-    const jumpDirection = gravity.clone().negate().normalize();
-    velocity.add(jumpDirection.multiplyScalar(this.jumpForce));
-  }
-
-  private clampVelocity(velocity: THREE.Vector3, maxVel: number) {
-    if (velocity.lengthSq() > maxVel ** 2) {
-      velocity.clampLength(0, maxVel);
+  handleJump (gravityDirection: THREE.Vector3, velocity: THREE.Vector3): void {
+    if (this.keyboardManager.keys[this.jumpKey]) {
+      const jumpDir = gravityDirection.negate().normalize()
+      velocity.copy(jumpDir.multiplyScalar(this.jumpForce))
     }
   }
 }

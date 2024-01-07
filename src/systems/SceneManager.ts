@@ -1,27 +1,26 @@
-import Instance from "src/components/instance";
-import * as THREE from "three";
+import type Instance from 'src/components/instance'
+import * as THREE from 'three'
 
 export default class SceneManager {
-  static instances: Instance[] = [];
-  scene: THREE.Scene;
-  constructor() {
-    this.scene = new THREE.Scene();
+  instances: Instance[] = []
+  scene: THREE.Scene
+  constructor () {
+    this.scene = new THREE.Scene()
   }
 
-  add(instance: Instance) {
-    this.scene.add(instance.mesh);
-    SceneManager.instances.push(instance);
+  add (instance: Instance): void {
+    this.scene.add(instance.mesh)
+    this.instances.push(instance)
   }
 
-  private update() {
-    SceneManager.instances.forEach((instance) => {
-      instance.update && instance.update();
-    });
-
+  animate (): void {
+    this.update()
+    window.requestAnimationFrame(this.animate.bind(this))
   }
 
-  animate() {
-    this.update();
-    window.requestAnimationFrame(this.animate.bind(this));
+  private update (): void {
+    this.instances.forEach((instance) => {
+      instance.update?.()
+    })
   }
 }
