@@ -32,8 +32,11 @@ class Main {
     this.renderer = new THREE.WebGLRenderer()
     this.eventManager = new EventManager()
     this.keyboardManager = new KeyboardManager(this.eventManager)
-    this.movementController = new MovementController(this.keyboardManager)
-    this.orientationController = new OrientationController()
+    this.movementController = new MovementController(
+      this.keyboardManager,
+      this.eventManager
+    )
+    this.orientationController = new OrientationController(this.eventManager)
     this.collisionController = new CollisionController()
   }
 

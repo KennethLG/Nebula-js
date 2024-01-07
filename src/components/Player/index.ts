@@ -41,7 +41,7 @@ export default class Player extends Instance {
     )
     this.onGround = this.collisionController.areColliding(this, this.planet)
 
-    this.orientationController.apply({
+    this.orientationController.alignWithGravity({
       gravityDirection: this.gravityDirection,
       mesh: this.mesh
     })
@@ -60,6 +60,7 @@ export default class Player extends Instance {
     }
     this.movementController.handleXMovement(this.mesh.quaternion, this.xVel)
     this.applyForces()
+    this.updateFacing()
   }
 
   private getGravityDirection (from: THREE.Vector3, to: THREE.Vector3): THREE.Vector3 {
@@ -69,5 +70,10 @@ export default class Player extends Instance {
   private applyForces (): void {
     this.mesh.position.add(this.gravity)
     this.mesh.position.add(this.xVel)
+  }
+
+  private updateFacing (): void {
+    const orientation = this.orientationController.getXOrientation()
+    this.mesh.scale.x = orientation
   }
 }

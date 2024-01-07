@@ -1,4 +1,4 @@
-import { type KeyboardManager } from 'src/systems'
+import { type EventManager, type KeyboardManager } from 'src/systems'
 import * as THREE from 'three'
 
 export default class MovementController {
@@ -9,7 +9,10 @@ export default class MovementController {
   private readonly moveVel = 0.01
   private readonly friction = 0.95
 
-  constructor (private readonly keyboardManager: KeyboardManager) {}
+  constructor (
+    private readonly keyboardManager: KeyboardManager,
+    private readonly eventManager: EventManager
+  ) {}
 
   handleXMovement (
     quaternion: THREE.Quaternion,
@@ -20,8 +23,10 @@ export default class MovementController {
 
     if (this.keyboardManager.keys[this.moveRightKey]) {
       xVelocity.add(right.clone().normalize().multiplyScalar(this.moveVel))
+      this.eventManager.emit('movementKeydown', 'right')
     } else if (this.keyboardManager.keys[this.moveLeftKey]) {
       xVelocity.add(right.clone().normalize().multiplyScalar(-this.moveVel))
+      this.eventManager.emit('movementKeydown', 'left')
     } else {
       xVelocity.multiplyScalar(this.friction)
     }
