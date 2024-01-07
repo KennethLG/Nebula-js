@@ -41,7 +41,6 @@ export default class MovementController {
   handleJump (gravityDirection: THREE.Vector3, velocity: THREE.Vector3): void {
     if (this.keyboardManager.keys[this.jumpKey]) {
       const jumpDir = gravityDirection.negate().normalize()
-      // velocity = jumpDir.multiplyScalar(this.jumpForce)
       velocity.copy(jumpDir.multiplyScalar(this.jumpForce))
     }
   }

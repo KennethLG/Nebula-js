@@ -1,3 +1,4 @@
+import config from '@/config'
 import type IInstance from 'src/entities/Instance'
 import * as THREE from 'three'
 
@@ -17,20 +18,21 @@ export default class Instance implements IInstance {
   geometry: THREE.CircleGeometry
   mesh: THREE.Mesh
 
-  constructor (config: InstanceConfig) {
-    this.name = config.name
-    this.texture = new THREE.TextureLoader().load(config.texturePath ?? '')
+  constructor (instanceConfig: InstanceConfig) {
+    this.name = instanceConfig.name
+    const texturePath = instanceConfig.texturePath ?? ''
+    this.texture = new THREE.TextureLoader().load(`${config.assetsPath}${texturePath}`)
     this.texture.magFilter = THREE.NearestFilter
     this.texture.minFilter = THREE.NearestFilter
 
-    this.material = config.material ?? new THREE.MeshBasicMaterial({
+    this.material = instanceConfig.material ?? new THREE.MeshBasicMaterial({
       map: this.texture,
       transparent: true
     })
-    this.geometry = config.geometry ?? new THREE.CircleGeometry(1)
-    this.mesh = config.mesh ?? new THREE.Mesh(this.geometry, this.material)
+    this.geometry = instanceConfig.geometry ?? new THREE.CircleGeometry(1)
+    this.mesh = instanceConfig.mesh ?? new THREE.Mesh(this.geometry, this.material)
     this.geometry.translate(0, 0, 0)
-    this.mesh.position.set(config.position.x, config.position.y, config.position.z)
+    this.mesh.position.set(instanceConfig.position.x, instanceConfig.position.y, instanceConfig.position.z)
   }
 
   update (): void {

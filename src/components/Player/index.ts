@@ -25,7 +25,7 @@ export default class Player extends Instance {
   ) {
     super({
       name: 'Player',
-      texturePath: '../../assets/player.png',
+      texturePath: 'player.png',
       position: new THREE.Vector3(5, 2, 0),
       geometry: new THREE.CircleGeometry(0.5)
     })

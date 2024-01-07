@@ -3,13 +3,13 @@ import { resolve } from 'path'
 
 export default defineConfig({
   build: {
-    outDir: 'dist',
-    rollupOptions: {
-      input: 'src/main.ts',
-      output: {
-        entryFileNames: 'bundle.js'
-      }
-    }
+    outDir: 'dist'
+    // rollupOptions: {
+    //   input: 'src/main.ts',
+    //   output: {
+    //     entryFileNames: 'bundle.js'
+    //   }
+    // }
   },
   resolve: {
     alias: {
