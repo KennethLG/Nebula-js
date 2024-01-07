@@ -56,7 +56,7 @@ export default class Player extends Instance {
         to: this.planet,
         velocity: this.gravity
       })
-      this.movementController.handleJump(this.gravityDirection)
+      this.movementController.handleJump(this.gravityDirection, this.gravity)
     }
     this.movementController.handleXMovement(this.mesh.quaternion, this.xVel)
     this.applyForces()

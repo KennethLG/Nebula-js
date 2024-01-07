@@ -5,7 +5,7 @@ export default class MovementController {
   private readonly moveLeftKey = 'a'
   private readonly moveRightKey = 'd'
   private readonly jumpKey = 'w'
-  private readonly jumpForce = 0.1
+  private readonly jumpForce = 0.2
   private readonly moveVel = 0.01
   private readonly friction = 0.95
 
@@ -38,12 +38,11 @@ export default class MovementController {
     return xVelocity
   }
 
-  handleJump (gravityDirection: THREE.Vector3): THREE.Vector3 {
-    let velocity = new THREE.Vector3()
+  handleJump (gravityDirection: THREE.Vector3, velocity: THREE.Vector3): void {
     if (this.keyboardManager.keys[this.jumpKey]) {
       const jumpDir = gravityDirection.negate().normalize()
-      velocity = jumpDir.multiplyScalar(this.jumpForce)
+      // velocity = jumpDir.multiplyScalar(this.jumpForce)
+      velocity.copy(jumpDir.multiplyScalar(this.jumpForce))
     }
-    return velocity
   }
 }
