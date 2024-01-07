@@ -25,7 +25,7 @@ export default class CollisionController {
     velocity.set(0, 0, 0);
   }
 
-  areColliding(from, to) {
+  areColliding(from: Instance, to: Instance) {
     const distance = from.mesh.position.distanceTo(to.mesh.position);
     const radiusFrom = from.geometry.parameters.radius;
     const radiusTo = to.geometry.parameters.radius;
