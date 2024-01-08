@@ -35,10 +35,8 @@ export default class CameraController {
   }
 
   private followTo (): void {
-    const desiredPositionX = this.follow.x
     const desiredPositionY = this.follow.y
 
-    this.camera.position.x += (desiredPositionX - this.camera.position.x) * this.smoothness
     this.camera.position.y += (desiredPositionY - this.camera.position.y) * this.smoothness
   }
 }

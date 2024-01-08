@@ -4,8 +4,9 @@ import Planet from '@/components/planet'
 
 export default class LevelGenerator {
   private lastChunkY: number = 0
-  private readonly chunkSize: number = 3
+  private readonly chunkSize: number = 4
   private readonly triggerThreshold: number = 3
+  private readonly xDistanceBetweenPlanets = 3
 
   constructor (
     private readonly camera: THREE.OrthographicCamera,
@@ -26,13 +27,18 @@ export default class LevelGenerator {
   private generateNewChunk (): void {
     const startY = this.lastChunkY + this.chunkSize
     const endY = startY + this.chunkSize
-    this.addPlanetAt(endY)
+    const xPos = this.genXPos()
+    this.addPlanetAt(xPos, endY)
   }
 
-  private addPlanetAt (y: number): void {
-    const planetPos = new THREE.Vector3(0, y, 0)
+  private addPlanetAt (x: number, y: number): void {
+    const planetPos = new THREE.Vector3(x, y, 0)
     const newPlanet = new Planet(planetPos)
     this.sceneManager.add(newPlanet)
-    // console.log(this.sceneManager.instances)
+  }
+
+  private genXPos (): number {
+    const xRange = this.xDistanceBetweenPlanets * Math.random()
+    return Math.random() < 0.5 ? -xRange : xRange
   }
 }
