@@ -22,6 +22,7 @@ module.exports = {
   },
   rules: {
     '@typescript-eslint/consistent-type-assertions': 'off',
-    'n/no-callback-literal': 'off'
+    'n/no-callback-literal': 'off',
+    '@typescript-eslint/no-unsafe-argument': 'off'
   }
 }

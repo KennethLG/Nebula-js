@@ -31,13 +31,12 @@ export default class GameScene extends IScene {
     )
     this.orientationController = new OrientationController(this.eventManager)
     this.collisionController = new CollisionController()
-    this.levelGenerator = new LevelGenerator(cameraController.camera)
+    this.levelGenerator = new LevelGenerator(cameraController.camera, this.sceneManager)
     this.cameraController = cameraController
   }
 
   init (): void {
-    this.sceneManager.add(new Planet(new THREE.Vector3(-1, 0, 0)))
-    this.sceneManager.add(new Planet(new THREE.Vector3(3, 0, 0)))
+    this.sceneManager.add(new Planet(new THREE.Vector3(0, 1, 0)))
     this.sceneManager.add(new Player(
       this.movementController,
       this.orientationController,
