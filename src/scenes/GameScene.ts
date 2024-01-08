@@ -10,7 +10,6 @@ import {
 } from '@/systems'
 import type CameraController from '@/systems/CameraController'
 import LevelGenerator from '@/systems/LevelGenerator'
-import * as THREE from 'three'
 
 export default class GameScene extends IScene {
   private readonly eventManager: EventManager
@@ -36,7 +35,7 @@ export default class GameScene extends IScene {
   }
 
   init (): void {
-    this.sceneManager.add(new Planet(new THREE.Vector3(0, 1, 0)))
+    this.sceneManager.add(new Planet(0, 1))
     this.sceneManager.add(new Player(
       this.movementController,
       this.orientationController,
