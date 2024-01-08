@@ -6,9 +6,10 @@ import IScene from '@/entities/IScene'
 import {
   EventManager,
   KeyboardManager,
-  MovementController,
-  type SceneManager
+  MovementController, type SceneManager
 } from '@/systems'
+import type CameraController from '@/systems/CameraController'
+import LevelGenerator from '@/systems/LevelGenerator'
 import * as THREE from 'three'
 
 export default class GameScene extends IScene {
@@ -17,8 +18,10 @@ export default class GameScene extends IScene {
   private readonly keyboardManager: KeyboardManager
   private readonly orientationController: OrientationController
   private readonly collisionController: CollisionController
+  private readonly levelGenerator: LevelGenerator
+  private readonly cameraController: CameraController
 
-  constructor (sceneManager: SceneManager) {
+  constructor (sceneManager: SceneManager, cameraController: CameraController) {
     super(sceneManager)
     this.eventManager = new EventManager()
     this.keyboardManager = new KeyboardManager(this.eventManager)
@@ -28,6 +31,8 @@ export default class GameScene extends IScene {
     )
     this.orientationController = new OrientationController(this.eventManager)
     this.collisionController = new CollisionController()
+    this.levelGenerator = new LevelGenerator(cameraController.camera)
+    this.cameraController = cameraController
   }
 
   init (): void {
@@ -42,6 +47,15 @@ export default class GameScene extends IScene {
   }
 
   update (): void {
-    //
+    this.levelGenerator.update()
+    this.updateCamera()
+  }
+
+  updateCamera (): void {
+    const desiredPlayer = this.sceneManager.instances.find(inst => inst.name === 'Player')
+    if (desiredPlayer == null) {
+      throw new Error('No player found')
+    }
+    this.cameraController.follow = desiredPlayer.mesh.position
   }
 }

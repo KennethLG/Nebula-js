@@ -4,24 +4,19 @@ import {
 } from './systems'
 import type IScene from './entities/IScene'
 import GameScene from './scenes/GameScene'
+import CameraController from './systems/CameraController'
 
 class Main {
   private readonly sceneManager: SceneManager
-  private readonly camera: THREE.PerspectiveCamera
+  private readonly cameraController: CameraController
   private readonly renderer: THREE.WebGLRenderer
   private readonly currentScene: IScene
 
   constructor () {
     this.sceneManager = new SceneManager()
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    )
-    this.camera.position.z = 10
+    this.cameraController = new CameraController()
     this.renderer = new THREE.WebGLRenderer()
-    this.currentScene = new GameScene(this.sceneManager)
+    this.currentScene = new GameScene(this.sceneManager, this.cameraController)
   }
 
   init (): void {
@@ -33,9 +28,10 @@ class Main {
   }
 
   animate (): void {
-    this.renderer.render(this.sceneManager.scene, this.camera)
+    this.renderer.render(this.sceneManager.scene, this.cameraController.camera)
     window.requestAnimationFrame(this.animate.bind(this))
     this.currentScene.update()
+    this.cameraController.update()
   }
 }
 
