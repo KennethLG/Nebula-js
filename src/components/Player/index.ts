@@ -62,8 +62,8 @@ export default class Player extends Instance {
     const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
 
     const nearestPlanet = planets.reduce((nearest, planet) => {
-      const nearestDistance = nearest.mesh.position.distanceTo(this.mesh.position)
-      const currentDistance = planet.mesh.position.distanceTo(this.mesh.position)
+      const nearestDistance = nearest.mesh.position.distanceTo(this.mesh.position) - nearest.boundingSphere.radius
+      const currentDistance = planet.mesh.position.distanceTo(this.mesh.position) - planet.boundingSphere.radius
       return currentDistance < nearestDistance ? planet : nearest
     }, planets[0])
 

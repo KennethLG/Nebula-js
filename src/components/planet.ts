@@ -14,6 +14,6 @@ export default class Planet extends Instance {
       geometry: new THREE.CircleGeometry(properties?.radius),
       material: new THREE.MeshBasicMaterial({ color: 0x00ff00 })
     })
-    this.boundingSphere = new THREE.Sphere(this.mesh.position, 1)
+    this.boundingSphere = new THREE.Sphere(this.mesh.position, properties?.radius)
   }
 }

@@ -40,7 +40,6 @@ export default class LevelGenerator {
       this.addPlanetAt(xPos, yCurrent, planetRadius)
     }
     this.lastChunkY = yCurrent
-    console.log('planets', this.sceneManager.instances)
   }
 
   private addPlanetAt (x: number, y: number, radius: number): void {
