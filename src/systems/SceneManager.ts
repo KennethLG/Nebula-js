@@ -1,4 +1,4 @@
-import type Instance from 'src/components/instance'
+import type Instance from '@/components/Instance'
 import * as THREE from 'three'
 
 export default class SceneManager {
