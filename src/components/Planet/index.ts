@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import Instance from './instance'
+import Instance from '../Instance'
 
 interface PlanetProperties {
   radius?: number

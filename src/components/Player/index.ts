@@ -1,10 +1,10 @@
 import * as THREE from 'three'
-import Instance from '../instance'
+import Instance from '../Instance'
 import {
   type SceneManager,
   applyGravitationalPull
 } from '../../systems'
-import type Planet from '../planet'
+import type Planet from '../Planet'
 import type OrientationController from './OrientationController'
 import type CollisionController from './CollisionController'
 import type MovementController from '../../systems/MovementController'

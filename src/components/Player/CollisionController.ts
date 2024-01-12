@@ -1,5 +1,5 @@
 import type * as THREE from 'three'
-import type Instance from '../instance'
+import type Instance from '../Instance'
 
 interface Config {
   velocity: THREE.Vector3

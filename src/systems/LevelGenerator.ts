@@ -1,5 +1,5 @@
 import type SceneManager from './SceneManager'
-import Planet from '@/components/planet'
+import Planet from '@/components/Planet'
 
 export default class LevelGenerator {
   private lastChunkY: number = 0
