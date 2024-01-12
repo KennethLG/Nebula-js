@@ -1,16 +1,6 @@
 import config from '@/config'
-import type IInstance from 'src/entities/Instance'
+import type { IInstance, InstanceConfig } from 'src/entities/Instance'
 import * as THREE from 'three'
-
-interface InstanceConfig {
-  name: string
-  position: THREE.Vector3
-  texturePath?: string
-  mesh?: THREE.Mesh
-  geometry?: THREE.CircleGeometry
-  material?: THREE.MeshBasicMaterial
-}
-
 export default class Instance implements IInstance {
   name: string
   texture: THREE.Texture
