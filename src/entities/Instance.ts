@@ -1,12 +1,7 @@
-export interface InstanceConfig {
-  name: string
-  position: THREE.Vector3
-  texturePath?: string
-  mesh?: THREE.Mesh
-  geometry?: THREE.CircleGeometry
-  material?: THREE.MeshBasicMaterial
-}
+import type IBody from './IBody'
 
 export abstract class IInstance {
+  abstract name: string
+  abstract body: IBody
   abstract update (): void
 }

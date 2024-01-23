@@ -9,26 +9,26 @@ interface Config {
 
 export default class CollisionController {
   handleCircularCollision ({ from, to, velocity }: Config): void {
-    const directionToSurface = from.mesh.position
+    const directionToSurface = from.body.position
       .clone()
-      .sub(to.mesh.position)
+      .sub(to.body.position)
       .normalize()
     const correctDistance =
-      to.geometry.parameters.radius + from.geometry.parameters.radius
+      to.body.boundingSphere.radius + from.body.boundingSphere.radius
     const correctPosition = directionToSurface
       .multiplyScalar(correctDistance)
-      .add(to.mesh.position)
+      .add(to.body.position)
 
-    from.mesh.position.copy(correctPosition)
+    from.body.position.copy(correctPosition)
 
     // Reset the velocity
     velocity.set(0, 0, 0)
   }
 
   areColliding (from: Instance, to: Instance): boolean {
-    const distance = from.mesh.position.distanceTo(to.mesh.position)
-    const radiusFrom = from.geometry.parameters.radius
-    const radiusTo = to.geometry.parameters.radius
+    const distance = from.body.position.distanceTo(to.body.position)
+    const radiusFrom = from.body.boundingSphere.radius
+    const radiusTo = to.body.boundingSphere.radius
     const sumOfRadii = radiusFrom + radiusTo
     return distance <= sumOfRadii
   }

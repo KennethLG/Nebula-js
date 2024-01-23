@@ -26,17 +26,17 @@ export default class Player extends Instance {
   ) {
     super({
       name: 'Player',
-      texturePath: 'player.png',
       position: new THREE.Vector3(5, 2, 0),
-      geometry: new THREE.CircleGeometry(0.5)
+      radius: 0.5,
+      spriteName: 'player-run.png'
     })
   }
 
   update (): void {
     this.planet = this.getNearestPlanet()
     this.gravityDirection = this.getGravityDirection(
-      this.mesh.position,
-      this.planet.mesh.position
+      this.body.position,
+      this.planet.body.position
     )
     this.manageOrientation()
     this.manageGrounding()
@@ -49,21 +49,21 @@ export default class Player extends Instance {
   }
 
   private applyForces (): void {
-    this.mesh.position.add(this.gravity)
-    this.mesh.position.add(this.xVel)
+    this.body.position.add(this.gravity)
+    this.body.position.add(this.xVel)
   }
 
   private updateFacing (): void {
-    const orientation = this.orientationController.getXOrientation()
-    this.mesh.scale.x = orientation
+    // const orientation = this.orientationController.getXOrientation()
+    // this.body.sprite.scale.x = orientation
   }
 
   private getNearestPlanet (): Planet {
     const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
 
     const nearestPlanet = planets.reduce((nearest, planet) => {
-      const nearestDistance = nearest.mesh.position.distanceTo(this.mesh.position) - nearest.boundingSphere.radius
-      const currentDistance = planet.mesh.position.distanceTo(this.mesh.position) - planet.boundingSphere.radius
+      const nearestDistance = nearest.body.position.distanceTo(this.body.position) - nearest.boundingSphere.radius
+      const currentDistance = planet.body.position.distanceTo(this.body.position) - planet.boundingSphere.radius
       return currentDistance < nearestDistance ? planet : nearest
     }, planets[0])
 
@@ -71,11 +71,11 @@ export default class Player extends Instance {
   }
 
   private manageOrientation (): void {
-    this.orientationController.alignWithGravity({
-      gravityDirection: this.gravityDirection,
-      mesh: this.mesh
-    })
-    this.movementController.handleXMovement(this.mesh.quaternion, this.xVel)
+    // this.orientationController.alignWithGravity({
+    //   gravityDirection: this.gravityDirection,
+    //   mesh: this.mesh
+    // })
+    // this.movementController.handleXMovement(this.mesh.quaternion, this.xVel)
   }
 
   private manageGrounding (): void {

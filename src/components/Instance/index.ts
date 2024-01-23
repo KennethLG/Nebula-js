@@ -1,31 +1,33 @@
-import config from '@/config'
-import type { IInstance, InstanceConfig } from 'src/entities/Instance'
-import * as THREE from 'three'
+import type IBody from '@/entities/IBody'
+import type { IInstance } from '@/entities/Instance'
+import { Body } from '../Body'
+import { BoundingSphere } from '@/systems'
+import Sprite from '../Sprite'
+
+interface InstanceConfig {
+  name: string
+  position: THREE.Vector3
+  radius: number
+  spriteName: string
+}
 export default class Instance implements IInstance {
   name: string
-  texture: THREE.Texture
-  material: THREE.MeshBasicMaterial
-  geometry: THREE.CircleGeometry
-  mesh: THREE.Mesh
+  body: IBody
 
-  constructor (instanceConfig: InstanceConfig) {
-    this.name = instanceConfig.name
-    const texturePath = instanceConfig.texturePath ?? ''
-    this.texture = new THREE.TextureLoader().load(`${config.assetsPath}${texturePath}`)
-    this.texture.magFilter = THREE.NearestFilter
-    this.texture.minFilter = THREE.NearestFilter
-
-    this.material = instanceConfig.material ?? new THREE.MeshBasicMaterial({
-      map: this.texture,
-      transparent: true
+  constructor ({ name, position, radius, spriteName }: InstanceConfig) {
+    this.name = name
+    const boundingSphere = new BoundingSphere(radius)
+    const sprite = new Sprite({
+      name: spriteName
     })
-    this.geometry = instanceConfig.geometry ?? new THREE.CircleGeometry(1)
-    this.mesh = instanceConfig.mesh ?? new THREE.Mesh(this.geometry, this.material)
-    this.geometry.translate(0, 0, 0)
-    this.mesh.position.set(instanceConfig.position.x, instanceConfig.position.y, instanceConfig.position.z)
+    this.body = new Body({
+      position,
+      boundingSphere,
+      sprite
+    })
   }
 
   update (): void {
-    //
+    this.body.sprite.sprite.position.copy(this.body.position.clone())
   }
 }
