@@ -54,6 +54,6 @@ export default class GameScene extends IScene {
     if (desiredPlayer == null) {
       throw new Error('No player found')
     }
-    this.cameraController.follow = desiredPlayer.mesh.position
+    this.cameraController.follow = desiredPlayer.body.position
   }
 }
