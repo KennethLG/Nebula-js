@@ -10,32 +10,46 @@ export default class Sprite implements ISprite {
   sprite: THREE.Object3D<THREE.Object3DEventMap>
   map: THREE.Texture
   currentTile = 0
-  xTiles = 3 // Number of tiles in the x direction
-  yTiles = 1 // Number of tiles in the y direction
-  totalTiles: number // Total number of tiles
+  maxDisplayTime = 0
+  elapsedTime = 0
+  private runningTileArrayIndex = 0
+  private playSpriteIndices: number[] = []
+  private readonly xTiles = 3
+  private readonly yTiles = 1
 
   constructor ({ name }: SpriteConfig) {
-    this.map = new THREE.TextureLoader().load(name, (texture) => {
-      // Called when the image is loaded
-      texture.magFilter = THREE.NearestFilter
-      texture.repeat.set(1 / this.xTiles, 1 / this.yTiles)
-      this.updateTextureOffset(texture)
-    })
+    this.map = new THREE.TextureLoader().load(`${config.assetsPath}${name}`)
+
+    this.map.magFilter = THREE.NearestFilter
+    this.map.repeat.set(1 / this.xTiles, 1 / this.yTiles)
+    this.update(0)
 
     const material = new THREE.SpriteMaterial({ map: this.map })
     this.sprite = new THREE.Sprite(material)
-    this.totalTiles = (this.xTiles * this.yTiles) - 1
   }
 
-  private updateTextureOffset (map: THREE.Texture): void {
-    const offsetX = (this.currentTile % this.xTiles) / this.xTiles
-    const offsetY = (this.yTiles - Math.floor(this.currentTile / this.xTiles) - 1) / this.yTiles
-    map.offset.set(offsetX, offsetY)
-    map.needsUpdate = true
+  loop (playSpriteIndices: number[], totalDuration: number): void {
+    this.playSpriteIndices = playSpriteIndices
+    this.runningTileArrayIndex = 0
+    this.currentTile = playSpriteIndices[this.runningTileArrayIndex]
+    this.maxDisplayTime = totalDuration / this.playSpriteIndices.length
+
+    this.elapsedTime = this.maxDisplayTime
   }
 
-  update (): void {
-    this.currentTile = (this.currentTile + 1) % this.totalTiles
-    this.updateTextureOffset(this.map)
+  update (delta: number): void {
+    this.elapsedTime += delta
+    if (this.maxDisplayTime > 0 && this.elapsedTime >= this.maxDisplayTime) {
+      this.elapsedTime = 0
+      this.runningTileArrayIndex = (this.runningTileArrayIndex + 1) % this.playSpriteIndices.length
+      this.currentTile = this.playSpriteIndices[this.runningTileArrayIndex]
+
+      const offsetX = (this.currentTile % this.xTiles) / this.xTiles
+      const offsetY = (this.yTiles - Math.floor(this.currentTile / this.xTiles) - 1) / this.yTiles
+
+      this.map.offset.x = offsetX
+      this.map.offset.y = offsetY
+      this.map.needsUpdate = true
+    }
   }
 }

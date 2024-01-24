@@ -32,7 +32,13 @@ export default class Player extends Instance {
     })
   }
 
+  init (): void {
+    this.body.sprite.loop([0, 1, 2], 1.5)
+    console.log('x', this.body.sprite.elapsedTime, this.body.sprite.maxDisplayTime)
+  }
+
   update (): void {
+    this.body.update()
     this.planet = this.getNearestPlanet()
     this.gravityDirection = this.getGravityDirection(
       this.body.position,

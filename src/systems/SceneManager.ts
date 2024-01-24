@@ -11,6 +11,7 @@ export default class SceneManager {
   add (instance: Instance): void {
     this.scene.add(instance.body.sprite.sprite)
     this.instances.push(instance)
+    instance.init()
   }
 
   animate (): void {
