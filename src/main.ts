@@ -5,18 +5,21 @@ import {
 import type IScene from './entities/IScene'
 import GameScene from './scenes/GameScene'
 import CameraController from './systems/CameraController'
+import GameParams from './systems/GameParams'
 
 class Main {
   private readonly sceneManager: SceneManager
   private readonly cameraController: CameraController
   private readonly renderer: THREE.WebGLRenderer
   private readonly currentScene: IScene
+  private readonly gameParams: GameParams
 
   constructor () {
     this.sceneManager = new SceneManager()
     this.cameraController = new CameraController()
     this.renderer = new THREE.WebGLRenderer()
     this.currentScene = new GameScene(this.sceneManager, this.cameraController)
+    this.gameParams = new GameParams()
   }
 
   init (): void {
