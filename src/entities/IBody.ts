@@ -17,4 +17,9 @@ export default abstract class IBody {
     this.sprite = sprite
     this.boundingSphere = boundingSphere
   }
+
+  update (): void {
+    this.sprite.update()
+    this.sprite.sprite.position.copy(this.position.clone())
+  }
 }

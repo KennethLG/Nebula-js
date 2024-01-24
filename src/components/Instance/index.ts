@@ -28,6 +28,6 @@ export default class Instance implements IInstance {
   }
 
   update (): void {
-    this.body.sprite.sprite.position.copy(this.body.position.clone())
+    this.body.update()
   }
 }
