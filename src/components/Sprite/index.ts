@@ -12,6 +12,7 @@ export default class Sprite implements ISprite {
   currentTile = 0
   maxDisplayTime = 0
   elapsedTime = 0
+  flipped = false
   private runningTileArrayIndex = 0
   private playSpriteIndices: number[] = []
   private readonly xTiles = 3
