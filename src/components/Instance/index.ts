@@ -31,7 +31,12 @@ export default class Instance implements IInstance {
 
   }
 
-  update (): void {
+  baseUpdate (): void {
     this.body.update()
+    this.update()
+  }
+
+  update (): void {
+
   }
 }

@@ -37,7 +37,6 @@ export default class Player extends Instance {
   }
 
   update (): void {
-    this.body.update()
     this.planet = this.getNearestPlanet()
     this.gravityDirection = this.getGravityDirection(
       this.body.position,
@@ -59,8 +58,8 @@ export default class Player extends Instance {
   }
 
   private updateFacing (): void {
-    // const orientation = this.orientationController.getXOrientation()
-    // this.body.sprite.scale.x = orientation
+    const orientation = this.orientationController.getXOrientation()
+    this.body.sprite.sprite.scale.x = orientation
   }
 
   private getNearestPlanet (): Planet {
@@ -76,11 +75,11 @@ export default class Player extends Instance {
   }
 
   private manageOrientation (): void {
-    // this.orientationController.alignWithGravity({
-    //   gravityDirection: this.gravityDirection,
-    //   mesh: this.mesh
-    // })
-    // this.movementController.handleXMovement(this.mesh.quaternion, this.xVel)
+    this.orientationController.alignWithGravity({
+      gravityDirection: this.gravityDirection,
+      sprite: this.body.sprite.sprite
+    })
+    this.movementController.handleXMovement(this.body.sprite.sprite.quaternion, this.xVel)
   }
 
   private manageGrounding (): void {
