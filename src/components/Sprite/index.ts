@@ -29,6 +29,15 @@ export default class Sprite implements ISprite {
     this.sprite = new THREE.Sprite(material)
   }
 
+  flipHorizontally (): void {
+    this.flipped = !this.flipped
+    this.map.repeat.x = this.flipped ? -1 / this.xTiles : 1 / this.xTiles
+    this.map.offset.x = this.flipped
+      ? (1 / this.xTiles) + (this.currentTile % this.xTiles) / this.xTiles
+      : (this.currentTile % this.xTiles) / this.xTiles
+    this.map.needsUpdate = true
+  }
+
   loop (playSpriteIndices: number[], totalDuration: number): void {
     this.playSpriteIndices = playSpriteIndices
     this.runningTileArrayIndex = 0
@@ -45,12 +54,24 @@ export default class Sprite implements ISprite {
       this.runningTileArrayIndex = (this.runningTileArrayIndex + 1) % this.playSpriteIndices.length
       this.currentTile = this.playSpriteIndices[this.runningTileArrayIndex]
 
-      const offsetX = (this.currentTile % this.xTiles) / this.xTiles
-      const offsetY = (this.yTiles - Math.floor(this.currentTile / this.xTiles) - 1) / this.yTiles
+      const offsetX = this.getXOffset()
+      const offsetY = this.getYOffset()
 
       this.map.offset.x = offsetX
       this.map.offset.y = offsetY
       this.map.needsUpdate = true
     }
+  }
+
+  private getXOffset (): number {
+    let offsetX = (this.currentTile % this.xTiles) / this.xTiles
+    if (this.flipped) {
+      offsetX = (1 / this.xTiles) + offsetX
+    }
+    return offsetX
+  }
+
+  private getYOffset (): number {
+    return (this.yTiles - Math.floor(this.currentTile / this.xTiles) - 1) / this.yTiles
   }
 }
