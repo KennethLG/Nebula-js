@@ -6,6 +6,7 @@ export default interface ISprite {
   maxDisplayTime: number
   elapsedTime: number
   flipped: boolean
+  rotateFromQuaternion: (quaternion: THREE.Quaternion) => void
   flipHorizontally: () => void
   update: (deltaTime: number) => void
   loop: (playSpriteIndices: number[], totalDuration: number) => void

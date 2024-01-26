@@ -42,10 +42,10 @@ export default class Player extends Instance {
       this.body.position,
       this.planet.body.position
     )
+    this.movementController.handleXMovement(this.body.quaternion, this.xVel)
     this.manageOrientation()
     this.manageGrounding()
     this.applyForces()
-    this.updateFacing()
   }
 
   private getGravityDirection (from: THREE.Vector3, to: THREE.Vector3): THREE.Vector3 {
@@ -84,9 +84,10 @@ export default class Player extends Instance {
   private manageOrientation (): void {
     this.orientationController.alignWithGravity({
       gravityDirection: this.gravityDirection,
-      sprite: this.body.sprite.sprite
+      quaternion: this.body.quaternion
     })
-    this.movementController.handleXMovement(this.body.sprite.sprite.quaternion, this.xVel)
+    this.updateFacing()
+    this.body.sprite.rotateFromQuaternion(this.body.quaternion)
   }
 
   private manageGrounding (): void {

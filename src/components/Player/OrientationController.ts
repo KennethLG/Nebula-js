@@ -3,7 +3,7 @@ import * as THREE from 'three'
 
 interface Config {
   gravityDirection: THREE.Vector3
-  sprite: THREE.Object3D<THREE.Object3DEventMap>
+  quaternion: THREE.Quaternion
 }
 
 type XMovementDirections = 'left' | 'right'
@@ -14,17 +14,16 @@ export default class OrientationController {
     this.eventManager.on('movementKeydown', this.handleMovementKeydown.bind(this))
   }
 
-  alignWithGravity ({ gravityDirection, sprite }: Config): void {
+  alignWithGravity ({ gravityDirection, quaternion }: Config): void {
     const fallDirection = gravityDirection.clone().normalize()
     const desiredUp = fallDirection.negate()
     const currentUp = new THREE.Vector3(0, 1, 0)
-    currentUp.applyQuaternion(sprite.quaternion)
-    const quaternion = new THREE.Quaternion().setFromUnitVectors(
+    currentUp.applyQuaternion(quaternion)
+    const calculatedQuaternion = new THREE.Quaternion().setFromUnitVectors(
       currentUp,
       desiredUp
     )
-    // Apply the quaternion to the player's mesh to perform the rotation
-    sprite.applyQuaternion(quaternion)
+    quaternion.multiply(calculatedQuaternion) // Apply the calculated quaternion
   }
 
   private handleMovementKeydown (key: XMovementDirections): void {

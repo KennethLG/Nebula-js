@@ -17,6 +17,7 @@ export default class Sprite implements ISprite {
   private playSpriteIndices: number[] = []
   private readonly xTiles = 3
   private readonly yTiles = 1
+  private readonly euler = new THREE.Euler()
 
   constructor ({ name }: SpriteConfig) {
     this.map = new THREE.TextureLoader().load(`${config.assetsPath}${name}`)
@@ -27,6 +28,11 @@ export default class Sprite implements ISprite {
 
     const material = new THREE.SpriteMaterial({ map: this.map })
     this.sprite = new THREE.Sprite(material)
+  }
+
+  rotateFromQuaternion (quaternion: THREE.Quaternion): void {
+    this.euler.setFromQuaternion(quaternion, 'XYZ');
+    (this.sprite as THREE.Sprite).material.rotation = this.euler.z
   }
 
   flipHorizontally (): void {
