@@ -5,6 +5,8 @@ export default interface ISprite {
   currentTile: number
   maxDisplayTime: number
   elapsedTime: number
+  flipped: boolean
+  flipHorizontally: () => void
   update: (deltaTime: number) => void
   loop: (playSpriteIndices: number[], totalDuration: number) => void
 }

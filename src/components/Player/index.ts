@@ -59,7 +59,14 @@ export default class Player extends Instance {
 
   private updateFacing (): void {
     const orientation = this.orientationController.getXOrientation()
-    this.body.sprite.sprite.scale.x = orientation
+    if (orientation === -1 && !this.body.sprite.flipped) {
+      this.body.sprite.flipHorizontally()
+      return
+    }
+
+    if (orientation === 1 && this.body.sprite.flipped) {
+      this.body.sprite.flipHorizontally()
+    }
   }
 
   private getNearestPlanet (): Planet {
