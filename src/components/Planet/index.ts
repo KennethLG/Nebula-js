@@ -13,7 +13,9 @@ export default class Planet extends Instance {
       name: 'Planet',
       position: new THREE.Vector3(x, y, 0),
       radius: properties?.radius ?? 1,
-      spriteName: ''
+      spriteName: '',
+      xTiles: 1,
+      yTiles: 1
     })
     this.boundingSphere = new THREE.Sphere(this.body.position, properties?.radius)
     this.geometry = new THREE.CircleGeometry(properties?.radius)

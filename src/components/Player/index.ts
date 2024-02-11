@@ -28,12 +28,15 @@ export default class Player extends Instance {
       name: 'Player',
       position: new THREE.Vector3(5, 2, 0),
       radius: 0.5,
-      spriteName: 'player-run.png'
+      spriteName: 'player-run-2.png',
+      xTiles: 3,
+      yTiles: 2
     })
   }
 
   init (): void {
-    this.body.sprite.loop([0, 1, 2], 1.5)
+    this.body.sprite.loop([0], 1)
+    // this.body.sprite.loop([3, 4, 5], 0.5)
   }
 
   update (): void {
