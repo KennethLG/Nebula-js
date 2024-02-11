@@ -4,6 +4,8 @@ import config from '@/config'
 
 interface SpriteConfig {
   name: string
+  xTiles: number
+  yTiles: number
 }
 
 export default class Sprite implements ISprite {
@@ -15,11 +17,13 @@ export default class Sprite implements ISprite {
   flipped = false
   private runningTileArrayIndex = 0
   private playSpriteIndices: number[] = []
-  private readonly xTiles = 3
-  private readonly yTiles = 1
+  private readonly xTiles: number
+  private readonly yTiles: number
   private readonly euler = new THREE.Euler()
 
-  constructor ({ name }: SpriteConfig) {
+  constructor ({ name, xTiles, yTiles }: SpriteConfig) {
+    this.xTiles = xTiles
+    this.yTiles = yTiles
     this.map = new THREE.TextureLoader().load(`${config.assetsPath}${name}`)
 
     this.map.magFilter = THREE.NearestFilter

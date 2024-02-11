@@ -9,16 +9,20 @@ interface InstanceConfig {
   position: THREE.Vector3
   radius: number
   spriteName: string
+  xTiles: number
+  yTiles: number
 }
 export default class Instance implements IInstance {
   name: string
   body: IBody
 
-  constructor ({ name, position, radius, spriteName }: InstanceConfig) {
+  constructor ({ name, position, radius, spriteName, xTiles, yTiles }: InstanceConfig) {
     this.name = name
     const boundingSphere = new BoundingSphere(radius)
     const sprite = new Sprite({
-      name: spriteName
+      name: spriteName,
+      xTiles,
+      yTiles
     })
     this.body = new Body({
       position,

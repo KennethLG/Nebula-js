@@ -8,6 +8,7 @@ import type Planet from '../Planet'
 import type OrientationController from './OrientationController'
 import type CollisionController from './CollisionController'
 import type MovementController from '../../systems/MovementController'
+import AnimationController from './AnimationController'
 
 export default class Player extends Instance {
   onGround = false
@@ -17,6 +18,7 @@ export default class Player extends Instance {
   velocity = new THREE.Vector3(0, 0, 0)
   planet: Planet | undefined
   gravityDirection = new THREE.Vector3(0, 0, 0)
+  private readonly animationController: AnimationController<{ xVel: THREE.Vector3 }>
 
   constructor (
     private readonly movementController: MovementController,
@@ -28,12 +30,28 @@ export default class Player extends Instance {
       name: 'Player',
       position: new THREE.Vector3(5, 2, 0),
       radius: 0.5,
-      spriteName: 'player-run.png'
+      spriteName: 'player-run-2.png',
+      xTiles: 3,
+      yTiles: 2
     })
+    this.animationController = new AnimationController(this.body.sprite, [
+      {
+        name: 'idle',
+        sequence: [0],
+        speed: 1,
+        condition: (context) => context.xVel.lengthSq() === 0
+      },
+      {
+        name: 'running',
+        sequence: [3, 4, 5],
+        speed: 0.5,
+        condition: (context) => context.xVel.lengthSq() !== 0
+      }
+    ], 'idle')
   }
 
   init (): void {
-    this.body.sprite.loop([0, 1, 2], 1.5)
+
   }
 
   update (): void {
@@ -46,6 +64,11 @@ export default class Player extends Instance {
     this.manageOrientation()
     this.manageGrounding()
     this.applyForces()
+
+    // animation
+    this.animationController.update({
+      xVel: this.xVel
+    })
   }
 
   private getGravityDirection (from: THREE.Vector3, to: THREE.Vector3): THREE.Vector3 {
