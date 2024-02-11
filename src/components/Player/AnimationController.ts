@@ -1,40 +1,35 @@
 import type ISprite from '@/entities/ISprite'
-import type * as THREE from 'three'
 
-interface Animation {
+interface Animation<T = any> {
   name: string
   sequence: number[]
   speed: number
+  condition?: (context: T) => boolean
 }
 
-export default class AnimationController {
-  animations: Animation[]
-  currentAnimation: Animation
+export default class AnimationController<T> {
+  private readonly animations: Array<Animation<T>>
+  private currentAnimation: Animation<T>
 
-  constructor (private readonly sprite: ISprite) {
-    this.animations = [{
-      name: 'idle',
-      sequence: [0],
-      speed: 1
-    }, {
-      name: 'running',
-      sequence: [3, 4, 5],
-      speed: 0.5
-    }]
+  constructor (
+    private readonly sprite: ISprite,
+    animations: Array<Animation<T>>,
+    initialAnimationName: string
+  ) {
+    this.animations = animations
 
-    this.currentAnimation = this.animations[0]
+    const initialAnimation = this.animations.find(animation => animation.name === initialAnimationName) ?? this.animations[0]
+    this.currentAnimation = initialAnimation
     this.sprite.loop(this.currentAnimation.sequence, this.currentAnimation.speed)
   }
 
-  update (xVel: THREE.Vector3): void {
-    if (xVel.lengthSq() === 0 && this.currentAnimation.name !== 'idle') {
-      this.currentAnimation = this.animations[0]
-      this.sprite.loop(this.currentAnimation.sequence, this.currentAnimation.speed)
-    }
-
-    if (xVel.lengthSq() !== 0 && this.currentAnimation.name !== 'running') {
-      this.currentAnimation = this.animations[1]
-      this.sprite.loop(this.currentAnimation.sequence, this.currentAnimation.speed)
+  update (context: T): void {
+    for (const animation of this.animations) {
+      if (animation.condition != null && animation.condition(context) && this.currentAnimation.name !== animation.name) {
+        this.currentAnimation = animation
+        this.sprite.loop(this.currentAnimation.sequence, this.currentAnimation.speed)
+        break
+      }
     }
   }
 }
