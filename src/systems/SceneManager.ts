@@ -1,15 +1,17 @@
 import type Instance from '@/components/Instance'
 import * as THREE from 'three'
+import type GameParams from './GameParams'
 
 export default class SceneManager {
   instances: Instance[] = []
   scene: THREE.Scene
-  constructor () {
+
+  constructor (readonly gameParams: GameParams) {
     this.scene = new THREE.Scene()
   }
 
   add (instance: Instance): void {
-    this.scene.add(instance.body.sprite.sprite)
+    this.scene.add(instance.body.mesh)
     this.instances.push(instance)
     instance.init()
   }
