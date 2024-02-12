@@ -17,8 +17,8 @@ export default class Sprite implements ISprite {
   flipped = false
   private runningTileArrayIndex = 0
   private playSpriteIndices: number[] = []
-  private readonly xTiles
-  private readonly yTiles
+  private readonly xTiles: number
+  private readonly yTiles: number
   private readonly euler = new THREE.Euler()
 
   constructor ({ name, xTiles, yTiles }: SpriteConfig) {
