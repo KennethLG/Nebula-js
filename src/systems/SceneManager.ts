@@ -16,6 +16,15 @@ export default class SceneManager {
     instance.init()
   }
 
+  destroy (id: number): void {
+    const instanceIndex = this.instances.findIndex(instance => instance.id === id)
+
+    if (instanceIndex !== -1) {
+      this.scene.remove(this.instances[instanceIndex].body.mesh)
+      this.instances.splice(instanceIndex, 1)
+    }
+  }
+
   animate (): void {
     this.update()
     window.requestAnimationFrame(this.animate.bind(this))

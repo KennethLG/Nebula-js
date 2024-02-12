@@ -12,6 +12,7 @@ interface InstanceConfig {
 export default class Instance implements IInstance {
   name: string
   body: IBody
+  id: number
 
   constructor ({ name, position, radius, mesh }: InstanceConfig) {
     this.name = name
@@ -21,6 +22,7 @@ export default class Instance implements IInstance {
       boundingSphere,
       mesh
     })
+    this.id = Date.now()
   }
 
   init (): void {

@@ -13,7 +13,7 @@ export default class CameraController {
 
   constructor () {
     const aspectRatio = window.innerWidth / window.innerHeight
-    const cameraHeight = 10 // Adjust as needed
+    const cameraHeight = 10
     const cameraWidth = cameraHeight * aspectRatio
 
     this.camera = new THREE.OrthographicCamera(
@@ -37,6 +37,8 @@ export default class CameraController {
   private followTo (): void {
     const desiredPositionY = this.follow.y
 
-    this.camera.position.y += (desiredPositionY - this.camera.position.y) * this.smoothness
+    if (desiredPositionY > this.camera.position.y) {
+      this.camera.position.y += (desiredPositionY - this.camera.position.y) * this.smoothness
+    }
   }
 }

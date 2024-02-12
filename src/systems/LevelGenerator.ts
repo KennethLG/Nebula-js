@@ -18,6 +18,18 @@ export default class LevelGenerator {
 
   update (): void {
     this.checkForChunkGeneration()
+    this.removeOuterPlanets()
+  }
+
+  private removeOuterPlanets (): void {
+    const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet')
+    if (planets.length === 0) return
+
+    const outerPlanets = planets.filter(
+      planet => planet.body.position.y < (this.camera.position.y + this.camera.bottom)
+    )
+
+    outerPlanets.forEach((planet) => { this.sceneManager.destroy(planet.id) })
   }
 
   private checkForChunkGeneration (): void {
