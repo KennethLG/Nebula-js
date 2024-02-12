@@ -15,11 +15,11 @@ class Main {
   private readonly gameParams: GameParams
 
   constructor () {
-    this.sceneManager = new SceneManager()
+    this.gameParams = new GameParams()
+    this.sceneManager = new SceneManager(this.gameParams)
     this.cameraController = new CameraController()
     this.renderer = new THREE.WebGLRenderer()
     this.currentScene = new GameScene(this.sceneManager, this.cameraController)
-    this.gameParams = new GameParams()
   }
 
   init (): void {

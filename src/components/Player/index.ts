@@ -9,6 +9,8 @@ import type OrientationController from './OrientationController'
 import type CollisionController from './CollisionController'
 import type MovementController from '../../systems/MovementController'
 import AnimationController from './AnimationController'
+import type ISprite from '@/entities/ISprite'
+import Sprite from '../Sprite'
 
 export default class Player extends Instance {
   onGround = false
@@ -18,6 +20,7 @@ export default class Player extends Instance {
   velocity = new THREE.Vector3(0, 0, 0)
   planet: Planet | undefined
   gravityDirection = new THREE.Vector3(0, 0, 0)
+  private readonly sprite: ISprite
   private readonly animationController: AnimationController<{ xVel: THREE.Vector3 }>
 
   constructor (
@@ -26,15 +29,22 @@ export default class Player extends Instance {
     private readonly collisionController: CollisionController,
     private readonly sceneManager: SceneManager
   ) {
+    const sprite = new Sprite({
+      name: 'player-run-2.png',
+      xTiles: 3,
+      yTiles: 2
+    })
+
     super({
       name: 'Player',
       position: new THREE.Vector3(5, 2, 0),
       radius: 0.5,
-      spriteName: 'player-run-2.png',
-      xTiles: 3,
-      yTiles: 2
+      mesh: sprite.sprite
     })
-    this.animationController = new AnimationController(this.body.sprite, [
+
+    this.sprite = sprite
+
+    this.animationController = new AnimationController(this.sprite, [
       {
         name: 'idle',
         sequence: [0],
@@ -69,6 +79,7 @@ export default class Player extends Instance {
     this.animationController.update({
       xVel: this.xVel
     })
+    this.sprite.update(this.sceneManager.gameParams.clock.getDelta())
   }
 
   private getGravityDirection (from: THREE.Vector3, to: THREE.Vector3): THREE.Vector3 {
@@ -82,13 +93,13 @@ export default class Player extends Instance {
 
   private updateFacing (): void {
     const orientation = this.orientationController.getXOrientation()
-    if (orientation === -1 && !this.body.sprite.flipped) {
-      this.body.sprite.flipHorizontally()
+    if (orientation === -1 && !this.sprite.flipped) {
+      this.sprite.flipHorizontally()
       return
     }
 
-    if (orientation === 1 && this.body.sprite.flipped) {
-      this.body.sprite.flipHorizontally()
+    if (orientation === 1 && this.sprite.flipped) {
+      this.sprite.flipHorizontally()
     }
   }
 
@@ -110,7 +121,7 @@ export default class Player extends Instance {
       quaternion: this.body.quaternion
     })
     this.updateFacing()
-    this.body.sprite.rotateFromQuaternion(this.body.quaternion)
+    this.sprite.rotateFromQuaternion(this.body.quaternion)
   }
 
   private manageGrounding (): void {

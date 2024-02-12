@@ -1,7 +1,6 @@
 import Player from '@/components/Player'
 import CollisionController from '@/components/Player/CollisionController'
 import OrientationController from '@/components/Player/OrientationController'
-import Planet from '@/components/Planet'
 import IScene from '@/entities/IScene'
 import {
   EventManager,
@@ -35,7 +34,6 @@ export default class GameScene extends IScene {
   }
 
   init (): void {
-    this.sceneManager.add(new Planet(0, 1))
     this.sceneManager.add(new Player(
       this.movementController,
       this.orientationController,
