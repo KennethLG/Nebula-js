@@ -6,6 +6,7 @@ import type IScene from './entities/IScene'
 import GameScene from './scenes/GameScene'
 import CameraController from './systems/CameraController'
 import GameParams from './systems/GameParams'
+import GUI from './systems/GUI'
 
 class Main {
   private readonly sceneManager: SceneManager
@@ -27,6 +28,12 @@ class Main {
     document.body.appendChild(this.renderer.domElement)
 
     this.renderer.domElement.style.margin = 'auto'
+
+    const gui = new GUI(this.renderer)
+    window.addEventListener('resize', () => {
+      this.renderer.setSize(window.innerWidth, window.innerHeight)
+      gui.adjustToRenderer(this.renderer)
+    })
 
     this.currentScene.init()
     this.animate()

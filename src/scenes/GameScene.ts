@@ -44,13 +44,15 @@ export default class GameScene extends IScene {
     )
     this.sceneManager.add(player)
     this.player = player
+    // this.gui = new GUI()
   }
 
   update (): void {
     this.levelGenerator.update()
     this.updateCamera()
-    this.checkGameEnd()
+
     if (this.player != null) {
+      this.checkGameEnd(this.player)
       this.teleportPlayer(this.player)
     }
   }
@@ -63,8 +65,11 @@ export default class GameScene extends IScene {
     this.cameraController.follow = desiredPlayer.body.position
   }
 
-  private checkGameEnd (): void {
-
+  private checkGameEnd (player: Player): void {
+    const { position: { y: cameraY }, bottom } = this.cameraController.camera
+    if (player.body.position.y < (cameraY - bottom)) {
+      this.gameParams.end()
+    }
   }
 
   private teleportPlayer (player: Player): void {
