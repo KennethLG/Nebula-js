@@ -11,7 +11,7 @@ export default class CameraController {
   size: CameraSize
   smoothness = 0.1
 
-  constructor (screenWidth: number, screenHeight: number, roomWidth: number, roomHeight: number) {
+  constructor () {
     const cameraWorldHeight = 10 // Capture 5 units vertically
     const aspectRatio = 4 / 6 // Derived from the desired 300x500 pixels size
 
