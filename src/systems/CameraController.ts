@@ -11,16 +11,18 @@ export default class CameraController {
   size: CameraSize
   smoothness = 0.1
 
-  constructor () {
-    const aspectRatio = window.innerWidth / window.innerHeight
-    const cameraHeight = 10
-    const cameraWidth = cameraHeight * aspectRatio
+  constructor (screenWidth: number, screenHeight: number, roomWidth: number, roomHeight: number) {
+    const cameraWorldHeight = 10 // Capture 5 units vertically
+    const aspectRatio = 4 / 6 // Derived from the desired 300x500 pixels size
+
+    // Calculate camera dimensions to cover the desired world area
+    const cameraWorldWidth = cameraWorldHeight * aspectRatio
 
     this.camera = new THREE.OrthographicCamera(
-      cameraWidth / -2,
-      cameraWidth / 2,
-      cameraHeight / 2,
-      cameraHeight / -2,
+      cameraWorldWidth / -2,
+      cameraWorldWidth / 2,
+      cameraWorldHeight / 2,
+      cameraWorldHeight / -2,
       0.1,
       1000
     )
@@ -28,7 +30,7 @@ export default class CameraController {
     this.camera.position.z = 10
 
     this.follow = new THREE.Vector3(0, 0, 0) // The point to follow
-    this.size = { width: cameraWidth, height: cameraHeight }
+    this.size = { width: cameraWorldWidth, height: cameraWorldHeight }
   }
 
   update (): void {

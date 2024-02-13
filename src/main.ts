@@ -17,14 +17,17 @@ class Main {
   constructor () {
     this.gameParams = new GameParams()
     this.sceneManager = new SceneManager(this.gameParams)
-    this.cameraController = new CameraController()
+    this.cameraController = new CameraController(this.gameParams.screenWidth, this.gameParams.screenHeight, this.gameParams.roomWidth, this.gameParams.roomHeight)
     this.renderer = new THREE.WebGLRenderer()
-    this.currentScene = new GameScene(this.sceneManager, this.cameraController)
+    this.currentScene = new GameScene(this.sceneManager, this.cameraController, this.gameParams)
   }
 
   init (): void {
-    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    this.renderer.setSize(this.gameParams.roomWidth, this.gameParams.roomHeight)
     document.body.appendChild(this.renderer.domElement)
+
+    this.renderer.domElement.style.margin = 'auto'
+
     this.currentScene.init()
     this.animate()
     this.sceneManager.animate()
