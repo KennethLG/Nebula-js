@@ -1,6 +1,7 @@
 import Player from '@/components/Player'
 import CollisionController from '@/components/Player/CollisionController'
 import OrientationController from '@/components/Player/OrientationController'
+import Ufo from '@/components/UFO'
 import IScene from '@/entities/IScene'
 import {
   type EventManager,
@@ -46,7 +47,9 @@ export default class GameScene extends IScene {
       this.sceneManager,
       this.eventManager
     )
+    const ufo = new Ufo()
     this.sceneManager.add(player)
+    this.sceneManager.add(ufo)
     this.player = player
     // this.gui = new GUI()
   }

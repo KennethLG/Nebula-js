@@ -22,7 +22,6 @@ export default class Player extends Instance {
   gravity = new THREE.Vector3(0, 0, 0)
   xVel = new THREE.Vector3(0, 0, 0)
   yVel = new THREE.Vector3(0, 0, 0)
-  velocity = new THREE.Vector3(0, 0, 0)
   planet: Planet | undefined
   gravityDirection = new THREE.Vector3(0, 0, 0)
   dead = false
