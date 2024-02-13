@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import type EventManager from './EventManager'
 
 export default class GameParams {
   readonly clock: THREE.Clock
@@ -8,11 +9,12 @@ export default class GameParams {
   readonly screenWidth = window.innerWidth
   readonly screenHeight = window.innerHeight
 
-  constructor () {
+  constructor (private readonly eventManager: EventManager) {
     this.clock = new THREE.Clock()
   }
 
   end (): void {
     this.gameOver = true
+    this.eventManager.emit('gameOver')
   }
 }

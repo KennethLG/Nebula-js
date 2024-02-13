@@ -3,7 +3,7 @@ import CollisionController from '@/components/Player/CollisionController'
 import OrientationController from '@/components/Player/OrientationController'
 import IScene from '@/entities/IScene'
 import {
-  EventManager,
+  type EventManager,
   KeyboardManager,
   MovementController, type SceneManager
 } from '@/systems'
@@ -12,7 +12,6 @@ import type GameParams from '@/systems/GameParams'
 import LevelGenerator from '@/systems/LevelGenerator'
 
 export default class GameScene extends IScene {
-  private readonly eventManager: EventManager
   private readonly movementController: MovementController
   private readonly keyboardManager: KeyboardManager
   private readonly orientationController: OrientationController
@@ -21,9 +20,13 @@ export default class GameScene extends IScene {
   private readonly cameraController: CameraController
   private player?: Player
 
-  constructor (sceneManager: SceneManager, cameraController: CameraController, private readonly gameParams: GameParams) {
+  constructor (
+    sceneManager: SceneManager,
+    cameraController: CameraController,
+    private readonly gameParams: GameParams,
+    private readonly eventManager: EventManager
+  ) {
     super(sceneManager)
-    this.eventManager = new EventManager()
     this.keyboardManager = new KeyboardManager(this.eventManager)
     this.movementController = new MovementController(
       this.keyboardManager,
@@ -40,7 +43,8 @@ export default class GameScene extends IScene {
       this.movementController,
       this.orientationController,
       this.collisionController,
-      this.sceneManager
+      this.sceneManager,
+      this.eventManager
     )
     this.sceneManager.add(player)
     this.player = player
@@ -67,7 +71,7 @@ export default class GameScene extends IScene {
 
   private checkGameEnd (player: Player): void {
     const { position: { y: cameraY }, bottom } = this.cameraController.camera
-    if (player.body.position.y < (cameraY - bottom)) {
+    if (player.body.position.y < (cameraY + bottom)) {
       this.gameParams.end()
     }
   }

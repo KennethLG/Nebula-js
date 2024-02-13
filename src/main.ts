@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import {
+  EventManager,
   SceneManager
 } from './systems'
 import type IScene from './entities/IScene'
@@ -14,13 +15,15 @@ class Main {
   private readonly renderer: THREE.WebGLRenderer
   private readonly currentScene: IScene
   private readonly gameParams: GameParams
+  private readonly eventManager: EventManager
 
   constructor () {
-    this.gameParams = new GameParams()
+    this.eventManager = new EventManager()
+    this.gameParams = new GameParams(this.eventManager)
     this.sceneManager = new SceneManager(this.gameParams)
     this.cameraController = new CameraController()
     this.renderer = new THREE.WebGLRenderer()
-    this.currentScene = new GameScene(this.sceneManager, this.cameraController, this.gameParams)
+    this.currentScene = new GameScene(this.sceneManager, this.cameraController, this.gameParams, this.eventManager)
   }
 
   init (): void {
