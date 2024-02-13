@@ -22,11 +22,13 @@ export default class LevelGenerator {
   }
 
   private removeOuterPlanets (): void {
-    const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet')
+    const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
     if (planets.length === 0) return
 
+    const cameraBottom = this.camera.position.y - (this.camera.top - this.camera.bottom) / 2
+
     const outerPlanets = planets.filter(
-      planet => planet.body.position.y < (this.camera.position.y + this.camera.bottom)
+      planet => planet.body.position.y + planet.boundingSphere.radius < cameraBottom
     )
 
     outerPlanets.forEach((planet) => { this.sceneManager.destroy(planet.id) })

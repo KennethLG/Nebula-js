@@ -24,6 +24,7 @@ export default class CameraController {
       0.1,
       1000
     )
+
     this.camera.position.z = 10
 
     this.follow = new THREE.Vector3(0, 0, 0) // The point to follow
