@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import Instance from '../Instance'
 import {
   type SceneManager,
-  applyGravitationalPull
+  applyGravitationalPull,
+  type EventManager
 } from '../../systems'
 import type Planet from '../Planet'
 import type OrientationController from './OrientationController'
@@ -11,26 +12,32 @@ import type MovementController from '../../systems/MovementController'
 import AnimationController from './AnimationController'
 import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
+import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
 
+interface AnimationContext {
+  xVel: THREE.Vector3
+  dead: boolean
+}
 export default class Player extends Instance {
   onGround = false
   gravity = new THREE.Vector3(0, 0, 0)
   xVel = new THREE.Vector3(0, 0, 0)
   yVel = new THREE.Vector3(0, 0, 0)
-  velocity = new THREE.Vector3(0, 0, 0)
   planet: Planet | undefined
   gravityDirection = new THREE.Vector3(0, 0, 0)
+  dead = false
   private readonly sprite: ISprite
-  private readonly animationController: AnimationController<{ xVel: THREE.Vector3 }>
+  private readonly animationController: AnimationController<AnimationContext>
 
   constructor (
     private readonly movementController: MovementController,
     private readonly orientationController: OrientationController,
     private readonly collisionController: CollisionController,
-    private readonly sceneManager: SceneManager
+    private readonly sceneManager: SceneManager,
+    private readonly eventManager: EventManager
   ) {
     const sprite = new Sprite({
-      name: 'player-run-2.png',
+      name: 'player.png',
       xTiles: 3,
       yTiles: 2
     })
@@ -49,15 +56,25 @@ export default class Player extends Instance {
         name: 'idle',
         sequence: [0],
         speed: 1,
-        condition: (context) => context.xVel.lengthSq() === 0
+        condition: (context) => context.xVel.lengthSq() === 0 && !context.dead
       },
       {
         name: 'running',
         sequence: [3, 4, 5],
         speed: 0.5,
-        condition: (context) => context.xVel.lengthSq() !== 0
+        condition: (context) => context.xVel.lengthSq() !== 0 && !context.dead
+      },
+      {
+        name: 'dead',
+        sequence: [1],
+        speed: 1,
+        condition: (context) => context.dead
       }
     ], 'idle')
+
+    this.eventManager.on('gameOver', () => {
+      this.dead = true
+    })
   }
 
   init (): void {
@@ -65,21 +82,27 @@ export default class Player extends Instance {
   }
 
   update (): void {
-    this.planet = this.getNearestPlanet()
+    this.planet = getNearestPlanet(this.sceneManager, this.body.position)
     this.gravityDirection = this.getGravityDirection(
       this.body.position,
       this.planet.body.position
     )
-    this.movementController.handleXMovement(this.body.quaternion, this.xVel)
+    this.moveX()
     this.manageOrientation()
     this.manageGrounding()
     this.applyForces()
 
     // animation
     this.animationController.update({
-      xVel: this.xVel
+      xVel: this.xVel,
+      dead: this.dead
     })
     this.sprite.update(this.sceneManager.gameParams.clock.getDelta())
+  }
+
+  private moveX (): void {
+    if (this.dead) return
+    this.movementController.handleXMovement(this.body.quaternion, this.xVel)
   }
 
   private getGravityDirection (from: THREE.Vector3, to: THREE.Vector3): THREE.Vector3 {
@@ -101,18 +124,6 @@ export default class Player extends Instance {
     if (orientation === 1 && this.sprite.flipped) {
       this.sprite.flipHorizontally()
     }
-  }
-
-  private getNearestPlanet (): Planet {
-    const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
-
-    const nearestPlanet = planets.reduce((nearest, planet) => {
-      const nearestDistance = nearest.body.position.distanceTo(this.body.position) - nearest.boundingSphere.radius
-      const currentDistance = planet.body.position.distanceTo(this.body.position) - planet.boundingSphere.radius
-      return currentDistance < nearestDistance ? planet : nearest
-    }, planets[0])
-
-    return nearestPlanet
   }
 
   private manageOrientation (): void {
@@ -140,6 +151,7 @@ export default class Player extends Instance {
       to: this.planet,
       velocity: this.gravity
     })
+    if (this.dead) return
     this.movementController.handleJump(this.gravityDirection, this.gravity)
   }
 }
