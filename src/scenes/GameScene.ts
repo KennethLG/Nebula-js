@@ -47,7 +47,7 @@ export default class GameScene extends IScene {
       this.sceneManager,
       this.eventManager
     )
-    const ufo = new Ufo()
+    const ufo = new Ufo(player)
     this.sceneManager.add(player)
     this.sceneManager.add(ufo)
     this.player = player
