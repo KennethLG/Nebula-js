@@ -13,9 +13,10 @@ class Main {
   private readonly sceneManager: SceneManager
   private readonly cameraController: CameraController
   private readonly renderer: THREE.WebGLRenderer
-  private readonly currentScene: IScene
+  private currentScene?: IScene
   private readonly gameParams: GameParams
   private readonly eventManager: EventManager
+  private gui?: GUI
 
   constructor () {
     this.eventManager = new EventManager()
@@ -23,7 +24,6 @@ class Main {
     this.sceneManager = new SceneManager(this.gameParams)
     this.cameraController = new CameraController()
     this.renderer = new THREE.WebGLRenderer()
-    this.currentScene = new GameScene(this.sceneManager, this.cameraController, this.gameParams, this.eventManager)
   }
 
   init (): void {
@@ -32,11 +32,20 @@ class Main {
 
     this.renderer.domElement.style.margin = 'auto'
 
-    const gui = new GUI(this.renderer)
+    this.gui = new GUI(this.renderer)
+
     window.addEventListener('resize', () => {
       this.renderer.setSize(window.innerWidth, window.innerHeight)
-      gui.adjustToRenderer(this.renderer)
+      this.gui?.adjustToRenderer(this.renderer)
     })
+
+    this.currentScene = new GameScene(
+      this.sceneManager,
+      this.cameraController,
+      this.gameParams,
+      this.eventManager,
+      this.gui
+    )
 
     this.currentScene.init()
     this.animate()
@@ -46,7 +55,7 @@ class Main {
   animate (): void {
     this.renderer.render(this.sceneManager.scene, this.cameraController.camera)
     window.requestAnimationFrame(this.animate.bind(this))
-    this.currentScene.update()
+    this.currentScene?.update()
     this.cameraController.update()
   }
 }

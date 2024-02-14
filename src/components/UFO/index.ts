@@ -23,7 +23,7 @@ export default class Ufo extends Instance {
     })
 
     super({
-      name: 'ufo',
+      name: 'Ufo',
       position: new THREE.Vector3(0, 0, 0),
       radius: 0.5,
       mesh: sprite.sprite
@@ -33,7 +33,7 @@ export default class Ufo extends Instance {
   }
 
   update (): void {
-    this.positionTo.y = this.target.body.position.y
+    this.positionTo.y = this.target.body.position.y - 2
 
     this.body.position.lerp(this.positionTo, 0.01)
   }
@@ -47,11 +47,13 @@ export default class Ufo extends Instance {
 
     const planet = getNearestPlanet(this.sceneManager, position)
 
+    const direction = planet.body.position.clone().sub(position).normalize()
+
     const bullet = new Bullet({
       position,
-      direction: planet.body.position.clone(),
-      speed: 0.01
-    })
+      direction,
+      speed: 0.1
+    }, this.sceneManager)
 
     this.sceneManager.add(bullet)
   }

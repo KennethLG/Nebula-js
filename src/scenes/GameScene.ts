@@ -1,3 +1,4 @@
+import type Bullet from '@/components/Bullet'
 import Player from '@/components/Player'
 import CollisionController from '@/components/Player/CollisionController'
 import OrientationController from '@/components/Player/OrientationController'
@@ -9,6 +10,7 @@ import {
   MovementController, type SceneManager
 } from '@/systems'
 import type CameraController from '@/systems/CameraController'
+import type GUI from '@/systems/GUI'
 import type GameParams from '@/systems/GameParams'
 import LevelGenerator from '@/systems/LevelGenerator'
 
@@ -20,12 +22,14 @@ export default class GameScene extends IScene {
   private readonly levelGenerator: LevelGenerator
   private readonly cameraController: CameraController
   private player?: Player
+  private readonly gameOverScreen: HTMLElement
 
   constructor (
     sceneManager: SceneManager,
     cameraController: CameraController,
     private readonly gameParams: GameParams,
-    private readonly eventManager: EventManager
+    private readonly eventManager: EventManager,
+    private readonly gui: GUI
   ) {
     super(sceneManager)
     this.keyboardManager = new KeyboardManager(this.eventManager)
@@ -37,6 +41,12 @@ export default class GameScene extends IScene {
     this.collisionController = new CollisionController()
     this.levelGenerator = new LevelGenerator(cameraController.camera, this.sceneManager)
     this.cameraController = cameraController
+
+    this.gameOverScreen = this.createGameOverScreen()
+    this.changeGameOverScreenVisibility('hidden')
+    this.eventManager.on('gameOver', () => {
+      this.changeGameOverScreenVisibility('visible')
+    })
   }
 
   init (): void {
@@ -45,18 +55,19 @@ export default class GameScene extends IScene {
       this.orientationController,
       this.collisionController,
       this.sceneManager,
-      this.eventManager
+      this.eventManager,
+      this.gameParams
     )
     const ufo = new Ufo(player, this.sceneManager)
     this.sceneManager.add(player)
     this.sceneManager.add(ufo)
     this.player = player
-    // this.gui = new GUI()
   }
 
   update (): void {
     this.levelGenerator.update()
     this.updateCamera()
+    this.removeOuterBullets()
 
     if (this.player != null) {
       this.checkGameEnd(this.player)
@@ -87,5 +98,32 @@ export default class GameScene extends IScene {
     if (player.body.position.x < (cameraX + left)) {
       player.body.position.setX(cameraX + right)
     }
+  }
+
+  private removeOuterBullets (): void {
+    const bullets = this.sceneManager.instances.filter(inst => inst.name === 'Bullet') as Bullet[]
+
+    if (bullets.length === 0) return
+
+    const { position: { y: cameraY }, top } = this.cameraController.camera
+
+    bullets.forEach((bullet) => {
+      if (bullet.body.position.y > (cameraY + top)) {
+        this.sceneManager.destroy(bullet.id)
+      }
+    })
+  }
+
+  private changeGameOverScreenVisibility (visibility: 'visible' | 'hidden'): void {
+    this.gameOverScreen.style.visibility = visibility
+  }
+
+  private createGameOverScreen (): HTMLElement {
+    return this.gui.createText('GAME OVER<br><br>Press any key to restart', {
+      left: '50%',
+      top: '50%',
+      textAlign: 'center',
+      transform: 'translate(-50%, -50%)'
+    })
   }
 }
