@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import Instance from '../Instance'
+import { type SceneManager } from '@/systems'
+import type Planet from '../Planet'
 
 interface BulletConfig {
   position: THREE.Vector3
@@ -10,7 +12,7 @@ interface BulletConfig {
 export default class Bullet extends Instance {
   private readonly direction: THREE.Vector3
   private readonly speed: number
-  constructor ({ position, direction, speed }: BulletConfig) {
+  constructor ({ position, direction, speed }: BulletConfig, private readonly sceneManager: SceneManager) {
     const geometry = new THREE.CircleGeometry(0.1)
     const material = new THREE.MeshBasicMaterial({ color: 'white' })
     const mesh = new THREE.Mesh(geometry, material)
@@ -27,5 +29,23 @@ export default class Bullet extends Instance {
   update (): void {
     const bulletForce = this.direction.clone().multiplyScalar(this.speed)
     this.body.position.add(bulletForce)
+
+    const collidingPlanet = this.getCollidingPlanet()
+    if (collidingPlanet != null) {
+      this.sceneManager.destroy(collidingPlanet.id)
+      this.sceneManager.destroy(this.id)
+    }
+  }
+
+  private getCollidingPlanet (): Planet | undefined {
+    const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
+
+    if (planets.length === 0) return
+
+    const collidingPlanet = planets.find(planet => {
+      return this.body.position.distanceTo(planet.body.position) < planet.boundingSphere.radius
+    })
+
+    return collidingPlanet
   }
 }
