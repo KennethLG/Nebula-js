@@ -15,7 +15,7 @@ export default class Bullet extends Instance {
     const material = new THREE.MeshBasicMaterial({ color: 'white' })
     const mesh = new THREE.Mesh(geometry, material)
     super({
-      name: 'bullet',
+      name: 'Bullet',
       mesh,
       position,
       radius: 0.2

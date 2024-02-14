@@ -1,3 +1,4 @@
+import type Bullet from '@/components/Bullet'
 import Player from '@/components/Player'
 import CollisionController from '@/components/Player/CollisionController'
 import OrientationController from '@/components/Player/OrientationController'
@@ -51,12 +52,12 @@ export default class GameScene extends IScene {
     this.sceneManager.add(player)
     this.sceneManager.add(ufo)
     this.player = player
-    // this.gui = new GUI()
   }
 
   update (): void {
     this.levelGenerator.update()
     this.updateCamera()
+    this.removeOuterBullets()
 
     if (this.player != null) {
       this.checkGameEnd(this.player)
@@ -87,5 +88,19 @@ export default class GameScene extends IScene {
     if (player.body.position.x < (cameraX + left)) {
       player.body.position.setX(cameraX + right)
     }
+  }
+
+  private removeOuterBullets (): void {
+    const bullets = this.sceneManager.instances.filter(inst => inst.name === 'Bullet') as Bullet[]
+
+    if (bullets.length === 0) return
+
+    const { position: { y: cameraY }, top } = this.cameraController.camera
+
+    bullets.forEach((bullet) => {
+      if (bullet.body.position.y > (cameraY + top)) {
+        this.sceneManager.destroy(bullet.id)
+      }
+    })
   }
 }
