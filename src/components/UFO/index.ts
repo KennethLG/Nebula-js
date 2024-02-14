@@ -3,13 +3,19 @@ import Instance from '../Instance'
 import Sprite from '../Sprite'
 import { randomRange } from '@/systems/util/random'
 import { type IInstance } from '@/entities/Instance'
+import { type SceneManager } from '@/systems'
+import Bullet from '../Bullet'
+import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
 
 export default class Ufo extends Instance {
   xVel = new THREE.Vector3(0, 0, 0)
   yVel = new THREE.Vector3(0, 0, 0)
   positionTo = new THREE.Vector3(0, 0, 0)
 
-  constructor (private readonly target: IInstance) {
+  constructor (
+    private readonly target: IInstance,
+    private readonly sceneManager: SceneManager
+  ) {
     const sprite = new Sprite({
       name: 'ufo.png',
       xTiles: 1,
@@ -23,6 +29,7 @@ export default class Ufo extends Instance {
       mesh: sprite.sprite
     })
     setInterval(() => { this.changeXPosition() }, 4000)
+    setInterval(() => { this.shoot() }, 5000)
   }
 
   update (): void {
@@ -33,5 +40,19 @@ export default class Ufo extends Instance {
 
   private changeXPosition (): void {
     this.positionTo.x = randomRange(-4, 4)
+  }
+
+  private shoot (): void {
+    const position = this.body.position.clone()
+
+    const planet = getNearestPlanet(this.sceneManager, position)
+
+    const bullet = new Bullet({
+      position,
+      direction: planet.body.position.clone(),
+      speed: 0.01
+    })
+
+    this.sceneManager.add(bullet)
   }
 }

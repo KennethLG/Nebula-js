@@ -12,6 +12,7 @@ import type MovementController from '../../systems/MovementController'
 import AnimationController from './AnimationController'
 import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
+import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
 
 interface AnimationContext {
   xVel: THREE.Vector3
@@ -81,7 +82,7 @@ export default class Player extends Instance {
   }
 
   update (): void {
-    this.planet = this.getNearestPlanet()
+    this.planet = getNearestPlanet(this.sceneManager, this.body.position)
     this.gravityDirection = this.getGravityDirection(
       this.body.position,
       this.planet.body.position
@@ -123,18 +124,6 @@ export default class Player extends Instance {
     if (orientation === 1 && this.sprite.flipped) {
       this.sprite.flipHorizontally()
     }
-  }
-
-  private getNearestPlanet (): Planet {
-    const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
-
-    const nearestPlanet = planets.reduce((nearest, planet) => {
-      const nearestDistance = nearest.body.position.distanceTo(this.body.position) - nearest.boundingSphere.radius
-      const currentDistance = planet.body.position.distanceTo(this.body.position) - planet.boundingSphere.radius
-      return currentDistance < nearestDistance ? planet : nearest
-    }, planets[0])
-
-    return nearestPlanet
   }
 
   private manageOrientation (): void {
