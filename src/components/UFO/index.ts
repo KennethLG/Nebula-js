@@ -6,15 +6,19 @@ import { type IInstance } from '@/entities/Instance'
 import { type SceneManager } from '@/systems'
 import Bullet from '../Bullet'
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
+import type GameParams from '@/systems/GameParams'
 
 export default class Ufo extends Instance {
   xVel = new THREE.Vector3(0, 0, 0)
   yVel = new THREE.Vector3(0, 0, 0)
   positionTo = new THREE.Vector3(0, 0, 0)
+  private readonly changePositionInterval: number
+  private readonly shootInterval: number
 
   constructor (
     private readonly target: IInstance,
-    private readonly sceneManager: SceneManager
+    private readonly sceneManager: SceneManager,
+    private readonly gameParams: GameParams
   ) {
     const sprite = new Sprite({
       name: 'ufo.png',
@@ -28,8 +32,8 @@ export default class Ufo extends Instance {
       radius: 0.5,
       mesh: sprite.sprite
     })
-    setInterval(() => { this.changeXPosition() }, 4000)
-    setInterval(() => { this.shoot() }, 5000)
+    this.changePositionInterval = setInterval(() => { this.changeXPosition() }, 4000)
+    this.shootInterval = setInterval(() => { this.shoot() }, 5000)
   }
 
   update (): void {
@@ -43,9 +47,12 @@ export default class Ufo extends Instance {
   }
 
   private shoot (): void {
+    if (this.gameParams.gameOver) return
     const position = this.body.position.clone()
 
     const planet = getNearestPlanet(this.sceneManager, position)
+
+    if (planet == null) return
 
     const direction = planet.body.position.clone().sub(position).normalize()
 
@@ -56,5 +63,10 @@ export default class Ufo extends Instance {
     }, this.sceneManager)
 
     this.sceneManager.add(bullet)
+  }
+
+  onDestroy (): void {
+    clearInterval(this.changePositionInterval)
+    clearInterval(this.shootInterval)
   }
 }

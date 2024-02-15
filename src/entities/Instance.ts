@@ -6,4 +6,5 @@ export abstract class IInstance {
   abstract baseUpdate (): void
   abstract update (): void
   abstract init (): void
+  abstract onDestroy (): void
 }

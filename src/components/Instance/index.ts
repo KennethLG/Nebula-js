@@ -38,4 +38,8 @@ export default class Instance implements IInstance {
   update (): void {
 
   }
+
+  onDestroy (): void {
+
+  }
 }

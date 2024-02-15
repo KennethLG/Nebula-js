@@ -19,7 +19,7 @@ export default class GameScene extends IScene {
   private readonly keyboardManager: KeyboardManager
   private readonly orientationController: OrientationController
   private readonly collisionController: CollisionController
-  private readonly levelGenerator: LevelGenerator
+  private levelGenerator: LevelGenerator
   private readonly cameraController: CameraController
   private player?: Player
   private readonly gameOverScreen: HTMLElement
@@ -47,9 +47,15 @@ export default class GameScene extends IScene {
     this.eventManager.on('gameOver', () => {
       this.changeGameOverScreenVisibility('visible')
     })
+    this.eventManager.on('keyup', () => {
+      if (this.gameParams.gameOver) {
+        this.gameRestart()
+      }
+    })
   }
 
   init (): void {
+    this.levelGenerator = new LevelGenerator(this.cameraController.camera, this.sceneManager)
     const player = new Player(
       this.movementController,
       this.orientationController,
@@ -58,10 +64,11 @@ export default class GameScene extends IScene {
       this.eventManager,
       this.gameParams
     )
-    const ufo = new Ufo(player, this.sceneManager)
+    const ufo = new Ufo(player, this.sceneManager, this.gameParams)
     this.sceneManager.add(player)
     this.sceneManager.add(ufo)
     this.player = player
+    this.cameraController.camera.position.setY(0)
   }
 
   update (): void {
@@ -125,5 +132,13 @@ export default class GameScene extends IScene {
       textAlign: 'center',
       transform: 'translate(-50%, -50%)'
     })
+  }
+
+  private gameRestart (): void {
+    this.changeGameOverScreenVisibility('hidden')
+
+    this.sceneManager.destroyAll()
+    this.gameParams.gameOver = false
+    this.init()
   }
 }
