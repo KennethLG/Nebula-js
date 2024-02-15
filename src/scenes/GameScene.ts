@@ -48,7 +48,7 @@ export default class GameScene extends IScene {
       this.changeGameOverScreenVisibility('visible')
     })
     this.eventManager.on('keyup', () => {
-      if (this.gameParams.gameOver) {
+      if (this.gameParams.gameOver && this.gameParams.canRestart) {
         this.gameRestart()
       }
     })
@@ -139,6 +139,7 @@ export default class GameScene extends IScene {
 
     this.sceneManager.destroyAll()
     this.gameParams.gameOver = false
+    this.gameParams.canRestart = false
     this.init()
   }
 }

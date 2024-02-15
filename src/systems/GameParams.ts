@@ -4,6 +4,7 @@ import type EventManager from './EventManager'
 export default class GameParams {
   readonly clock: THREE.Clock
   gameOver = false
+  canRestart = false
   readonly roomWidth = 400
   readonly roomHeight = 600
   readonly screenWidth = window.innerWidth
@@ -16,5 +17,8 @@ export default class GameParams {
   end (): void {
     this.gameOver = true
     this.eventManager.emit('gameOver')
+    setTimeout(() => {
+      this.canRestart = true
+    }, 1000)
   }
 }
