@@ -31,7 +31,7 @@ export default class GUI {
   createText (text: string, style: Style): HTMLElement {
     const textElement = document.createElement('div')
     this.styleElement(textElement, style)
-    textElement.textContent = text
+    textElement.innerHTML = text
     this.overlay.appendChild(textElement)
     return textElement
   }

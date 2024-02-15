@@ -41,12 +41,8 @@ export default class GameScene extends IScene {
     this.collisionController = new CollisionController()
     this.levelGenerator = new LevelGenerator(cameraController.camera, this.sceneManager)
     this.cameraController = cameraController
-    this.gameOverScreen = this.gui.createText('GAME OVER', {
-      left: '50%',
-      top: '50%',
-      textAlign: 'center',
-      transform: 'translate(-50%, -50%)'
-    })
+
+    this.gameOverScreen = this.createGameOverScreen()
     this.changeGameOverScreenVisibility('hidden')
     this.eventManager.on('gameOver', () => {
       this.changeGameOverScreenVisibility('visible')
@@ -120,5 +116,14 @@ export default class GameScene extends IScene {
 
   private changeGameOverScreenVisibility (visibility: 'visible' | 'hidden'): void {
     this.gameOverScreen.style.visibility = visibility
+  }
+
+  private createGameOverScreen (): HTMLElement {
+    return this.gui.createText('GAME OVER<br><br>Press any key to restart', {
+      left: '50%',
+      top: '50%',
+      textAlign: 'center',
+      transform: 'translate(-50%, -50%)'
+    })
   }
 }
