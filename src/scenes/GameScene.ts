@@ -19,10 +19,12 @@ export default class GameScene extends IScene {
   private readonly keyboardManager: KeyboardManager
   private readonly orientationController: OrientationController
   private readonly collisionController: CollisionController
-  private readonly levelGenerator: LevelGenerator
+  private levelGenerator: LevelGenerator
   private readonly cameraController: CameraController
   private player?: Player
+  private ufo?: Ufo
   private readonly gameOverScreen: HTMLElement
+  private planetsScore: number[] = []
 
   constructor (
     sceneManager: SceneManager,
@@ -32,6 +34,7 @@ export default class GameScene extends IScene {
     private readonly gui: GUI
   ) {
     super(sceneManager)
+
     this.keyboardManager = new KeyboardManager(this.eventManager)
     this.movementController = new MovementController(
       this.keyboardManager,
@@ -47,9 +50,15 @@ export default class GameScene extends IScene {
     this.eventManager.on('gameOver', () => {
       this.changeGameOverScreenVisibility('visible')
     })
+    this.eventManager.on('keyup', () => {
+      if (this.gameParams.gameOver && this.gameParams.canRestart) {
+        this.gameRestart()
+      }
+    })
   }
 
   init (): void {
+    this.levelGenerator = new LevelGenerator(this.cameraController.camera, this.sceneManager)
     const player = new Player(
       this.movementController,
       this.orientationController,
@@ -58,10 +67,10 @@ export default class GameScene extends IScene {
       this.eventManager,
       this.gameParams
     )
-    const ufo = new Ufo(player, this.sceneManager)
     this.sceneManager.add(player)
-    this.sceneManager.add(ufo)
     this.player = player
+    this.cameraController.camera.position.setY(0)
+    this.planetsScore = []
   }
 
   update (): void {
@@ -73,6 +82,8 @@ export default class GameScene extends IScene {
       this.checkGameEnd(this.player)
       this.teleportPlayer(this.player)
     }
+    this.updateScore()
+    this.createUfo()
   }
 
   private updateCamera (): void {
@@ -125,5 +136,35 @@ export default class GameScene extends IScene {
       textAlign: 'center',
       transform: 'translate(-50%, -50%)'
     })
+  }
+
+  private gameRestart (): void {
+    this.changeGameOverScreenVisibility('hidden')
+
+    this.sceneManager.destroyAll()
+    this.gameParams.gameOver = false
+    this.gameParams.canRestart = false
+    this.gameParams.restartScores()
+    this.init()
+  }
+
+  private updateScore (): void {
+    const lastPlanet = this.player?.planet
+    if (lastPlanet == null) return
+
+    if (!this.planetsScore.includes(lastPlanet.id)) {
+      this.planetsScore.push(lastPlanet.id)
+      this.gameParams.scores.planets++
+    }
+  }
+
+  private createUfo (): void {
+    const player = this.player
+    if (player == null || this.ufo != null) return
+
+    if (this.gameParams.scores.planets === 5) {
+      this.ufo = new Ufo(player, this.sceneManager, this.gameParams)
+      this.sceneManager.add(this.ufo)
+    }
   }
 }

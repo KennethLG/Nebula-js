@@ -2,8 +2,10 @@ import type * as THREE from 'three'
 import type Planet from '@/components/Planet'
 import type SceneManager from '../SceneManager'
 
-export const getNearestPlanet = (sceneManager: SceneManager, from: THREE.Vector3): Planet => {
+export const getNearestPlanet = (sceneManager: SceneManager, from: THREE.Vector3): Planet | undefined => {
   const planets = sceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
+
+  if (planets.length === 0) return
 
   const nearestPlanet = planets.reduce((nearest, planet) => {
     const nearestDistance = nearest.body.position.distanceTo(from) - nearest.boundingSphere.radius

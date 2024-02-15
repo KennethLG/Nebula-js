@@ -18,11 +18,27 @@ export default class SceneManager {
 
   destroy (id: number): void {
     const instanceIndex = this.instances.findIndex(instance => instance.id === id)
-
     if (instanceIndex !== -1) {
-      this.scene.remove(this.instances[instanceIndex].body.mesh)
+      const instance = this.instances[instanceIndex]
+      instance.onDestroy()
+      this.scene.remove(instance.body.mesh)
       this.instances.splice(instanceIndex, 1)
     }
+  }
+
+  destroyAll (): void {
+    this.instances.forEach((instance) => {
+      instance.onDestroy()
+    })
+
+    this.instances.forEach((instance) => {
+      this.scene.remove(instance.body.mesh)
+    })
+
+    this.scene.clear()
+
+    // Reset the instances array
+    this.instances = []
   }
 
   animate (): void {

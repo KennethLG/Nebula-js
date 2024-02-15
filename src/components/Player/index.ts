@@ -86,6 +86,9 @@ export default class Player extends Instance {
 
   update (): void {
     this.planet = getNearestPlanet(this.sceneManager, this.body.position)
+
+    if (this.planet == null) return
+
     this.gravityDirection = this.getGravityDirection(
       this.body.position,
       this.planet.body.position
