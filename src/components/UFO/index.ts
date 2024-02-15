@@ -39,7 +39,7 @@ export default class Ufo extends Instance {
   update (): void {
     this.positionTo.y = this.target.body.position.y - 2
 
-    this.body.position.lerp(this.positionTo, 0.01)
+    this.body.position.lerp(this.positionTo, 0.02)
   }
 
   private changeXPosition (): void {
