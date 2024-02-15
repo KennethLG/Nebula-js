@@ -32,7 +32,7 @@ class Main {
 
     this.renderer.domElement.style.margin = 'auto'
 
-    this.gui = new GUI(this.renderer)
+    this.gui = new GUI(this.renderer, this.gameParams)
 
     window.addEventListener('resize', () => {
       this.renderer.setSize(window.innerWidth, window.innerHeight)
@@ -57,6 +57,7 @@ class Main {
     window.requestAnimationFrame(this.animate.bind(this))
     this.currentScene?.update()
     this.cameraController.update()
+    this.gui?.update()
   }
 }
 

@@ -23,6 +23,7 @@ export default class GameScene extends IScene {
   private readonly cameraController: CameraController
   private player?: Player
   private readonly gameOverScreen: HTMLElement
+  private planetsScore: number[] = []
 
   constructor (
     sceneManager: SceneManager,
@@ -69,6 +70,7 @@ export default class GameScene extends IScene {
     this.sceneManager.add(ufo)
     this.player = player
     this.cameraController.camera.position.setY(0)
+    this.planetsScore = []
   }
 
   update (): void {
@@ -80,6 +82,7 @@ export default class GameScene extends IScene {
       this.checkGameEnd(this.player)
       this.teleportPlayer(this.player)
     }
+    this.updateScore()
   }
 
   private updateCamera (): void {
@@ -140,6 +143,17 @@ export default class GameScene extends IScene {
     this.sceneManager.destroyAll()
     this.gameParams.gameOver = false
     this.gameParams.canRestart = false
+    this.gameParams.restartScores()
     this.init()
+  }
+
+  private updateScore (): void {
+    const lastPlanet = this.player?.planet
+    if (lastPlanet == null) return
+
+    if (!this.planetsScore.includes(lastPlanet.id)) {
+      this.planetsScore.push(lastPlanet.id)
+      this.gameParams.scores.planets++
+    }
   }
 }

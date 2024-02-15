@@ -29,4 +29,8 @@ export default class GameParams {
       this.canRestart = true
     }, 1000)
   }
+
+  restartScores (): void {
+    this.scores.planets = 0
+  }
 }

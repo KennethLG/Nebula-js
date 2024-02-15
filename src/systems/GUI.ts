@@ -1,10 +1,12 @@
 import type * as THREE from 'three'
+import type GameParams from './GameParams'
 
 type Style = Partial<CSSStyleDeclaration>
 export default class GUI {
   private readonly overlay: HTMLElement
+  private readonly planetsScore: HTMLElement
 
-  constructor (renderer: THREE.WebGLRenderer) {
+  constructor (renderer: THREE.WebGLRenderer, private readonly gameParams: GameParams) {
     this.overlay = document.createElement('div')
     this.overlay.style.position = 'absolute'
     const canvas = renderer.domElement
@@ -18,7 +20,7 @@ export default class GUI {
 
     document.body.appendChild(this.overlay)
 
-    this.createText('Life: 100', { top: '10px', left: '10px' })
+    this.planetsScore = this.createText('Planets: 0', { top: '10px', left: '10px' })
   }
 
   private styleElement (element: HTMLElement, position: Style): void {
@@ -44,5 +46,9 @@ export default class GUI {
     this.overlay.style.left = `${rect.left}px`
     this.overlay.style.width = `${canvas.clientWidth}px`
     this.overlay.style.height = `${canvas.clientHeight}px`
+  }
+
+  update (): void {
+    this.planetsScore.innerHTML = `Planets: ${this.gameParams.scores.planets}`
   }
 }
