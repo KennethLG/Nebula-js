@@ -1,5 +1,6 @@
 import type * as THREE from 'three'
 
+type Style = Partial<CSSStyleDeclaration>
 export default class GUI {
   private readonly overlay: HTMLElement
 
@@ -20,18 +21,22 @@ export default class GUI {
     this.createText('Life: 100', { top: '10px', left: '10px' })
   }
 
-  private createText (text: string, position: { top: string, left: string }): void {
-    const textElement = document.createElement('div')
-    textElement.style.position = 'absolute'
-    textElement.style.top = position.top
-    textElement.style.left = position.left
-    textElement.style.color = 'white'
-    textElement.style.fontFamily = '"Pixelify Sans", sans-serif'
-    textElement.textContent = text
-    this.overlay.appendChild(textElement)
+  private styleElement (element: HTMLElement, position: Style): void {
+    element.style.position = 'absolute'
+    element.style.color = position.color ?? 'white'
+    Object.assign(element.style, position)
+    element.style.fontFamily = '"Pixelify Sans", sans-serif'
   }
 
-  public adjustToRenderer (renderer: THREE.WebGLRenderer): void {
+  createText (text: string, style: Style): HTMLElement {
+    const textElement = document.createElement('div')
+    this.styleElement(textElement, style)
+    textElement.textContent = text
+    this.overlay.appendChild(textElement)
+    return textElement
+  }
+
+  adjustToRenderer (renderer: THREE.WebGLRenderer): void {
     const canvas = renderer.domElement
     const rect = canvas.getBoundingClientRect()
 

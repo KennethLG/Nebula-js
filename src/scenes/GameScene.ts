@@ -10,6 +10,7 @@ import {
   MovementController, type SceneManager
 } from '@/systems'
 import type CameraController from '@/systems/CameraController'
+import type GUI from '@/systems/GUI'
 import type GameParams from '@/systems/GameParams'
 import LevelGenerator from '@/systems/LevelGenerator'
 
@@ -21,12 +22,14 @@ export default class GameScene extends IScene {
   private readonly levelGenerator: LevelGenerator
   private readonly cameraController: CameraController
   private player?: Player
+  private readonly gameOverScreen: HTMLElement
 
   constructor (
     sceneManager: SceneManager,
     cameraController: CameraController,
     private readonly gameParams: GameParams,
-    private readonly eventManager: EventManager
+    private readonly eventManager: EventManager,
+    private readonly gui: GUI
   ) {
     super(sceneManager)
     this.keyboardManager = new KeyboardManager(this.eventManager)
@@ -38,6 +41,16 @@ export default class GameScene extends IScene {
     this.collisionController = new CollisionController()
     this.levelGenerator = new LevelGenerator(cameraController.camera, this.sceneManager)
     this.cameraController = cameraController
+    this.gameOverScreen = this.gui.createText('GAME OVER', {
+      left: '50%',
+      top: '50%',
+      textAlign: 'center',
+      transform: 'translate(-50%, -50%)'
+    })
+    this.changeGameOverScreenVisibility('hidden')
+    this.eventManager.on('gameOver', () => {
+      this.changeGameOverScreenVisibility('visible')
+    })
   }
 
   init (): void {
@@ -103,5 +116,9 @@ export default class GameScene extends IScene {
         this.sceneManager.destroy(bullet.id)
       }
     })
+  }
+
+  private changeGameOverScreenVisibility (visibility: 'visible' | 'hidden'): void {
+    this.gameOverScreen.style.visibility = visibility
   }
 }
