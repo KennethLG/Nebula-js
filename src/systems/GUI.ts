@@ -5,6 +5,7 @@ type Style = Partial<CSSStyleDeclaration>
 export default class GUI {
   private readonly overlay: HTMLElement
   private readonly planetsScore: HTMLElement
+  private readonly planetsRecord: HTMLElement
 
   constructor (renderer: THREE.WebGLRenderer, private readonly gameParams: GameParams) {
     this.overlay = document.createElement('div')
@@ -20,7 +21,8 @@ export default class GUI {
 
     document.body.appendChild(this.overlay)
 
-    this.planetsScore = this.createText('Planets: 0', { top: '10px', left: '10px' })
+    this.planetsRecord = this.createText(`Planets Record: ${this.gameParams.scores.planetsRecord}`, { top: '10px', left: '10px' })
+    this.planetsScore = this.createText('Planets: 0', { top: '25px', left: '10px' })
   }
 
   private styleElement (element: HTMLElement, position: Style): void {
@@ -50,5 +52,6 @@ export default class GUI {
 
   update (): void {
     this.planetsScore.innerHTML = `Planets: ${this.gameParams.scores.planets}`
+    this.planetsRecord.innerHTML = `Planets Record: ${this.gameParams.scores.planetsRecord}`
   }
 }
