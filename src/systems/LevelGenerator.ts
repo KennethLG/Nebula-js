@@ -59,10 +59,14 @@ export default class LevelGenerator {
   private addPlanetAt (x: number, y: number, radius: number): void {
     const newPlanet = this.genPlanet(x, y, radius)
     this.sceneManager.add(newPlanet)
+
+    newPlanet.decorations.forEach(decoration => {
+      this.sceneManager.scene.add(decoration.sprite)
+    })
   }
 
   private genPlanet (x: number, y: number, radius: number): Planet {
-    const planet = new Planet(x, y, {
+    const planet = new Planet(x, y, this.sceneManager, {
       radius
     })
     return planet

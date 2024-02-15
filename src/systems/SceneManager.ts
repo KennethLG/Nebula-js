@@ -19,7 +19,6 @@ export default class SceneManager {
   destroy (id: number): void {
     const instanceIndex = this.instances.findIndex(instance => instance.id === id)
     if (instanceIndex !== -1) {
-      this.scene.remove(this.instances[instanceIndex].body.mesh)
       this.instances.splice(instanceIndex, 1)
     }
   }
@@ -32,6 +31,8 @@ export default class SceneManager {
     this.instances.forEach((instance) => {
       this.scene.remove(instance.body.mesh)
     })
+
+    this.scene.clear()
 
     // Reset the instances array
     this.instances = []
