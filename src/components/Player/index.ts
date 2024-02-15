@@ -13,6 +13,8 @@ import AnimationController from './AnimationController'
 import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
+import type Explosion from '../UFO/explosion'
+import type GameParams from '@/systems/GameParams'
 
 interface AnimationContext {
   xVel: THREE.Vector3
@@ -34,7 +36,8 @@ export default class Player extends Instance {
     private readonly orientationController: OrientationController,
     private readonly collisionController: CollisionController,
     private readonly sceneManager: SceneManager,
-    private readonly eventManager: EventManager
+    private readonly eventManager: EventManager,
+    private readonly gameParams: GameParams
   ) {
     const sprite = new Sprite({
       name: 'player.png',
@@ -98,6 +101,8 @@ export default class Player extends Instance {
       dead: this.dead
     })
     this.sprite.update(this.sceneManager.gameParams.clock.getDelta())
+
+    this.checkDeath()
   }
 
   private moveX (): void {
@@ -153,5 +158,24 @@ export default class Player extends Instance {
     })
     if (this.dead) return
     this.movementController.handleJump(this.gravityDirection, this.gravity)
+  }
+
+  private getCollidingExplosion (): Explosion | undefined {
+    const explosions = this.sceneManager.instances.filter(inst => inst.name === 'Explosion') as Explosion[]
+
+    if (explosions.length === 0) return
+
+    const collidingExplosion = explosions.find(explosion => {
+      return this.body.position.distanceTo(explosion.body.position) < (explosion.radius + 1)
+    })
+
+    return collidingExplosion
+  }
+
+  private checkDeath (): void {
+    const explosion = this.getCollidingExplosion()
+    if (explosion == null) return
+
+    this.gameParams.end()
   }
 }

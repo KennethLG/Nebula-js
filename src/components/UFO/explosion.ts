@@ -10,6 +10,7 @@ interface ExplosionConfig {
 
 export default class Explosion extends Instance {
   private readonly material: THREE.MeshBasicMaterial
+  radius: number
   constructor (
     { position, radius, color }: ExplosionConfig,
     private readonly sceneManager: SceneManager
@@ -24,11 +25,13 @@ export default class Explosion extends Instance {
       radius
     })
     this.material = material
+    this.radius = radius
   }
 
   update (): void {
     this.body.mesh.scale.x += 0.05
     this.body.mesh.scale.y += 0.05
+    this.radius += 0.05
     this.material.opacity -= 0.2
 
     if (this.material.opacity <= 0) {
