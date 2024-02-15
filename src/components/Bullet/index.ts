@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import Instance from '../Instance'
 import { type SceneManager } from '@/systems'
 import type Planet from '../Planet'
+import Explosion from '../UFO/explosion'
 
 interface BulletConfig {
   position: THREE.Vector3
@@ -35,6 +36,14 @@ export default class Bullet extends Instance {
 
     const collidingPlanet = this.getCollidingPlanet()
     if (collidingPlanet != null) {
+      this.sceneManager.add(new Explosion(
+        {
+          position: collidingPlanet.body.position,
+          radius: collidingPlanet.boundingSphere.radius,
+          color: collidingPlanet.color
+        },
+        this.sceneManager)
+      )
       this.sceneManager.destroy(collidingPlanet.id)
       this.sceneManager.destroy(this.id)
     }
