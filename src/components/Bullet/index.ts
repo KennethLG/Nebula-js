@@ -12,7 +12,10 @@ interface BulletConfig {
 export default class Bullet extends Instance {
   private readonly direction: THREE.Vector3
   private readonly speed: number
-  constructor ({ position, direction, speed }: BulletConfig, private readonly sceneManager: SceneManager) {
+  constructor (
+    { position, direction, speed }: BulletConfig,
+    private readonly sceneManager: SceneManager
+  ) {
     const geometry = new THREE.CircleGeometry(0.1)
     const material = new THREE.MeshBasicMaterial({ color: 'white' })
     const mesh = new THREE.Mesh(geometry, material)
