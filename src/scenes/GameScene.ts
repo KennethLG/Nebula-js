@@ -34,6 +34,7 @@ export default class GameScene extends IScene {
     private readonly gui: GUI
   ) {
     super(sceneManager)
+
     this.keyboardManager = new KeyboardManager(this.eventManager)
     this.movementController = new MovementController(
       this.keyboardManager,

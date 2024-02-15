@@ -7,6 +7,8 @@ import { type SceneManager } from '@/systems'
 
 interface PlanetProperties {
   radius?: number
+  color: THREE.ColorRepresentation
+
 }
 
 export default class Planet extends Instance {
@@ -16,7 +18,7 @@ export default class Planet extends Instance {
   decorations: ISprite[]
   constructor (x: number, y: number, private readonly sceneManager: SceneManager, properties?: PlanetProperties) {
     const geometry = new THREE.CircleGeometry(properties?.radius)
-    const color = 0x00ff00
+    const color = properties?.color ?? 0x00ff00
     const material = new THREE.MeshBasicMaterial({ color })
     const mesh = new THREE.Mesh(geometry, material)
     super({
@@ -30,7 +32,6 @@ export default class Planet extends Instance {
     this.geometry.translate(0, 0, 0)
     this.color = color
     this.decorations = this.createDecorations()
-    console.log(this.decorations)
   }
 
   private createDecorations (): ISprite[] {
@@ -57,6 +58,12 @@ export default class Planet extends Instance {
   update (): void {
     this.decorations.forEach(decoration => {
       decoration.update(this.sceneManager.gameParams.clock.getDelta())
+    })
+  }
+
+  onDestroy (): void {
+    this.decorations.forEach(decoration => {
+      this.sceneManager.scene.remove(decoration.sprite)
     })
   }
 }

@@ -1,5 +1,6 @@
 import type SceneManager from './SceneManager'
 import Planet from '@/components/Planet'
+import { randomRange } from './util/random'
 
 export default class LevelGenerator {
   private lastChunkY: number = 0
@@ -11,10 +12,16 @@ export default class LevelGenerator {
   private readonly planetRadius = 1
   private readonly planetRadiusRange = 1
 
+  private hue: number
+  private currentColor: string
+
   constructor (
     private readonly camera: THREE.OrthographicCamera,
     private readonly sceneManager: SceneManager
-  ) {}
+  ) {
+    this.hue = this.genHue()
+    this.currentColor = this.genColor()
+  }
 
   update (): void {
     this.checkForChunkGeneration()
@@ -41,6 +48,8 @@ export default class LevelGenerator {
   }
 
   private generateNewChunk (): void {
+    this.hue = this.genHue()
+    this.currentColor = this.genColor()
     const yStart = this.lastChunkY
     const yEnd = yStart + this.chunkSize
     let yCurrent = yStart
@@ -67,7 +76,8 @@ export default class LevelGenerator {
 
   private genPlanet (x: number, y: number, radius: number): Planet {
     const planet = new Planet(x, y, this.sceneManager, {
-      radius
+      radius,
+      color: this.currentColor
     })
     return planet
   }
@@ -79,5 +89,24 @@ export default class LevelGenerator {
   private genXPos (): number {
     const xRange = this.xRangeBetweenPlanets * Math.random()
     return Math.random() < 0.5 ? -xRange : xRange
+  }
+
+  private genHue (): number {
+    const hueDecreasePerPlanet = 5 // Adjust this value as needed.
+    let newHue = 300 - (this.sceneManager.gameParams.scores.planets * hueDecreasePerPlanet) % 360
+
+    // Ensure the hue stays within the 0-360 range.
+    if (newHue < 0) {
+      newHue += 360
+    }
+
+    return newHue
+  }
+
+  private genColor (): string {
+    const h = Math.round(this.hue)
+    const s = Math.round(randomRange(30, 100))
+    const l = Math.round(randomRange(30, 100))
+    return `hsl(${h}, ${s}%, ${l}%)`
   }
 }

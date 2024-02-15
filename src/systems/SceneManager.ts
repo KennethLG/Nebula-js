@@ -19,6 +19,9 @@ export default class SceneManager {
   destroy (id: number): void {
     const instanceIndex = this.instances.findIndex(instance => instance.id === id)
     if (instanceIndex !== -1) {
+      const instance = this.instances[instanceIndex]
+      instance.onDestroy()
+      this.scene.remove(instance.body.mesh)
       this.instances.splice(instanceIndex, 1)
     }
   }
