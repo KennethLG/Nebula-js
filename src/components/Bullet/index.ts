@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 import Instance from '../Instance'
-import { type SceneManager } from '@/systems'
 import type Planet from '../Planet'
 import Explosion from '../UFO/explosion'
+import { type ISceneManager } from '@/systems/SceneManager'
 
 interface BulletConfig {
   position: THREE.Vector3
@@ -15,7 +15,7 @@ export default class Bullet extends Instance {
   private readonly speed: number
   constructor (
     { position, direction, speed }: BulletConfig,
-    private readonly sceneManager: SceneManager
+    private readonly sceneManager: ISceneManager
   ) {
     const geometry = new THREE.CircleGeometry(0.1)
     const material = new THREE.MeshBasicMaterial({ color: 'white' })

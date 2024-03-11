@@ -1,8 +1,8 @@
 import type * as THREE from 'three'
 import type Planet from '@/components/Planet'
-import type SceneManager from '../SceneManager'
+import { type ISceneManager } from '../SceneManager'
 
-export const getNearestPlanet = (sceneManager: SceneManager, from: THREE.Vector3): Planet | undefined => {
+export const getNearestPlanet = (sceneManager: ISceneManager, from: THREE.Vector3): Planet | undefined => {
   const planets = sceneManager.instances.filter(inst => inst.name === 'Planet') as Planet[]
 
   if (planets.length === 0) return

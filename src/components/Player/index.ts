@@ -1,26 +1,39 @@
 import * as THREE from 'three'
 import Instance from '../Instance'
 import {
-  type SceneManager,
-  applyGravitationalPull,
-  type EventManager
+  applyGravitationalPull
 } from '../../systems'
 import type Planet from '../Planet'
-import type OrientationController from './OrientationController'
-import type CollisionController from './CollisionController'
-import type MovementController from '../../systems/MovementController'
 import AnimationController from './AnimationController'
 import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
 import type Explosion from '../UFO/explosion'
-import type GameParams from '@/systems/GameParams'
+import { type IMovementController } from '../../systems/MovementController'
+import { type IOrientationController } from './OrientationController'
+import { type ICollisionController } from './CollisionController'
+import { type ISceneManager } from '@/systems/SceneManager'
+import { type IEventManager } from '@/systems/EventManager'
+import { type IGameParams } from '@/systems/GameParams'
+import { inject, injectable } from 'inversify'
+import TYPES from '@/systems/DI/tokens'
 
 interface AnimationContext {
   xVel: THREE.Vector3
   dead: boolean
 }
-export default class Player extends Instance {
+
+export interface IPlayer extends Instance {
+  onGround: boolean
+  gravity: THREE.Vector3
+  xVel: THREE.Vector3
+  yVel: THREE.Vector3
+  planet: Planet | undefined
+  gravityDirection: THREE.Vector3
+  dead: boolean
+}
+@injectable()
+export default class Player extends Instance implements IPlayer {
   onGround = false
   gravity = new THREE.Vector3(0, 0, 0)
   xVel = new THREE.Vector3(0, 0, 0)
@@ -30,14 +43,31 @@ export default class Player extends Instance {
   dead = false
   private readonly sprite: ISprite
   private readonly animationController: AnimationController<AnimationContext>
+  // @inject(TYPES.IMovementController)
+  // private readonly movementController!: IMovementController
+
+  // @inject(TYPES.IOrientationController)
+  // private readonly orientationController!: IOrientationController
+
+  // @inject(TYPES.ICollisionController)
+  // private readonly collisionController!: ICollisionController
+
+  // @inject(TYPES.ISceneManager)
+  // private readonly sceneManager!: ISceneManager
+
+  // @inject(TYPES.IEventManager)
+  // private readonly eventManager!: IEventManager
+
+  // @inject(TYPES.IGameParams)
+  // private readonly gameParams!: IGameParams
 
   constructor (
-    private readonly movementController: MovementController,
-    private readonly orientationController: OrientationController,
-    private readonly collisionController: CollisionController,
-    private readonly sceneManager: SceneManager,
-    private readonly eventManager: EventManager,
-    private readonly gameParams: GameParams
+    @inject(TYPES.IMovementController) private readonly movementController: IMovementController,
+    @inject(TYPES.IOrientationController) private readonly orientationController: IOrientationController,
+    @inject(TYPES.ICollisionController) private readonly collisionController: ICollisionController,
+    @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
+    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
+    @inject(TYPES.IGameParams) private readonly gameParams: IGameParams
   ) {
     const sprite = new Sprite({
       name: 'player.png',
@@ -74,14 +104,12 @@ export default class Player extends Instance {
         condition: (context) => context.dead
       }
     ], 'idle')
-
-    this.eventManager.on('gameOver', () => {
-      this.dead = true
-    })
   }
 
   init (): void {
-
+    this.eventManager.on('gameOver', () => {
+      this.dead = true
+    })
   }
 
   update (): void {
@@ -103,7 +131,7 @@ export default class Player extends Instance {
       xVel: this.xVel,
       dead: this.dead
     })
-    this.sprite.update(this.sceneManager.gameParams.clock.getDelta())
+    this.sprite.update(this.gameParams.clock.getDelta())
 
     this.checkDeath()
   }

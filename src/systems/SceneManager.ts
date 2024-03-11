@@ -1,19 +1,29 @@
 import type Instance from '@/components/Instance'
+import { injectable } from 'inversify'
 import * as THREE from 'three'
-import type GameParams from './GameParams'
 
-export default class SceneManager {
+export interface ISceneManager {
+  instances: Instance[]
+  scene: THREE.Scene
+  add: (instance: Instance) => void
+  destroy: (id: number) => void
+  destroyAll: () => void
+  animate: () => void
+}
+
+@injectable()
+export default class SceneManager implements ISceneManager {
   instances: Instance[] = []
   scene: THREE.Scene
+  canInitInstances = true
 
-  constructor (readonly gameParams: GameParams) {
+  constructor () {
     this.scene = new THREE.Scene()
   }
 
   add (instance: Instance): void {
     this.scene.add(instance.body.mesh)
     this.instances.push(instance)
-    instance.init()
   }
 
   destroy (id: number): void {
@@ -49,6 +59,13 @@ export default class SceneManager {
   private update (): void {
     this.instances.forEach((instance) => {
       instance.baseUpdate()
+    })
+
+    if (!this.canInitInstances) return
+
+    this.canInitInstances = false
+    this.instances.forEach((instance) => {
+      instance.init()
     })
   }
 }

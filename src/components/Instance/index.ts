@@ -2,6 +2,7 @@ import type IBody from '@/entities/IBody'
 import type { IInstance } from '@/entities/Instance'
 import { Body } from '../Body'
 import { BoundingSphere } from '@/systems'
+import { injectable } from 'inversify'
 
 interface InstanceConfig {
   name: string
@@ -9,6 +10,8 @@ interface InstanceConfig {
   radius: number
   mesh: THREE.Object3D
 }
+
+@injectable()
 export default class Instance implements IInstance {
   name: string
   body: IBody

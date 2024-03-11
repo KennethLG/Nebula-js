@@ -1,15 +1,29 @@
 import type * as THREE from 'three'
-import type GameParams from './GameParams'
+import { IGameParams } from './GameParams'
+import { inject, injectable } from 'inversify'
+import TYPES from './DI/tokens'
 
 type Style = Partial<CSSStyleDeclaration>
-export default class GUI {
-  private readonly overlay: HTMLElement
-  private readonly planetsScore: HTMLElement
-  private readonly planetsRecord: HTMLElement
 
-  constructor (renderer: THREE.WebGLRenderer, private readonly gameParams: GameParams) {
+export interface IGUI {
+  adjustToRenderer: (renderer: THREE.WebGLRenderer) => void
+  createText: (text: string, style: Style) => HTMLElement
+  update: () => void
+  init: (renderer: THREE.WebGLRenderer) => void
+}
+
+@injectable()
+export default class GUI implements IGUI {
+  private readonly overlay: HTMLElement
+  private planetsScore?: HTMLElement
+  private planetsRecord?: HTMLElement
+
+  constructor (@inject(TYPES.IGameParams) private readonly gameParams: IGameParams) {
     this.overlay = document.createElement('div')
     this.overlay.style.position = 'absolute'
+  }
+
+  init (renderer: THREE.WebGLRenderer): void {
     const canvas = renderer.domElement
     const rect = canvas.getBoundingClientRect()
 
@@ -51,7 +65,11 @@ export default class GUI {
   }
 
   update (): void {
-    this.planetsScore.innerHTML = `Planets: ${this.gameParams.scores.planets}`
-    this.planetsRecord.innerHTML = `Planets Record: ${this.gameParams.scores.planetsRecord}`
+    const planetsRecord = this.planetsRecord
+    const planetsScore = this.planetsScore
+    if (planetsRecord == null || planetsScore == null) return
+
+    planetsScore.innerHTML = `Planets: ${this.gameParams.scores.planets}`
+    planetsRecord.innerHTML = `Planets Record: ${this.gameParams.scores.planetsRecord}`
   }
 }

@@ -1,18 +1,31 @@
-import { type EventManager, type KeyboardManager } from 'src/systems'
 import * as THREE from 'three'
+import { type IEventManager } from './EventManager'
+import { type IKeyboardManager } from './KeyboardManager'
+import { inject, injectable } from 'inversify'
+import TYPES from './DI/tokens'
 
-export default class MovementController {
+export interface IMovementController {
+  handleXMovement: (
+    quaternion: THREE.Quaternion,
+    xVelocity: THREE.Vector3
+  ) => THREE.Vector3
+  handleJump: (gravityDirection: THREE.Vector3, velocity: THREE.Vector3) => void
+}
+
+@injectable()
+export default class MovementController implements IMovementController {
   private readonly moveLeftKey = 'a'
   private readonly moveRightKey = 'd'
   private readonly jumpKey = 'w'
   private readonly jumpForce = 0.2
   private readonly moveVel = 0.01
-  private readonly friction = 0.95
+  private readonly friction = 0.9
 
-  constructor (
-    private readonly keyboardManager: KeyboardManager,
-    private readonly eventManager: EventManager
-  ) {}
+  @inject(TYPES.IKeyboardManager)
+  private readonly keyboardManager!: IKeyboardManager
+
+  @inject(TYPES.IEventManager)
+  private readonly eventManager!: IEventManager
 
   handleXMovement (
     quaternion: THREE.Quaternion,
@@ -31,7 +44,7 @@ export default class MovementController {
       xVelocity.multiplyScalar(this.friction)
     }
 
-    xVelocity.clampLength(0, 0.1)
+    xVelocity.clampLength(0, 0.05)
     if (xVelocity.length() < 0.01) {
       xVelocity.set(0, 0, 0)
     }

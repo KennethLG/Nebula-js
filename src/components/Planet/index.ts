@@ -3,20 +3,36 @@ import Instance from '../Instance'
 import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
 import { randomRange } from '@/systems/util/random'
-import { type SceneManager } from '@/systems'
+import { inject } from 'inversify'
+import TYPES from '@/systems/DI/tokens'
+import { IGameParams } from '@/systems/GameParams'
+import { ISceneManager } from '@/systems/SceneManager'
 
-interface PlanetProperties {
+export interface PlanetProperties {
   radius?: number
   color: THREE.ColorRepresentation
 
 }
 
-export default class Planet extends Instance {
+export interface IPlanet extends Instance {
+  boundingSphere: THREE.Sphere
+  geometry: THREE.CircleGeometry
+  color: THREE.ColorRepresentation
+  decorations: ISprite[]
+}
+
+export default class Planet extends Instance implements IPlanet {
   boundingSphere = new THREE.Sphere()
   geometry: THREE.CircleGeometry
   color: THREE.ColorRepresentation
   decorations: ISprite[]
-  constructor (x: number, y: number, private readonly sceneManager: SceneManager, properties?: PlanetProperties) {
+  constructor (
+    x: number,
+    y: number,
+    @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
+    @inject(TYPES.IGameParams) private readonly gameParams: IGameParams,
+    properties?: PlanetProperties
+  ) {
     const geometry = new THREE.CircleGeometry(properties?.radius)
     const color = properties?.color ?? 0x00ff00
     const material = new THREE.MeshBasicMaterial({ color })
@@ -57,7 +73,7 @@ export default class Planet extends Instance {
 
   update (): void {
     this.decorations.forEach(decoration => {
-      decoration.update(this.sceneManager.gameParams.clock.getDelta())
+      decoration.update(this.gameParams.clock.getDelta())
     })
   }
 

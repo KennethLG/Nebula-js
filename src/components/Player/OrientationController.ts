@@ -1,4 +1,6 @@
-import type { EventManager } from 'src/systems'
+import TYPES from '@/systems/DI/tokens'
+import { type IEventManager } from '@/systems/EventManager'
+import { inject, injectable } from 'inversify'
 import * as THREE from 'three'
 
 interface Config {
@@ -8,9 +10,18 @@ interface Config {
 
 type XMovementDirections = 'left' | 'right'
 
-export default class OrientationController {
+export interface IOrientationController {
+  face: XMovementDirections
+  alignWithGravity: (config: Config) => void
+  getXOrientation: () => number
+}
+
+@injectable()
+export default class OrientationController implements IOrientationController {
   face: XMovementDirections = 'right'
-  constructor (private readonly eventManager: EventManager) {
+  constructor (
+    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager
+  ) {
     this.eventManager.on('movementKeydown', this.handleMovementKeydown.bind(this))
   }
 

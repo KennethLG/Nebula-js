@@ -3,22 +3,37 @@ import Instance from '../Instance'
 import Sprite from '../Sprite'
 import { randomRange } from '@/systems/util/random'
 import { type IInstance } from '@/entities/Instance'
-import { type SceneManager } from '@/systems'
 import Bullet from '../Bullet'
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
-import type GameParams from '@/systems/GameParams'
+import { type ISceneManager } from '@/systems/SceneManager'
+import { type IGameParams } from '@/systems/GameParams'
+import { inject, injectable } from 'inversify'
+import TYPES from '@/systems/DI/tokens'
 
-export default class Ufo extends Instance {
+export interface IUfo extends Instance {
+  xVel: THREE.Vector3
+  yVel: THREE.Vector3
+  positionTo: THREE.Vector3
+  update: () => void
+  onDestroy: () => void
+}
+
+@injectable()
+export default class Ufo extends Instance implements IUfo {
   xVel = new THREE.Vector3(0, 0, 0)
   yVel = new THREE.Vector3(0, 0, 0)
   positionTo = new THREE.Vector3(0, 0, 0)
   private readonly changePositionInterval: number
   private readonly shootInterval: number
 
+  private readonly target?: IInstance
+
   constructor (
-    private readonly target: IInstance,
-    private readonly sceneManager: SceneManager,
-    private readonly gameParams: GameParams
+    @inject(TYPES.ISceneManager)
+    private readonly sceneManager: ISceneManager,
+
+    @inject(TYPES.IGameParams)
+    private readonly gameParams: IGameParams
   ) {
     const sprite = new Sprite({
       name: 'ufo.png',
@@ -37,6 +52,8 @@ export default class Ufo extends Instance {
   }
 
   update (): void {
+    if (this.target == null) return
+
     this.positionTo.y = this.target.body.position.y - 2
 
     this.body.position.lerp(this.positionTo, 0.02)

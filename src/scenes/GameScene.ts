@@ -1,50 +1,36 @@
 import type Bullet from '@/components/Bullet'
-import Player from '@/components/Player'
-import CollisionController from '@/components/Player/CollisionController'
-import OrientationController from '@/components/Player/OrientationController'
-import Ufo from '@/components/UFO'
-import IScene from '@/entities/IScene'
-import {
-  type EventManager,
-  KeyboardManager,
-  MovementController, type SceneManager
-} from '@/systems'
-import type CameraController from '@/systems/CameraController'
-import type GUI from '@/systems/GUI'
-import type GameParams from '@/systems/GameParams'
-import LevelGenerator from '@/systems/LevelGenerator'
+import { type IPlayer } from '@/components/Player'
+import { type IUfo } from '@/components/UFO'
+import type IScene from '@/entities/IScene'
+import { type ICameraController } from '@/systems/CameraController'
+import container from '@/systems/DI/inversify.config'
+import TYPES from '@/systems/DI/tokens'
+import { type IEventManager } from '@/systems/EventManager'
+import { type IGUI } from '@/systems/GUI'
+import { type IGameParams } from '@/systems/GameParams'
+import { type ILevelGenerator } from '@/systems/LevelGenerator'
+import { type ISceneManager } from '@/systems/SceneManager'
+import { inject, injectable } from 'inversify'
 
-export default class GameScene extends IScene {
-  private readonly movementController: MovementController
-  private readonly keyboardManager: KeyboardManager
-  private readonly orientationController: OrientationController
-  private readonly collisionController: CollisionController
-  private levelGenerator: LevelGenerator
-  private readonly cameraController: CameraController
-  private player?: Player
-  private ufo?: Ufo
-  private readonly gameOverScreen: HTMLElement
+@injectable()
+export default class GameScene implements IScene {
   private planetsScore: number[] = []
+  private gameOverScreen: HTMLElement
+  private player?: IPlayer
+  private ufo?: IUfo
 
   constructor (
-    sceneManager: SceneManager,
-    cameraController: CameraController,
-    private readonly gameParams: GameParams,
-    private readonly eventManager: EventManager,
-    private readonly gui: GUI
+    @inject(TYPES.ICameraController) private readonly cameraController: ICameraController,
+    @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
+    @inject(TYPES.IGameParams) private readonly gameParams: IGameParams,
+    @inject(TYPES.ILevelGenerator) private levelGenerator: ILevelGenerator,
+    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
+    @inject(TYPES.IGUI) private readonly gui: IGUI
   ) {
-    super(sceneManager)
+    this.gameOverScreen = document.createElement('div')
+  }
 
-    this.keyboardManager = new KeyboardManager(this.eventManager)
-    this.movementController = new MovementController(
-      this.keyboardManager,
-      this.eventManager
-    )
-    this.orientationController = new OrientationController(this.eventManager)
-    this.collisionController = new CollisionController()
-    this.levelGenerator = new LevelGenerator(cameraController.camera, this.sceneManager)
-    this.cameraController = cameraController
-
+  init (): void {
     this.gameOverScreen = this.createGameOverScreen()
     this.changeGameOverScreenVisibility('hidden')
     this.eventManager.on('gameOver', () => {
@@ -55,18 +41,9 @@ export default class GameScene extends IScene {
         this.gameRestart()
       }
     })
-  }
-
-  init (): void {
-    this.levelGenerator = new LevelGenerator(this.cameraController.camera, this.sceneManager)
-    const player = new Player(
-      this.movementController,
-      this.orientationController,
-      this.collisionController,
-      this.sceneManager,
-      this.eventManager,
-      this.gameParams
-    )
+    this.levelGenerator = container.get<ILevelGenerator>(TYPES.ILevelGenerator)
+    this.levelGenerator.init()
+    const player = container.get<IPlayer>(TYPES.IPlayer)
     this.sceneManager.add(player)
     this.player = player
     this.cameraController.camera.position.setY(0)
@@ -94,14 +71,14 @@ export default class GameScene extends IScene {
     this.cameraController.follow = desiredPlayer.body.position
   }
 
-  private checkGameEnd (player: Player): void {
+  private checkGameEnd (player: IPlayer): void {
     const { position: { y: cameraY }, bottom } = this.cameraController.camera
     if (player.body.position.y < (cameraY + bottom)) {
       this.gameParams.end()
     }
   }
 
-  private teleportPlayer (player: Player): void {
+  private teleportPlayer (player: IPlayer): void {
     const { right, left, position: { x: cameraX } } = this.cameraController.camera
     if (player.body.position.x > (cameraX + right)) {
       player.body.position.setX(cameraX + left)
@@ -163,7 +140,7 @@ export default class GameScene extends IScene {
     if (player == null || this.ufo != null) return
 
     if (this.gameParams.scores.planets === 5) {
-      this.ufo = new Ufo(player, this.sceneManager, this.gameParams)
+      this.ufo = container.get<IUfo>(TYPES.IUfo) // new Ufo(player)
       this.sceneManager.add(this.ufo)
     }
   }
