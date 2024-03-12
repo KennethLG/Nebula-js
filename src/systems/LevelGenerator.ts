@@ -14,15 +14,14 @@ export interface ILevelGenerator {
 
 @injectable()
 export default class LevelGenerator implements ILevelGenerator {
-  private lastChunkY: number = 0
-  private readonly chunkSize: number = 4
-  private readonly triggerThreshold: number = 3
-  private readonly xRangeBetweenPlanets = 3
-  private readonly yRangeBetweenPlanets = 1
-  private readonly yMarginBetweenPlanets = 2
-  private readonly planetRadius = 1
-  private readonly planetRadiusRange = 1
-
+  private chunkSize: number
+  private triggerThreshold: number
+  private xRangeBetweenPlanets: number
+  private yRangeBetweenPlanets: number
+  private yMarginBetweenPlanets: number
+  private planetRadius: number
+  private planetRadiusRange: number
+  private lastChunkY: number
   private hue: number
   private currentColor: string
 
@@ -35,11 +34,28 @@ export default class LevelGenerator implements ILevelGenerator {
   ) {
     this.hue = 0
     this.currentColor = ''
+    this.lastChunkY = 0
+    this.chunkSize = 4
+    this.triggerThreshold = 3
+    this.xRangeBetweenPlanets = 3
+    this.yRangeBetweenPlanets = 1
+    this.yMarginBetweenPlanets = 2
+    this.planetRadius = 1
+    this.planetRadiusRange = 1
   }
 
   init (): void {
+    this.random.resetCurrent()
     this.hue = this.genHue()
     this.currentColor = this.genColor()
+    this.lastChunkY = 0
+    this.chunkSize = 4
+    this.triggerThreshold = 3
+    this.xRangeBetweenPlanets = 3
+    this.yRangeBetweenPlanets = 1
+    this.yMarginBetweenPlanets = 2
+    this.planetRadius = 1
+    this.planetRadiusRange = 1
   }
 
   update (): void {
@@ -94,10 +110,6 @@ export default class LevelGenerator implements ILevelGenerator {
   }
 
   private genPlanet (x: number, y: number, radius: number): IPlanet {
-    // const planet = new Planet(x, y, this.sceneManager, {
-    //   radius,
-    //   color: this.currentColor
-    // })
     return this.createPlanet(x, y, {
       radius,
       color: this.currentColor

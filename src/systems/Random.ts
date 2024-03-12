@@ -7,14 +7,21 @@ export const generateSeed = (): number => {
 export interface IRandom {
   next: () => number
   randomRange: (min: number, max: number) => number
+  resetCurrent: () => void
 }
 
 @injectable()
 export default class Random implements IRandom {
-  private seed: number
+  private readonly seed: number
+  private current: number
 
   constructor () {
     this.seed = 1000 // generateSeed()
+    this.current = this.seed
+  }
+
+  resetCurrent (): void {
+    this.current = this.seed
   }
 
   next (): number {
@@ -22,8 +29,8 @@ export default class Random implements IRandom {
     const c = 1013904223
     const m = 2 ** 32
 
-    this.seed = (a * this.seed + c) % m
-    return this.seed / m
+    this.current = (a * this.current + c) % m
+    return this.current / m
   }
 
   randomRange (min: number, max: number): number {

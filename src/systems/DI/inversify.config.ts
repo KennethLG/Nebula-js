@@ -24,7 +24,6 @@ container.bind<IEventManager>(TYPES.IEventManager).to(EventManager).inSingletonS
 container.bind<IRandom>(TYPES.IRandom).to(Random).inSingletonScope()
 container.bind<ISceneManager>(TYPES.ISceneManager).to(SceneManager).inSingletonScope()
 container.bind<IGameParams>(TYPES.IGameParams).to(GameParams).inSingletonScope()
-container.bind<ILevelGenerator>(TYPES.ILevelGenerator).to(LevelGenerator).inSingletonScope()
 container.bind<IScene>(TYPES.IScene).to(GameScene).inSingletonScope()
 container.bind<ICameraController>(TYPES.ICameraController).to(CameraController).inSingletonScope()
 container.bind<IGUI>(TYPES.IGUI).to(GUI).inSingletonScope()
@@ -33,9 +32,9 @@ container.bind<IOrientationController>(TYPES.IOrientationController).to(Orientat
 container.bind<ICollisionController>(TYPES.ICollisionController).to(CollisionController)
 container.bind<IKeyboardManager>(TYPES.IKeyboardManager).to(KeyboardManager).inSingletonScope()
 container.bind<IMain>(TYPES.IMain).to(Main)
+container.bind<ILevelGenerator>(TYPES.ILevelGenerator).to(LevelGenerator).inTransientScope()
 
 container.bind<IPlayer>(TYPES.IPlayer).to(Player).inTransientScope()
-
 container.bind<IUfo>(TYPES.IUfo).to(Ufo).inTransientScope()
 
 container.bind<interfaces.Factory<IPlanet>>('Factory<Planet>')

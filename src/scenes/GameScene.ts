@@ -16,18 +16,21 @@ import { inject, injectable } from 'inversify'
 export default class GameScene implements IScene {
   private planetsScore: number[] = []
   private gameOverScreen: HTMLElement
-  private player?: IPlayer
-  private ufo?: IUfo
+  private player: IPlayer | null
+  private ufo: IUfo | null
 
   constructor (
     @inject(TYPES.ICameraController) private readonly cameraController: ICameraController,
     @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
     @inject(TYPES.IGameParams) private readonly gameParams: IGameParams,
-    @inject(TYPES.ILevelGenerator) private levelGenerator: ILevelGenerator,
+    @inject(TYPES.ILevelGenerator) private readonly levelGenerator: ILevelGenerator,
     @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
     @inject(TYPES.IGUI) private readonly gui: IGUI
   ) {
     this.gameOverScreen = document.createElement('div')
+    this.levelGenerator = container.get<ILevelGenerator>(TYPES.ILevelGenerator)
+    this.player = null
+    this.ufo = null
   }
 
   init (): void {
@@ -41,7 +44,7 @@ export default class GameScene implements IScene {
         this.gameRestart()
       }
     })
-    this.levelGenerator = container.get<ILevelGenerator>(TYPES.ILevelGenerator)
+
     this.levelGenerator.init()
     const player = container.get<IPlayer>(TYPES.IPlayer)
     this.sceneManager.add(player)
@@ -116,6 +119,8 @@ export default class GameScene implements IScene {
   }
 
   private gameRestart (): void {
+    this.player = null
+    this.ufo = null
     this.changeGameOverScreenVisibility('hidden')
 
     this.sceneManager.destroyAll()
