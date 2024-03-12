@@ -16,6 +16,7 @@ export interface IUfo extends Instance {
   positionTo: THREE.Vector3
   update: () => void
   onDestroy: () => void
+  defineTarget: (instance: Instance) => void
 }
 
 @injectable()
@@ -26,7 +27,7 @@ export default class Ufo extends Instance implements IUfo {
   private readonly changePositionInterval: number
   private readonly shootInterval: number
 
-  private readonly target?: IInstance
+  private target?: IInstance
 
   constructor (
     @inject(TYPES.ISceneManager)
@@ -49,6 +50,10 @@ export default class Ufo extends Instance implements IUfo {
     })
     this.changePositionInterval = setInterval(() => { this.changeXPosition() }, 4000)
     this.shootInterval = setInterval(() => { this.shoot() }, 5000)
+  }
+
+  defineTarget (instance: Instance): void {
+    this.target = instance
   }
 
   update (): void {

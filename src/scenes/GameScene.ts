@@ -140,8 +140,11 @@ export default class GameScene implements IScene {
     if (player == null || this.ufo != null) return
 
     if (this.gameParams.scores.planets === 5) {
-      this.ufo = container.get<IUfo>(TYPES.IUfo) // new Ufo(player)
-      this.sceneManager.add(this.ufo)
+      const ufo = container.get<IUfo>(TYPES.IUfo)
+      this.ufo = ufo
+      ufo.defineTarget(player)
+
+      this.sceneManager.add(ufo)
     }
   }
 }
