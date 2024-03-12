@@ -14,7 +14,7 @@ export default class Random implements IRandom {
   private seed: number
 
   constructor () {
-    this.seed = generateSeed()
+    this.seed = 1000 // generateSeed()
   }
 
   next (): number {

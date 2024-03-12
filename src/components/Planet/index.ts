@@ -2,11 +2,11 @@ import * as THREE from 'three'
 import Instance from '../Instance'
 import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
-import { randomRange } from '@/systems/util/random'
 import { inject } from 'inversify'
 import TYPES from '@/systems/DI/tokens'
 import { IGameParams } from '@/systems/GameParams'
 import { ISceneManager } from '@/systems/SceneManager'
+import { IRandom } from '@/systems/Random'
 
 export interface PlanetProperties {
   radius?: number
@@ -31,6 +31,7 @@ export default class Planet extends Instance implements IPlanet {
     y: number,
     @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
     @inject(TYPES.IGameParams) private readonly gameParams: IGameParams,
+    @inject(TYPES.IRandom) private readonly random: IRandom,
     properties?: PlanetProperties
   ) {
     const geometry = new THREE.CircleGeometry(properties?.radius)
@@ -59,11 +60,11 @@ export default class Planet extends Instance implements IPlanet {
         xTiles: 6,
         yTiles: 1
       })
-      const randomIndex = randomRange(0, 5)
+      const randomIndex = this.random.randomRange(0, 5)
       sprite.loop([Math.round(randomIndex)], 1)
       const spritePosition = new THREE.Vector3(
-        x + randomRange(-radius, radius),
-        y + randomRange(-radius, radius),
+        x + this.random.randomRange(-radius, radius),
+        y + this.random.randomRange(-radius, radius),
         0
       )
       sprite.sprite.position.copy(spritePosition)

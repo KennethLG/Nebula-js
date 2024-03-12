@@ -43,7 +43,8 @@ container.bind<interfaces.Factory<IPlanet>>('Factory<Planet>')
   return (x: number, y: number, properties?: PlanetProperties) => {
     const sceneManager = context.container.get<ISceneManager>(TYPES.ISceneManager)
     const gameParams = context.container.get<IGameParams>(TYPES.IGameParams)
-    return new Planet(x, y, sceneManager, gameParams, properties)
+    const random = context.container.get<IRandom>(TYPES.IRandom)
+    return new Planet(x, y, sceneManager, gameParams, random, properties)
     // return context.container.get<IPlanet>(TYPES.IPlanet)
   }
 })
