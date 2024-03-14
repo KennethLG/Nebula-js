@@ -5,6 +5,7 @@ import * as THREE from 'three'
 export interface ISceneManager {
   instances: Instance[]
   scene: THREE.Scene
+  canInitInstances: boolean
   add: (instance: Instance) => void
   destroy: (id: number) => void
   destroyAll: () => void
@@ -49,6 +50,7 @@ export default class SceneManager implements ISceneManager {
 
     // Reset the instances array
     this.instances = []
+    this.canInitInstances = true
   }
 
   animate (): void {

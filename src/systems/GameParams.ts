@@ -45,6 +45,7 @@ export default class GameParams implements IGameParams {
   }
 
   end (): void {
+    console.log('game end')
     if (this.scores.planets > this.scores.planetsRecord) {
       setItem('planetsRecord', this.scores.planets)
       this.scores.planetsRecord = this.scores.planets

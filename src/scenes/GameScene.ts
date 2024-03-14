@@ -75,6 +75,13 @@ export default class GameScene implements IScene {
   }
 
   private checkGameEnd (player: IPlayer): void {
+    if (this.gameParams.gameOver) return
+
+    if (player.explosionCollision) {
+      this.gameParams.end()
+      return
+    }
+
     const { position: { y: cameraY }, bottom } = this.cameraController.camera
     if (player.body.position.y < (cameraY + bottom)) {
       this.gameParams.end()

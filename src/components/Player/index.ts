@@ -31,6 +31,7 @@ export interface IPlayer extends Instance {
   planet: Planet | undefined
   gravityDirection: THREE.Vector3
   dead: boolean
+  explosionCollision: boolean
 }
 @injectable()
 export default class Player extends Instance implements IPlayer {
@@ -41,25 +42,10 @@ export default class Player extends Instance implements IPlayer {
   planet: Planet | undefined
   gravityDirection = new THREE.Vector3(0, 0, 0)
   dead = false
+  explosionCollision = false
   private readonly sprite: ISprite
   private readonly animationController: AnimationController<AnimationContext>
-  // @inject(TYPES.IMovementController)
-  // private readonly movementController!: IMovementController
-
-  // @inject(TYPES.IOrientationController)
-  // private readonly orientationController!: IOrientationController
-
-  // @inject(TYPES.ICollisionController)
-  // private readonly collisionController!: ICollisionController
-
-  // @inject(TYPES.ISceneManager)
-  // private readonly sceneManager!: ISceneManager
-
-  // @inject(TYPES.IEventManager)
-  // private readonly eventManager!: IEventManager
-
-  // @inject(TYPES.IGameParams)
-  // private readonly gameParams!: IGameParams
+  private readonly onGameOverBound: () => void
 
   constructor (
     @inject(TYPES.IMovementController) private readonly movementController: IMovementController,
@@ -101,15 +87,21 @@ export default class Player extends Instance implements IPlayer {
         name: 'dead',
         sequence: [1],
         speed: 1,
-        condition: (context) => context.dead
+        condition: (context) => {
+          console.log(this.id)
+          return context.dead
+        }
       }
     ], 'idle')
+    this.onGameOverBound = this.onGameOver.bind(this)
   }
 
   init (): void {
-    this.eventManager.on('gameOver', () => {
-      this.dead = true
-    })
+    this.eventManager.on('gameOver', this.onGameOverBound)
+  }
+
+  private onGameOver (): void {
+    this.dead = true
   }
 
   update (): void {
@@ -205,8 +197,10 @@ export default class Player extends Instance implements IPlayer {
 
   private checkDeath (): void {
     const explosion = this.getCollidingExplosion()
-    if (explosion == null) return
+    this.explosionCollision = explosion != null
+  }
 
-    this.gameParams.end()
+  onDestroy (): void {
+    this.eventManager.off('gameOver', this.onGameOverBound)
   }
 }
