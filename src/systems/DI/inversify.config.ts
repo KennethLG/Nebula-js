@@ -18,9 +18,11 @@ import Player, { type IPlayer } from '@/components/Player'
 import Ufo, { type IUfo } from '@/components/UFO'
 import { type IMain, Main } from '@/bootstrap'
 import Planet, { type IPlanet, type PlanetProperties } from '@/components/Planet'
+import MatchmakingSocket, { IMatchmakingSocket } from '../http/matchmakingSocket'
 
 const container = new Container()
 container.bind<IEventManager>(TYPES.IEventManager).to(EventManager).inSingletonScope()
+container.bind<IMatchmakingSocket>(TYPES.IMatchmakingSocket).to(MatchmakingSocket)
 container.bind<IRandom>(TYPES.IRandom).to(Random).inSingletonScope()
 container.bind<ISceneManager>(TYPES.ISceneManager).to(SceneManager).inSingletonScope()
 container.bind<IGameParams>(TYPES.IGameParams).to(GameParams).inSingletonScope()

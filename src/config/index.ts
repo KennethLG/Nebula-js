@@ -1,4 +1,5 @@
 export default {
   assetsPath: '/',
-  local: false
+  local: false,
+  baseURL: 'http://localhost:5000'
 }

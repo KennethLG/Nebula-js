@@ -4,28 +4,7 @@ import TYPES from './DI/tokens';
 import { IEventManager } from './EventManager';
 
 export interface IRandom {
-  initialized: boolean;
   seed: Seed;
-  init: () => Promise<void>
-}
-
-class SeedGenerator {
-
-  private readonly httpService = new HttpService();
-
-  async getRemoteSeed() {
-    const response = await this.httpService.getSeed();
-    console.log("🚀 ~ SeedGenerator ~ getRemoteSeed ~ response:", response)
-    if (response) {
-      return response.data.seed;
-    }
-    console.log('could not get seed remotely. Trying locally...');
-    return this.getLocalSeed();
-  }
-
-  getLocalSeed() {
-    return Date.now()
-  }
 }
 
 class Seed {
@@ -55,33 +34,16 @@ class Seed {
 @injectable()
 export default class Random implements IRandom {
   private _seed: Seed | null;
-  public initialized: boolean;
 
   constructor(
-    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager
+    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
   ) {
-    this._seed = null
-    this.initialized = false;
+    this._seed = null;
+
+    this.eventManager.on('matchFound', (data) => {
+      this._seed = new Seed(data.seed);
+    })
   }
-
-  async init() {
-    const seed = await this.getSeed();
-    this._seed = new Seed(seed);
-    this.initialized = true;
-    this.eventManager.emit('seedGenerated');
-  }
-
-  private async getSeed() {
-    const remote = true;
-    const seedGenerator = new SeedGenerator();
-
-    if (remote) {
-      return await seedGenerator.getRemoteSeed();
-    }
-    console.log(this._seed);
-    return seedGenerator.getLocalSeed();
-  }
-
   public get seed(): Seed {
     if (this._seed !== null) {
       return this._seed;

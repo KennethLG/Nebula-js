@@ -10,6 +10,7 @@ import { type IGUI } from '@/systems/GUI'
 import { type IGameParams } from '@/systems/GameParams'
 import { type ILevelGenerator } from '@/systems/LevelGenerator'
 import { type ISceneManager } from '@/systems/SceneManager'
+import { IMatchmakingSocket } from '@/systems/http/matchmakingSocket'
 import { inject, injectable } from 'inversify'
 
 @injectable()
@@ -18,6 +19,7 @@ export default class GameScene implements IScene {
   private gameOverScreen: HTMLElement
   private player: IPlayer | null
   private ufo: IUfo | null
+  private matchFound = false
 
   constructor (
     @inject(TYPES.ICameraController) private readonly cameraController: ICameraController,
@@ -25,12 +27,15 @@ export default class GameScene implements IScene {
     @inject(TYPES.IGameParams) private readonly gameParams: IGameParams,
     @inject(TYPES.ILevelGenerator) private readonly levelGenerator: ILevelGenerator,
     @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
-    @inject(TYPES.IGUI) private readonly gui: IGUI
+    @inject(TYPES.IGUI) private readonly gui: IGUI,
+    @inject(TYPES.IMatchmakingSocket) private readonly matchmakingSocket: IMatchmakingSocket
   ) {
     this.gameOverScreen = document.createElement('div')
     this.levelGenerator = container.get<ILevelGenerator>(TYPES.ILevelGenerator)
     this.player = null
     this.ufo = null
+    this.matchmakingSocket.init()
+    // this.matchmakingSocket = new MatchmakingSocket()
   }
 
   init (): void {
@@ -45,15 +50,21 @@ export default class GameScene implements IScene {
       }
     })
 
-    this.levelGenerator.init()
-    const player = container.get<IPlayer>(TYPES.IPlayer)
-    this.sceneManager.add(player)
-    this.player = player
-    this.cameraController.camera.position.setY(0)
-    this.planetsScore = []
+    this.eventManager.on('matchFound', () => {
+      this.matchFound = true;
+      this.levelGenerator.init()
+      const player = container.get<IPlayer>(TYPES.IPlayer)
+      this.sceneManager.add(player)
+      this.player = player
+      this.cameraController.camera.position.setY(0)
+      this.planetsScore = []
+    })
+
   }
 
   update (): void {
+    if (!this.matchFound) return;
+    
     this.levelGenerator.update()
     this.updateCamera()
     this.removeOuterBullets()

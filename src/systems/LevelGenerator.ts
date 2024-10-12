@@ -47,11 +47,8 @@ export default class LevelGenerator implements ILevelGenerator {
   }
 
   init (): void {
-    this.random.init();
-    this.eventManager.on('seedGenerated', () => {
-      this.hue = this.genHue()
-      this.currentColor = this.genColor()
-    })
+    this.hue = this.genHue()
+    this.currentColor = this.genColor()
     this.lastChunkY = 0
     this.chunkSize = 4
     this.triggerThreshold = 3
@@ -63,10 +60,6 @@ export default class LevelGenerator implements ILevelGenerator {
   }
   
   update (): void {
-    if (!this.random.initialized) {
-      console.log('Waiting for seed to generate world');
-      return;
-    }
     this.random.seed.resetCurrent()
     this.checkForChunkGeneration()
     this.removeOuterPlanets()

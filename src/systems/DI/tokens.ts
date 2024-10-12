@@ -15,7 +15,9 @@ const TYPES = {
   IUfo: Symbol.for('IUfo'),
   IPlayer: Symbol.for('IPlayer'),
   IPlanet: Symbol.for('IPlanet'),
-  IMain: Symbol.for('IMain')
+  IMain: Symbol.for('IMain'),
+  IHttp: Symbol.for('IHttp'),
+  IMatchmakingSocket: Symbol.for('IMatchmakingSocket')
 }
 
 export default TYPES
