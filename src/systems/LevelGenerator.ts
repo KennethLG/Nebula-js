@@ -6,6 +6,7 @@ import { type IGameParams } from './GameParams'
 import { inject, injectable } from 'inversify'
 import { type ICameraController } from './CameraController'
 import TYPES from './DI/tokens'
+import { IEventManager } from './EventManager'
 
 export interface ILevelGenerator {
   init: () => void
@@ -30,6 +31,7 @@ export default class LevelGenerator implements ILevelGenerator {
     @inject(TYPES.ICameraController) private readonly cameraController: ICameraController,
     @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
     @inject(TYPES.IRandom) private readonly random: IRandom,
+    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
     @inject('Factory<Planet>') private readonly createPlanet: (x: number, y: number, properties: PlanetProperties) => IPlanet
   ) {
     this.hue = 0
@@ -45,9 +47,11 @@ export default class LevelGenerator implements ILevelGenerator {
   }
 
   init (): void {
-    this.random.resetCurrent()
-    this.hue = this.genHue()
-    this.currentColor = this.genColor()
+    this.random.init();
+    this.eventManager.on('seedGenerated', () => {
+      this.hue = this.genHue()
+      this.currentColor = this.genColor()
+    })
     this.lastChunkY = 0
     this.chunkSize = 4
     this.triggerThreshold = 3
@@ -57,8 +61,13 @@ export default class LevelGenerator implements ILevelGenerator {
     this.planetRadius = 1
     this.planetRadiusRange = 1
   }
-
+  
   update (): void {
+    if (!this.random.initialized) {
+      console.log('Waiting for seed to generate world');
+      return;
+    }
+    this.random.seed.resetCurrent()
     this.checkForChunkGeneration()
     this.removeOuterPlanets()
   }
@@ -92,7 +101,7 @@ export default class LevelGenerator implements ILevelGenerator {
     while (yCurrent < yEnd) {
       const planetRadius = this.genPlanetRadius()
       const xPos = this.genXPos()
-      const yRange = this.yRangeBetweenPlanets * this.random.next()
+      const yRange = this.yRangeBetweenPlanets * this.random.seed.next()
       const yPos = this.yMarginBetweenPlanets + yRange + (planetRadius * 2)
       yCurrent += yPos
       this.addPlanetAt(xPos, yCurrent, planetRadius)
@@ -117,12 +126,12 @@ export default class LevelGenerator implements ILevelGenerator {
   }
 
   private genPlanetRadius (): number {
-    return this.planetRadius + (this.planetRadiusRange * this.random.next())
+    return this.planetRadius + (this.planetRadiusRange * this.random.seed.next())
   }
 
   private genXPos (): number {
-    const xRange = this.xRangeBetweenPlanets * this.random.next()
-    return this.random.next() < 0.5 ? -xRange : xRange
+    const xRange = this.xRangeBetweenPlanets * this.random.seed.next()
+    return this.random.seed.next() < 0.5 ? -xRange : xRange
   }
 
   private genHue (): number {
@@ -139,8 +148,8 @@ export default class LevelGenerator implements ILevelGenerator {
 
   private genColor (): string {
     const h = Math.round(this.hue)
-    const s = Math.round(this.random.randomRange(30, 100))
-    const l = Math.round(this.random.randomRange(30, 100))
+    const s = Math.round(this.random.seed.randomRange(30, 100))
+    const l = Math.round(this.random.seed.randomRange(30, 100))
     return `hsl(${h}, ${s}%, ${l}%)`
   }
 }

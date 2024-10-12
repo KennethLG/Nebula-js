@@ -60,11 +60,11 @@ export default class Planet extends Instance implements IPlanet {
         xTiles: 6,
         yTiles: 1
       })
-      const randomIndex = this.random.randomRange(0, 5)
+      const randomIndex = this.random.seed.randomRange(0, 5)
       sprite.loop([Math.round(randomIndex)], 1)
       const spritePosition = new THREE.Vector3(
-        x + this.random.randomRange(-radius, radius),
-        y + this.random.randomRange(-radius, radius),
+        x + this.random.seed.randomRange(-radius, radius),
+        y + this.random.seed.randomRange(-radius, radius),
         0
       )
       sprite.sprite.position.copy(spritePosition)

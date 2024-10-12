@@ -1,3 +1,4 @@
 export default {
-  assetsPath: '/'
+  assetsPath: '/',
+  local: false
 }
