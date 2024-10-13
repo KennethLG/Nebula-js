@@ -9,6 +9,7 @@ interface InstanceConfig {
   position: THREE.Vector3
   radius: number
   mesh: THREE.Object3D
+  id?: number
 }
 
 @injectable()
@@ -17,7 +18,7 @@ export default class Instance implements IInstance {
   body: IBody
   id: number
 
-  constructor ({ name, position, radius, mesh }: InstanceConfig) {
+  constructor ({ name, position, radius, mesh, id }: InstanceConfig) {
     this.name = name
     const boundingSphere = new BoundingSphere(radius)
     this.body = new Body({
@@ -25,7 +26,7 @@ export default class Instance implements IInstance {
       boundingSphere,
       mesh
     })
-    this.id = Date.now()
+    this.id = id || Date.now()
   }
 
   init (): void {

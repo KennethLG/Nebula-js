@@ -9,6 +9,7 @@ import { type IEventManager } from '@/systems/EventManager'
 import { type IGUI } from '@/systems/GUI'
 import { type IGameParams } from '@/systems/GameParams'
 import { type ILevelGenerator } from '@/systems/LevelGenerator'
+import { IPlayerDataController } from '@/systems/PlayerDataController'
 import { type ISceneManager } from '@/systems/SceneManager'
 import { IMatchmakingSocket } from '@/systems/http/matchmakingSocket'
 import { inject, injectable } from 'inversify'
@@ -28,13 +29,16 @@ export default class GameScene implements IScene {
     @inject(TYPES.ILevelGenerator) private readonly levelGenerator: ILevelGenerator,
     @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
     @inject(TYPES.IGUI) private readonly gui: IGUI,
-    @inject(TYPES.IMatchmakingSocket) private readonly matchmakingSocket: IMatchmakingSocket
+    @inject(TYPES.IMatchmakingSocket) private readonly matchmakingSocket: IMatchmakingSocket,
+    @inject(TYPES.IPlayerDataController) private readonly playerDataController: IPlayerDataController,
+    @inject('Factory<Player>') private readonly createPlayer: (controllable: boolean, id: number) => IPlayer
   ) {
     this.gameOverScreen = document.createElement('div')
     this.levelGenerator = container.get<ILevelGenerator>(TYPES.ILevelGenerator)
     this.player = null
     this.ufo = null
-    this.matchmakingSocket.init()
+    this.playerDataController.getPlayerData()
+    this.matchmakingSocket.init(this.playerDataController.playerData.id)
     // this.matchmakingSocket = new MatchmakingSocket()
   }
 
@@ -50,12 +54,22 @@ export default class GameScene implements IScene {
       }
     })
 
-    this.eventManager.on('matchFound', () => {
+    this.eventManager.on('matchFound', (data) => {
+      console.log("executed", data)
       this.matchFound = true;
       this.levelGenerator.init()
-      const player = container.get<IPlayer>(TYPES.IPlayer)
+      console.log(this.playerDataController.playerData, data.players)
+      const currentPlayer = data.players.find(player => player.id === this.playerDataController.playerData.id);
+      const player = this.createPlayer(true, currentPlayer.id)
       this.sceneManager.add(player)
       this.player = player
+      
+      // const otherPlayers = data.players.filter(player => player.id !== this.playerDataController.playerData.id);
+      // otherPlayers.forEach(player => {
+      //   const newPlayer = this.createPlayer(false, player.id)
+      //   this.sceneManager.add(newPlayer)
+      // })
+
       this.cameraController.camera.position.setY(0)
       this.planetsScore = []
     })
@@ -64,7 +78,7 @@ export default class GameScene implements IScene {
 
   update (): void {
     if (!this.matchFound) return;
-    
+
     this.levelGenerator.update()
     this.updateCamera()
     this.removeOuterBullets()
@@ -78,11 +92,13 @@ export default class GameScene implements IScene {
   }
 
   private updateCamera (): void {
-    const desiredPlayer = this.sceneManager.instances.find(inst => inst.name === 'Player')
-    if (desiredPlayer == null) {
-      throw new Error('No player found')
-    }
-    this.cameraController.follow = desiredPlayer.body.position
+    // const desiredPlayer = this.sceneManager.instances.find(inst => inst.name === 'Player')
+    // if (desiredPlayer == null) {
+    //   throw new Error('No player found')
+    // }
+    if (!this.player) return;
+
+    this.cameraController.follow = this.player.body.position
   }
 
   private checkGameEnd (player: IPlayer): void {

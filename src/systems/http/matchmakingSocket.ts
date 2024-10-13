@@ -5,7 +5,7 @@ import TYPES from "../DI/tokens";
 import { IEventManager } from "../EventManager";
 
 export interface IMatchmakingSocket {
-    init: () => void;
+    init: (id: number) => void;
 }
 
 @injectable()
@@ -18,9 +18,9 @@ export default class MatchmakingSocket {
         this.socket = io(config.baseURL)
     }
 
-    init() {
+    init(id: number) {
         this.socket.on('connect', () => {
-            this.joinMatch()
+            this.joinMatch(id)
             this.onMatchFound()
         })
 
@@ -29,8 +29,10 @@ export default class MatchmakingSocket {
         })
     }
 
-    private joinMatch() {
-        this.socket.emit('joinMatch')
+    private joinMatch(id: number) {
+        this.socket.emit('joinMatch', {
+            id
+        })
     }
 
     private onMatchFound() {

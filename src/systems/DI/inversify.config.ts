@@ -19,11 +19,13 @@ import Ufo, { type IUfo } from '@/components/UFO'
 import { type IMain, Main } from '@/bootstrap'
 import Planet, { type IPlanet, type PlanetProperties } from '@/components/Planet'
 import MatchmakingSocket, { IMatchmakingSocket } from '../http/matchmakingSocket'
+import PlayerDataController, { IPlayerDataController } from '../PlayerDataController'
 
 const container = new Container()
 container.bind<IEventManager>(TYPES.IEventManager).to(EventManager).inSingletonScope()
 container.bind<IMatchmakingSocket>(TYPES.IMatchmakingSocket).to(MatchmakingSocket)
 container.bind<IRandom>(TYPES.IRandom).to(Random).inSingletonScope()
+container.bind<IPlayerDataController>(TYPES.IPlayerDataController).to(PlayerDataController).inSingletonScope()
 container.bind<ISceneManager>(TYPES.ISceneManager).to(SceneManager).inSingletonScope()
 container.bind<IGameParams>(TYPES.IGameParams).to(GameParams).inSingletonScope()
 container.bind<IScene>(TYPES.IScene).to(GameScene).inSingletonScope()
@@ -49,4 +51,18 @@ container.bind<interfaces.Factory<IPlanet>>('Factory<Planet>')
     // return context.container.get<IPlanet>(TYPES.IPlanet)
   }
 })
+
+container.bind<interfaces.Factory<IPlayer>>('Factory<Player>')
+  .toFactory<IPlayer, [boolean, number]>((context: interfaces.Context) => {
+    return (controllable: boolean, id?: number) => {
+      const movementController = context.container.get<IMovementController>(TYPES.IMovementController)
+      const orientationController = context.container.get<IOrientationController>(TYPES.IOrientationController)
+      const collisionController = context.container.get<ICollisionController>(TYPES.ICollisionController)
+      const sceneManager = context.container.get<ISceneManager>(TYPES.ISceneManager)
+      const eventManager = context.container.get<IEventManager>(TYPES.IEventManager)
+      const gameParams = context.container.get<IGameParams>(TYPES.IGameParams)
+      
+      return new Player(movementController, orientationController, collisionController, sceneManager, eventManager, gameParams, controllable, id)
+    }
+  })
 export default container
