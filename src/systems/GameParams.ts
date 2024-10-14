@@ -1,8 +1,6 @@
 import * as THREE from 'three'
 import { getItem, setItem } from './GameStorage'
 import { type IEventManager } from './EventManager'
-import { inject, injectable } from 'inversify'
-import TYPES from './DI/tokens'
 
 interface Scores {
   planetsRecord: number
@@ -23,7 +21,6 @@ export interface IGameParams {
   restartScores: () => void
 }
 
-@injectable()
 export default class GameParams implements IGameParams {
   readonly clock: THREE.Clock
   gameOver = false
@@ -35,7 +32,7 @@ export default class GameParams implements IGameParams {
   scores: Scores
 
   constructor (
-    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager
+    private readonly eventManager: IEventManager
   ) {
     this.clock = new THREE.Clock()
     this.scores = {

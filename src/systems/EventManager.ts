@@ -1,4 +1,3 @@
-import { injectable } from 'inversify'
 
 export interface IEventManager<T extends string = string> {
   on: (event: T, callback: (...args: any[]) => void) => void
@@ -6,7 +5,6 @@ export interface IEventManager<T extends string = string> {
   emit: (event: T, ...args: any[]) => void
 }
 
-@injectable()
 export default class EventManager<T extends string = string> implements IEventManager<T> {
   eventMap = {} as Record<T, Set<(...args: any[]) => void>>
 

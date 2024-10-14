@@ -1,6 +1,5 @@
 import type * as THREE from 'three'
 import { IGameParams } from './GameParams'
-import { inject, injectable } from 'inversify'
 import TYPES from './DI/tokens'
 
 type Style = Partial<CSSStyleDeclaration>
@@ -12,13 +11,12 @@ export interface IGUI {
   init: (renderer: THREE.WebGLRenderer) => void
 }
 
-@injectable()
 export default class GUI implements IGUI {
   private readonly overlay: HTMLElement
   private planetsScore?: HTMLElement
   private planetsRecord?: HTMLElement
 
-  constructor (@inject(TYPES.IGameParams) private readonly gameParams: IGameParams) {
+  constructor (private readonly gameParams: IGameParams) {
     this.overlay = document.createElement('div')
     this.overlay.style.position = 'absolute'
   }

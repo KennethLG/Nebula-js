@@ -2,9 +2,8 @@ import type Bullet from '@/components/Bullet'
 import { type IPlayer } from '@/components/Player'
 import { type IUfo } from '@/components/UFO'
 import type IScene from '@/entities/IScene'
+import { KeyboardManager } from '@/systems'
 import { type ICameraController } from '@/systems/CameraController'
-import container from '@/systems/DI/inversify.config'
-import TYPES from '@/systems/DI/tokens'
 import { type IEventManager } from '@/systems/EventManager'
 import { type IGUI } from '@/systems/GUI'
 import { type IGameParams } from '@/systems/GameParams'
@@ -12,9 +11,7 @@ import { type ILevelGenerator } from '@/systems/LevelGenerator'
 import { IPlayerDataController } from '@/systems/PlayerDataController'
 import { type ISceneManager } from '@/systems/SceneManager'
 import { IMatchmakingSocket } from '@/systems/http/matchmakingSocket'
-import { inject, injectable } from 'inversify'
 
-@injectable()
 export default class GameScene implements IScene {
   private planetsScore: number[] = []
   private gameOverScreen: HTMLElement
@@ -23,32 +20,34 @@ export default class GameScene implements IScene {
   private matchFound = false
 
   constructor (
-    @inject(TYPES.ICameraController) private readonly cameraController: ICameraController,
-    @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
-    @inject(TYPES.IGameParams) private readonly gameParams: IGameParams,
-    @inject(TYPES.ILevelGenerator) private readonly levelGenerator: ILevelGenerator,
-    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
-    @inject(TYPES.IGUI) private readonly gui: IGUI,
-    @inject(TYPES.IMatchmakingSocket) private readonly matchmakingSocket: IMatchmakingSocket,
-    @inject(TYPES.IPlayerDataController) private readonly playerDataController: IPlayerDataController,
-    @inject('Factory<Player>') private readonly createPlayer: (controllable: boolean, id: number) => IPlayer
+    private readonly cameraController: ICameraController,
+    private readonly sceneManager: ISceneManager,
+    private readonly gameParams: IGameParams,
+    private readonly levelGenerator: ILevelGenerator,
+    private readonly eventManager: IEventManager,
+    private readonly gui: IGUI,
+    private readonly matchmakingSocket: IMatchmakingSocket,
+    private readonly playerDataController: IPlayerDataController,
+    private readonly createPlayer: (controllable: boolean, id: number) => IPlayer,
+    private readonly createUfoInstance: () => IUfo
   ) {
     this.gameOverScreen = document.createElement('div')
-    this.levelGenerator = container.get<ILevelGenerator>(TYPES.ILevelGenerator)
     this.player = null
     this.ufo = null
     this.playerDataController.getPlayerData()
     this.matchmakingSocket.init(this.playerDataController.playerData.id)
-    // this.matchmakingSocket = new MatchmakingSocket()
+    new KeyboardManager(this.eventManager)
   }
 
   init (): void {
+    console.log('gamescene init')
     this.gameOverScreen = this.createGameOverScreen()
     this.changeGameOverScreenVisibility('hidden')
     this.eventManager.on('gameOver', () => {
       this.changeGameOverScreenVisibility('visible')
     })
     this.eventManager.on('keyup', () => {
+      console.log("keyup on gameover", this.gameParams.gameOver, this.gameParams.canRestart)
       if (this.gameParams.gameOver && this.gameParams.canRestart) {
         this.gameRestart()
       }
@@ -64,11 +63,11 @@ export default class GameScene implements IScene {
       this.sceneManager.add(player)
       this.player = player
       
-      // const otherPlayers = data.players.filter(player => player.id !== this.playerDataController.playerData.id);
-      // otherPlayers.forEach(player => {
-      //   const newPlayer = this.createPlayer(false, player.id)
-      //   this.sceneManager.add(newPlayer)
-      // })
+      const otherPlayers = data.players.filter(player => player.id !== this.playerDataController.playerData.id);
+      otherPlayers.forEach(player => {
+        const newPlayer = this.createPlayer(false, player.id)
+        this.sceneManager.add(newPlayer)
+      })
 
       this.cameraController.camera.position.setY(0)
       this.planetsScore = []
@@ -179,7 +178,7 @@ export default class GameScene implements IScene {
     if (player == null || this.ufo != null) return
 
     if (this.gameParams.scores.planets === 5) {
-      const ufo = container.get<IUfo>(TYPES.IUfo)
+      const ufo = this.createUfoInstance()
       this.ufo = ufo
       ufo.defineTarget(player)
 

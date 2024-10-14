@@ -1,16 +1,13 @@
-import { inject, injectable } from 'inversify'
 import { type IEventManager } from './EventManager'
-import TYPES from './DI/tokens'
 
 export interface IKeyboardManager {
   keys: Record<string, boolean>
 }
 
-@injectable()
 export default class KeyboardManager implements IKeyboardManager {
   keys: Record<string, boolean> = {}
 
-  constructor (@inject(TYPES.IEventManager) private readonly eventManager: IEventManager) {
+  constructor (private readonly eventManager: IEventManager) {
     window.addEventListener('keydown', this.onKeyDown.bind(this))
     window.addEventListener('keyup', this.onKeyUp.bind(this))
   }
@@ -22,6 +19,7 @@ export default class KeyboardManager implements IKeyboardManager {
 
   private onKeyUp (event: KeyboardEvent): void {
     this.keys[event.key] = false
+    console.log('Keyup emitted:', event.key)
     this.eventManager.emit('keyup', event.key)
   }
 }

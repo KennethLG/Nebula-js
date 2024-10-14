@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import { inject, injectable } from 'inversify'
 import TYPES from './systems/DI/tokens'
 import { ISceneManager } from './systems/SceneManager'
 import { ICameraController } from './systems/CameraController'
@@ -11,24 +10,18 @@ export interface IMain {
   init: () => void
 }
 
-@injectable()
 export class Main implements IMain {
   private readonly renderer: THREE.WebGLRenderer
 
   constructor (
-    @inject(TYPES.ISceneManager)
     private readonly sceneManager: ISceneManager,
 
-    @inject(TYPES.ICameraController)
     private readonly cameraController: ICameraController,
 
-    @inject(TYPES.IGameParams)
     private readonly gameParams: IGameParams,
 
-    @inject(TYPES.IGUI)
     private readonly gui: IGUI,
 
-    @inject(TYPES.IScene)
     private readonly currentScene: IScene
   ) {
     this.renderer = new THREE.WebGLRenderer()

@@ -9,14 +9,12 @@ import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
 import type Explosion from '../UFO/explosion'
-import { type IMovementController } from '../../systems/MovementController'
-import { type IOrientationController } from './OrientationController'
-import { type ICollisionController } from './CollisionController'
+import MovementController, { type IMovementController } from '../../systems/MovementController'
+import OrientationController, { type IOrientationController } from './OrientationController'
+import CollisionController, { type ICollisionController } from './CollisionController'
 import { type ISceneManager } from '@/systems/SceneManager'
 import { type IEventManager } from '@/systems/EventManager'
 import { type IGameParams } from '@/systems/GameParams'
-import { inject, injectable } from 'inversify'
-import TYPES from '@/systems/DI/tokens'
 
 interface AnimationContext {
   xVel: THREE.Vector3
@@ -34,7 +32,6 @@ export interface IPlayer extends Instance {
   explosionCollision: boolean
   controllable: boolean
 }
-@injectable()
 export default class Player extends Instance implements IPlayer {
   onGround = false
   gravity = new THREE.Vector3(0, 0, 0)
@@ -48,14 +45,15 @@ export default class Player extends Instance implements IPlayer {
   private readonly sprite: ISprite
   private readonly animationController: AnimationController<AnimationContext>
   private readonly onGameOverBound: () => void
-
+  
   constructor (
-    @inject(TYPES.IMovementController) private readonly movementController: IMovementController,
-    @inject(TYPES.IOrientationController) private readonly orientationController: IOrientationController,
-    @inject(TYPES.ICollisionController) private readonly collisionController: ICollisionController,
-    @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
-    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
-    @inject(TYPES.IGameParams) private readonly gameParams: IGameParams,
+    private readonly sceneManager: ISceneManager,
+    private readonly eventManager: IEventManager,
+    private readonly gameParams: IGameParams,
+    private readonly playerEvents: IEventManager,
+    private readonly movementController: IMovementController,
+    private readonly orientationController: IOrientationController,
+    private readonly collisionController: ICollisionController,
     controllable: boolean,
     id?: number
   ) {
@@ -93,7 +91,6 @@ export default class Player extends Instance implements IPlayer {
         sequence: [1],
         speed: 1,
         condition: (context) => {
-          console.log(this.id)
           return context.dead
         }
       }
@@ -103,14 +100,17 @@ export default class Player extends Instance implements IPlayer {
   }
 
   init (): void {
+    console.log('subscribe gameover')
     this.eventManager.on('gameOver', this.onGameOverBound)
   }
 
   private onGameOver (): void {
+    console.log('onGameOver')
     this.dead = true
   }
 
   update (): void {
+    console.log(this.dead)
     this.planet = getNearestPlanet(this.sceneManager, this.body.position)
 
     if (this.planet == null) return
@@ -120,13 +120,9 @@ export default class Player extends Instance implements IPlayer {
       this.planet.body.position
     )
 
-    if (this.controllable) {
-      this.moveX()
-      this.manageJumping()
-    }
-
-    this.manageGrounding()
+    this.moveX()
     this.manageOrientation()
+    this.manageGrounding()
     this.applyForces()
 
     // animation
@@ -140,13 +136,8 @@ export default class Player extends Instance implements IPlayer {
   }
 
   private moveX (): void {
-    if (this.dead) return
+    if (this.dead || !this.controllable) return
     this.movementController.handleXMovement(this.body.quaternion, this.xVel)
-  }
-  
-  private manageJumping (): void {
-    if (this.dead || !this.onGround) return;
-    this.movementController.handleJump(this.gravityDirection, this.gravity)
   }
 
   private getGravityDirection (from: THREE.Vector3, to: THREE.Vector3): THREE.Vector3 {
@@ -195,7 +186,8 @@ export default class Player extends Instance implements IPlayer {
       to: this.planet,
       velocity: this.gravity
     })
-    if (this.dead) return
+    if (this.dead || !this.controllable) return
+    this.movementController.handleJump(this.gravityDirection, this.gravity)
   }
 
   private getCollidingExplosion (): Explosion | undefined {

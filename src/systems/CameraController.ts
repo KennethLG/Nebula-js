@@ -1,4 +1,3 @@
-import { injectable } from 'inversify'
 import * as THREE from 'three'
 
 interface CameraSize {
@@ -14,7 +13,6 @@ export interface ICameraController {
   update: () => void
 }
 
-@injectable()
 export default class CameraController implements ICameraController {
   camera: THREE.OrthographicCamera
   follow: THREE.Vector3

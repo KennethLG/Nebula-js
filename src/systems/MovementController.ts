@@ -1,8 +1,6 @@
 import * as THREE from 'three'
 import { type IEventManager } from './EventManager'
 import { type IKeyboardManager } from './KeyboardManager'
-import { inject, injectable } from 'inversify'
-import TYPES from './DI/tokens'
 
 export interface IMovementController {
   handleXMovement: (
@@ -12,7 +10,6 @@ export interface IMovementController {
   handleJump: (gravityDirection: THREE.Vector3, velocity: THREE.Vector3) => void
 }
 
-@injectable()
 export default class MovementController implements IMovementController {
   private readonly moveLeftKey = 'a'
   private readonly moveRightKey = 'd'
@@ -21,13 +18,13 @@ export default class MovementController implements IMovementController {
   private readonly moveVel = 0.01
   private readonly friction = 0.9
 
-  @inject(TYPES.IKeyboardManager)
-  private readonly keyboardManager!: IKeyboardManager
+  constructor(
+    private readonly keyboardManager: IKeyboardManager,
+    private readonly eventManager: IEventManager
+  ) { }
 
-  @inject(TYPES.IEventManager)
-  private readonly eventManager!: IEventManager
 
-  handleXMovement (
+  handleXMovement(
     quaternion: THREE.Quaternion,
     xVelocity: THREE.Vector3
   ): THREE.Vector3 {
@@ -51,7 +48,7 @@ export default class MovementController implements IMovementController {
     return xVelocity
   }
 
-  handleJump (gravityDirection: THREE.Vector3, velocity: THREE.Vector3): void {
+  handleJump(gravityDirection: THREE.Vector3, velocity: THREE.Vector3): void {
     if (this.keyboardManager.keys[this.jumpKey]) {
       const jumpDir = gravityDirection.negate().normalize()
       velocity.copy(jumpDir.multiplyScalar(this.jumpForce))

@@ -1,21 +1,20 @@
-import Planet, { type IPlanet } from '@/components/Planet'
+import Planet, { PlanetProperties, type IPlanet } from '@/components/Planet'
 import { ISceneManager } from '../SceneManager'
 import { IGameParams } from '../GameParams'
-import { inject, injectable } from 'inversify'
-import TYPES from '../DI/tokens'
+import { IRandom } from '../Random'
 
 interface IPlanetFactory {
-  createPlanet: (x: number, y: number, radius: number, color: THREE.ColorRepresentation) => IPlanet
+  createPlanet: (x: number, y: number, planetProperties: PlanetProperties) => IPlanet
 }
 
-@injectable()
 export class PlanetFactory implements IPlanetFactory {
   constructor (
-    @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
-    @inject(TYPES.IGameParams) private readonly gameParams: IGameParams
+    private readonly sceneManager: ISceneManager,
+    private readonly gameParams: IGameParams,
+    private readonly random: IRandom
   ) {}
 
-  createPlanet (x: number, y: number, radius: number, color: THREE.ColorRepresentation): Planet {
-    return new Planet(x, y, this.sceneManager, this.gameParams, { radius, color })
+  createPlanet (x: number, y: number, planetProperties: PlanetProperties): Planet {
+    return new Planet(x, y, this.sceneManager, this.gameParams, this.random, planetProperties)
   }
 }

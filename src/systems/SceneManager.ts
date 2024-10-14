@@ -1,5 +1,4 @@
 import type Instance from '@/components/Instance'
-import { injectable } from 'inversify'
 import * as THREE from 'three'
 
 export interface ISceneManager {
@@ -12,7 +11,6 @@ export interface ISceneManager {
   animate: () => void
 }
 
-@injectable()
 export default class SceneManager implements ISceneManager {
   instances: Instance[] = []
   scene: THREE.Scene
@@ -63,11 +61,12 @@ export default class SceneManager implements ISceneManager {
       instance.baseUpdate()
     })
 
-    if (!this.canInitInstances) return
-
+    if (!this.canInitInstances || this.instances.length === 0) return
     this.canInitInstances = false
+    console.log('can init instances', this.canInitInstances, this.instances.length)
     this.instances.forEach((instance) => {
       instance.init()
+      console.log('init instance', instance)
     })
   }
 }

@@ -1,6 +1,5 @@
 import type * as THREE from 'three'
 import type Instance from '../Instance'
-import { injectable } from 'inversify'
 
 interface Config {
   velocity: THREE.Vector3
@@ -13,7 +12,6 @@ export interface ICollisionController {
   areColliding: (from: Instance, to: Instance) => boolean
 }
 
-@injectable()
 export default class CollisionController implements ICollisionController {
   handleCircularCollision ({ from, to, velocity }: Config): void {
     const directionToSurface = from.body.position

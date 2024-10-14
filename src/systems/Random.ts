@@ -1,6 +1,3 @@
-import { inject, injectable } from 'inversify'
-import { HttpService } from './http'
-import TYPES from './DI/tokens';
 import { IEventManager } from './EventManager';
 
 export interface IRandom {
@@ -31,12 +28,11 @@ class Seed {
   }
 }
 
-@injectable()
 export default class Random implements IRandom {
   private _seed: Seed | null;
 
   constructor(
-    @inject(TYPES.IEventManager) private readonly eventManager: IEventManager,
+    private readonly eventManager: IEventManager,
   ) {
     this._seed = null;
 

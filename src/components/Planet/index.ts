@@ -2,7 +2,6 @@ import * as THREE from 'three'
 import Instance from '../Instance'
 import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
-import { inject } from 'inversify'
 import TYPES from '@/systems/DI/tokens'
 import { IGameParams } from '@/systems/GameParams'
 import { ISceneManager } from '@/systems/SceneManager'
@@ -29,9 +28,9 @@ export default class Planet extends Instance implements IPlanet {
   constructor (
     x: number,
     y: number,
-    @inject(TYPES.ISceneManager) private readonly sceneManager: ISceneManager,
-    @inject(TYPES.IGameParams) private readonly gameParams: IGameParams,
-    @inject(TYPES.IRandom) private readonly random: IRandom,
+    private readonly sceneManager: ISceneManager,
+    private readonly gameParams: IGameParams,
+    private readonly random: IRandom,
     properties?: PlanetProperties
   ) {
     const geometry = new THREE.CircleGeometry(properties?.radius)

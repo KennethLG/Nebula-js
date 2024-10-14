@@ -7,7 +7,6 @@ import Bullet from '../Bullet'
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
 import { type ISceneManager } from '@/systems/SceneManager'
 import { type IGameParams } from '@/systems/GameParams'
-import { inject, injectable } from 'inversify'
 import TYPES from '@/systems/DI/tokens'
 
 export interface IUfo extends Instance {
@@ -19,7 +18,6 @@ export interface IUfo extends Instance {
   defineTarget: (instance: Instance) => void
 }
 
-@injectable()
 export default class Ufo extends Instance implements IUfo {
   xVel = new THREE.Vector3(0, 0, 0)
   yVel = new THREE.Vector3(0, 0, 0)
@@ -30,10 +28,7 @@ export default class Ufo extends Instance implements IUfo {
   private target?: IInstance
 
   constructor (
-    @inject(TYPES.ISceneManager)
     private readonly sceneManager: ISceneManager,
-
-    @inject(TYPES.IGameParams)
     private readonly gameParams: IGameParams
   ) {
     const sprite = new Sprite({
