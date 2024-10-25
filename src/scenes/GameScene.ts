@@ -10,7 +10,7 @@ import { type IGameParams } from '@/systems/GameParams'
 import { type ILevelGenerator } from '@/systems/LevelGenerator'
 import { IPlayerDataController } from '@/systems/PlayerDataController'
 import { type ISceneManager } from '@/systems/SceneManager'
-import { IMatchmakingSocket } from '@/systems/http/matchmakingSocket'
+import { IMatchSocket } from '@/systems/http/matchmakingSocket'
 
 export default class GameScene implements IScene {
   private planetsScore: number[] = []
@@ -26,7 +26,7 @@ export default class GameScene implements IScene {
     private readonly levelGenerator: ILevelGenerator,
     private readonly eventManager: IEventManager,
     private readonly gui: IGUI,
-    private readonly matchmakingSocket: IMatchmakingSocket,
+    private readonly matchmakingSocket: IMatchSocket,
     private readonly playerDataController: IPlayerDataController,
     private readonly createPlayer: (controllable: boolean, id: number) => IPlayer,
     private readonly createUfoInstance: () => IUfo

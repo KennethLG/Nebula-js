@@ -6,7 +6,7 @@ import GUI from "../GUI"
 import { Scene } from "three"
 import GameScene from "@/scenes/GameScene"
 import LevelGenerator from "../LevelGenerator"
-import MatchmakingSocket from "../http/matchmakingSocket"
+import MatchSocket from "../http/matchmakingSocket"
 import PlayerDataController from "../PlayerDataController"
 import Random from "../Random"
 import { PlanetFactory } from "./PlanetFatory"
@@ -29,7 +29,7 @@ export const mainFactory = () => {
         eventsManager, 
         planetFactory.createPlanet
     )
-    const matchmakingSocket = new MatchmakingSocket(eventsManager)
+    const matchmakingSocket = new MatchSocket(eventsManager)
     const playerDataController = new PlayerDataController()
     const playerFactory = new PlayerFactory(
         sceneManager,

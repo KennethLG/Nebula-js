@@ -1,13 +1,12 @@
 import config from "@/config"
 import { io, Socket } from "socket.io-client"
-import TYPES from "../DI/tokens";
 import { IEventManager } from "../EventManager";
 
-export interface IMatchmakingSocket {
+export interface IMatchSocket {
     init: (id: number) => void;
 }
 
-export default class MatchmakingSocket {
+export default class MatchSocket {
     private readonly socket: Socket
 
     constructor(
