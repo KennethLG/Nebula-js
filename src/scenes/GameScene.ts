@@ -10,7 +10,9 @@ import { type IGameParams } from '@/systems/GameParams'
 import { type ILevelGenerator } from '@/systems/LevelGenerator'
 import { IPlayerDataController } from '@/systems/PlayerDataController'
 import { type ISceneManager } from '@/systems/SceneManager'
-import { IMatchSocket } from '@/systems/http/matchmakingSocket'
+import { IMatchSocket } from '@/systems/http/matchSocket'
+import PlayerStateSocket from '@/systems/http/playerStateSocket'
+import { MatchFoundResponse, PlayerUpdatedResponse } from '@/systems/http/responses/socketResponse'
 
 export default class GameScene implements IScene {
   private planetsScore: number[] = []
@@ -53,17 +55,27 @@ export default class GameScene implements IScene {
       }
     })
 
-    this.eventManager.on('matchFound', (data) => {
-      console.log("executed", data)
+    this.eventManager.on('matchFound', (data: MatchFoundResponse) => {
+      
+      const players = data.players.map(player => {
+        return {
+          ...player,
+          id: parseInt(player.id)
+        }
+      });
+
       this.matchFound = true;
       this.levelGenerator.init()
       console.log(this.playerDataController.playerData, data.players)
-      const currentPlayer = data.players.find(player => player.id === this.playerDataController.playerData.id);
-      const player = this.createPlayer(true, currentPlayer.id)
+      const currentPlayer = players.find(player => player.id === this.playerDataController.playerData.id);
+      if (currentPlayer == null) {
+        throw new Error('No player found')
+      }
+      const player = this.createPlayer(true, currentPlayer.id);
       this.sceneManager.add(player)
       this.player = player
       
-      const otherPlayers = data.players.filter(player => player.id !== this.playerDataController.playerData.id);
+      const otherPlayers = players.filter(player => player.id !== this.playerDataController.playerData.id);
       otherPlayers.forEach(player => {
         const newPlayer = this.createPlayer(false, player.id)
         this.sceneManager.add(newPlayer)
@@ -71,7 +83,28 @@ export default class GameScene implements IScene {
 
       this.cameraController.camera.position.setY(0)
       this.planetsScore = []
+      this.eventManager.emit('matchStart', {
+        matchId: data.id,
+        player
+      })
     })
+
+    this.eventManager.on('playerUpdated', (data: PlayerUpdatedResponse) => {
+      const player = {
+        ...data.player,
+        id: parseInt(data.player.id)
+      }
+      console.log('updating player', player)
+
+      const playerInstance = this.sceneManager.instances.find(inst => inst.id === player.id)
+      if (playerInstance == null) {
+        throw new Error('No player found')
+      }
+      const foundPlayer = playerInstance as IPlayer
+      console.log("found player", foundPlayer)
+      foundPlayer.xVel.set(player.xVel.x, player.xVel.y, 0);
+      foundPlayer.yVel.set(player.yVel.x, player.yVel.y, 0);
+    });
 
   }
 

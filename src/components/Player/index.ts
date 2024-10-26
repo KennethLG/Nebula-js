@@ -97,6 +97,11 @@ export default class Player extends Instance implements IPlayer {
     ], 'idle')
     this.onGameOverBound = this.onGameOver.bind(this)
     this.controllable = controllable
+
+    this.playerEvents.on('movementKeydown', () => {
+      console.log('movementKeyDown')
+      this.eventManager.emit('movementKeydown')
+    })
   }
 
   init (): void {
