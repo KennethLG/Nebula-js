@@ -107,7 +107,13 @@ export default class GameScene implements IScene {
       }
       const foundPlayer = playerInstance as IPlayer
       console.log('triggering: ', data.player.keyState ? 'keydown' : 'keyup', data.player.key, 'for player', foundPlayer.id)
-      foundPlayer.playerEvents.emit(data.player.keyState ? 'keydown' : 'keyup', data.player.key)
+      foundPlayer.playerEvents.emit(data.player.keyState ? 'keydown' : 'keyup', data.player.key);
+      // set foundplayer position based on a threshold
+      const threshold = 0.1;
+      if (Math.abs(foundPlayer.body.position.x - player.position.x) > threshold) {
+        foundPlayer.body.position.setX(player.position.x)
+        foundPlayer.body.position.setY(player.position.y)
+      }
     });
 
     setTimeout(() => {
@@ -131,10 +137,6 @@ export default class GameScene implements IScene {
   }
 
   private updateCamera(): void {
-    // const desiredPlayer = this.sceneManager.instances.find(inst => inst.name === 'Player')
-    // if (desiredPlayer == null) {
-    //   throw new Error('No player found')
-    // }
     if (!this.player) return;
 
     this.cameraController.follow = this.player.body.position
