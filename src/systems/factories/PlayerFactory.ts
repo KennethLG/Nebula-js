@@ -6,7 +6,8 @@ import OrientationController from "@/components/Player/OrientationController";
 import MovementController from "../MovementController";
 import CollisionController from "@/components/Player/CollisionController";
 import KeyboardManager from "../KeyboardManager";
-import { ICameraController } from "../CameraController";
+
+export type CreatePlayer = (controllable: boolean, id?: number, position?: THREE.Vector3) => Player
 
 export default class PlayerFactory {
 
@@ -16,7 +17,7 @@ export default class PlayerFactory {
         private readonly gameParams: IGameParams,
     ) {}
 
-    createPlayer(controllable: boolean, id?: number, position?: THREE.Vector3): Player {
+    createPlayer: CreatePlayer = (controllable, id, position): Player => {
         const playerEvents = new EventManager()
         const orientationController = new OrientationController(playerEvents)
         

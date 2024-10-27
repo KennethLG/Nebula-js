@@ -10,8 +10,8 @@ import { type IGameParams } from '@/systems/GameParams'
 import { type ILevelGenerator } from '@/systems/LevelGenerator'
 import { IPlayerDataController } from '@/systems/PlayerDataController'
 import { type ISceneManager } from '@/systems/SceneManager'
+import { CreatePlayer } from '@/systems/factories/PlayerFactory'
 import { IMatchSocket } from '@/systems/http/matchSocket'
-import PlayerStateSocket from '@/systems/http/playerStateSocket'
 import { MatchFoundResponse, PlayerUpdatedResponse } from '@/systems/http/responses/socketResponse'
 import { Vector3 } from 'three'
 
@@ -32,7 +32,7 @@ export default class GameScene implements IScene {
     private readonly gui: IGUI,
     private readonly matchSocket: IMatchSocket,
     private readonly playerDataController: IPlayerDataController,
-    private readonly createPlayer: (controllable: boolean, id: number, position: THREE.Vector3) => IPlayer,
+    private readonly createPlayer: CreatePlayer,
     private readonly createUfoInstance: () => IUfo
   ) {
     this.gameOverScreen = document.createElement('div')
@@ -57,64 +57,8 @@ export default class GameScene implements IScene {
       }
     })
 
-    this.eventManager.on('matchFound', (data: MatchFoundResponse) => {
-
-      const players = data.players.map(player => {
-        return {
-          ...player,
-          id: parseInt(player.id)
-        }
-      });
-
-      this.matchFound = true;
-      this.levelGenerator.init()
-      console.log(this.playerDataController.playerData, data.players)
-      const currentPlayer = players.find(player => player.id === this.playerDataController.playerData.id);
-      if (currentPlayer == null) {
-        throw new Error('No player found')
-      }
-      console.log('current player', currentPlayer)
-      const playerPosition = new Vector3(currentPlayer.position.x, currentPlayer.position.y, 0)
-      const player = this.createPlayer(true, currentPlayer.id, playerPosition);
-      this.sceneManager.add(player)
-      this.player = player
-
-      const otherPlayers = players.filter(player => player.id !== this.playerDataController.playerData.id);
-      otherPlayers.forEach(player => {
-        const playerPosition = new Vector3(player.position.x, player.position.y, 0)
-        const newPlayer = this.createPlayer(false, player.id, playerPosition)
-        this.sceneManager.add(newPlayer)
-      })
-
-      this.cameraController.camera.position.setY(0)
-      this.planetsScore = []
-      this.eventManager.emit('matchStart', {
-        matchId: data.id,
-        player
-      })
-    })
-
-    this.eventManager.on('playerUpdated', (data: PlayerUpdatedResponse) => {
-      const player = {
-        ...data.player,
-        id: parseInt(data.player.id)
-      }
-      console.log('updating player', player, 'data', data)
-
-      const playerInstance = this.sceneManager.instances.find(inst => inst.id === player.id)
-      if (playerInstance == null) {
-        throw new Error('No player found')
-      }
-      const foundPlayer = playerInstance as IPlayer
-      console.log('triggering: ', data.player.keyState ? 'keydown' : 'keyup', data.player.key, 'for player', foundPlayer.id)
-      foundPlayer.playerEvents.emit(data.player.keyState ? 'keydown' : 'keyup', data.player.key);
-      // set foundplayer position based on a threshold
-      const threshold = 0.1;
-      if (Math.abs(foundPlayer.body.position.x - player.position.x) > threshold) {
-        foundPlayer.body.position.setX(player.position.x)
-        foundPlayer.body.position.setY(player.position.y)
-      }
-    });
+    this.eventManager.on('matchFound', this.onMatchFound.bind(this))
+    this.eventManager.on('playerUpdated', this.onPlayerUpdated.bind(this));
 
     setTimeout(() => {
       this.playerDelayCompleted = true;
@@ -230,6 +174,64 @@ export default class GameScene implements IScene {
       ufo.defineTarget(player)
 
       this.sceneManager.add(ufo)
+    }
+  }
+
+  private onMatchFound(data: MatchFoundResponse): void {
+    const players = data.players.map(player => {
+      return {
+        ...player,
+        id: parseInt(player.id)
+      }
+    });
+
+    this.matchFound = true;
+    this.levelGenerator.init()
+    console.log(this.playerDataController.playerData, data.players)
+    const currentPlayer = players.find(player => player.id === this.playerDataController.playerData.id);
+    if (currentPlayer == null) {
+      throw new Error('No player found')
+    }
+    console.log('current player', currentPlayer)
+    const playerPosition = new Vector3(currentPlayer.position.x, currentPlayer.position.y, 0)
+    const player = this.createPlayer(true, currentPlayer.id, playerPosition);
+    this.sceneManager.add(player)
+    this.player = player
+
+    const otherPlayers = players.filter(player => player.id !== this.playerDataController.playerData.id);
+    otherPlayers.forEach(player => {
+      const playerPosition = new Vector3(player.position.x, player.position.y, 0)
+      const newPlayer = this.createPlayer(false, player.id, playerPosition)
+      this.sceneManager.add(newPlayer)
+    })
+
+    this.cameraController.camera.position.setY(0)
+    this.planetsScore = []
+    this.eventManager.emit('matchStart', {
+      matchId: data.id,
+      player
+    })
+  }
+
+  private onPlayerUpdated(data: PlayerUpdatedResponse): void {
+    const player = {
+      ...data.player,
+      id: parseInt(data.player.id)
+    }
+    console.log('updating player', player, 'data', data)
+
+    const playerInstance = this.sceneManager.instances.find(inst => inst.id === player.id)
+    if (playerInstance == null) {
+      throw new Error('No player found')
+    }
+    const foundPlayer = playerInstance as IPlayer
+    console.log('triggering: ', data.player.keyState ? 'keydown' : 'keyup', data.player.key, 'for player', foundPlayer.id)
+    foundPlayer.playerEvents.emit(data.player.keyState ? 'keydown' : 'keyup', data.player.key);
+    // set foundplayer position based on a threshold
+    const threshold = 0.1;
+    if (Math.abs(foundPlayer.body.position.x - player.position.x) > threshold) {
+      foundPlayer.body.position.setX(player.position.x)
+      foundPlayer.body.position.setY(player.position.y)
     }
   }
 }
