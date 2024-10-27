@@ -34,7 +34,7 @@ export const mainFactory = () => {
     const playerFactory = new PlayerFactory(
         sceneManager,
         eventsManager,
-        gameParams
+        gameParams,
     )
     const ufoFactory = new UfoFactory(sceneManager, gameParams)
     const currentScene = new GameScene(

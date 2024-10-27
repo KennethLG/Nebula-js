@@ -9,10 +9,17 @@ export default class PlayerStateSocket {
         player: IPlayer,
         matchId: string
     ) {
-        this.eventManager.on('movementKeydown', () => this.sendVelocity(matchId, player.id, player.xVel, player.yVel));
+        this.eventManager.on('keyup', (key: string) => {
+            this.sendVelocity(matchId, player.id, player.xVel, player.yVel, player.body.position, key, false);
+        });
+        this.eventManager.on('keydown', (key: string) => {
+            this.sendVelocity(matchId, player.id, player.xVel, player.yVel, player.body.position, key, true);
+        });
+        setInterval(() => {
+        }, 20)
     }
-    
-    private sendVelocity(matchId: string, playerId: number, xVel: THREE.Vector3, yVel: THREE.Vector3) {
+
+    private sendVelocity(matchId: string, playerId: number, xVel: THREE.Vector3, yVel: THREE.Vector3, pos: THREE.Vector3, key: string, keyState: boolean) {
         console.log('sending velocity', xVel, yVel)
         this.io.emit('updatePlayer', {
             matchId,
@@ -25,8 +32,14 @@ export default class PlayerStateSocket {
                 yVel: {
                     x: yVel.x,
                     y: yVel.y
-                }
-            }
+                },
+                position: {
+                    x: pos.x,
+                    y: pos.y
+                },
+                key,
+                keyState
+            },
         })
     }
 }

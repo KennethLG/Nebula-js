@@ -13,6 +13,7 @@ export default class KeyboardManager implements IKeyboardManager {
   }
 
   private onKeyDown (event: KeyboardEvent): void {
+    console.log('Keydown emitted:', event.key)
     this.keys[event.key] = true
     this.eventManager.emit('keydown', event.key)
   }

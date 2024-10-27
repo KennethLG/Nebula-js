@@ -13,6 +13,7 @@ import { type ISceneManager } from '@/systems/SceneManager'
 import { IMatchSocket } from '@/systems/http/matchSocket'
 import PlayerStateSocket from '@/systems/http/playerStateSocket'
 import { MatchFoundResponse, PlayerUpdatedResponse } from '@/systems/http/responses/socketResponse'
+import { Vector3 } from 'three'
 
 export default class GameScene implements IScene {
   private planetsScore: number[] = []
@@ -20,28 +21,29 @@ export default class GameScene implements IScene {
   private player: IPlayer | null
   private ufo: IUfo | null
   private matchFound = false
+  private playerDelayCompleted = false
 
-  constructor (
+  constructor(
     private readonly cameraController: ICameraController,
     private readonly sceneManager: ISceneManager,
     private readonly gameParams: IGameParams,
     private readonly levelGenerator: ILevelGenerator,
     private readonly eventManager: IEventManager,
     private readonly gui: IGUI,
-    private readonly matchmakingSocket: IMatchSocket,
+    private readonly matchSocket: IMatchSocket,
     private readonly playerDataController: IPlayerDataController,
-    private readonly createPlayer: (controllable: boolean, id: number) => IPlayer,
+    private readonly createPlayer: (controllable: boolean, id: number, position: THREE.Vector3) => IPlayer,
     private readonly createUfoInstance: () => IUfo
   ) {
     this.gameOverScreen = document.createElement('div')
     this.player = null
     this.ufo = null
     this.playerDataController.getPlayerData()
-    this.matchmakingSocket.init(this.playerDataController.playerData.id)
+    this.matchSocket.init(this.playerDataController.playerData.id)
     new KeyboardManager(this.eventManager)
   }
 
-  init (): void {
+  init(): void {
     console.log('gamescene init')
     this.gameOverScreen = this.createGameOverScreen()
     this.changeGameOverScreenVisibility('hidden')
@@ -56,7 +58,7 @@ export default class GameScene implements IScene {
     })
 
     this.eventManager.on('matchFound', (data: MatchFoundResponse) => {
-      
+
       const players = data.players.map(player => {
         return {
           ...player,
@@ -71,13 +73,16 @@ export default class GameScene implements IScene {
       if (currentPlayer == null) {
         throw new Error('No player found')
       }
-      const player = this.createPlayer(true, currentPlayer.id);
+      console.log('current player', currentPlayer)
+      const playerPosition = new Vector3(currentPlayer.position.x, currentPlayer.position.y, 0)
+      const player = this.createPlayer(true, currentPlayer.id, playerPosition);
       this.sceneManager.add(player)
       this.player = player
-      
+
       const otherPlayers = players.filter(player => player.id !== this.playerDataController.playerData.id);
       otherPlayers.forEach(player => {
-        const newPlayer = this.createPlayer(false, player.id)
+        const playerPosition = new Vector3(player.position.x, player.position.y, 0)
+        const newPlayer = this.createPlayer(false, player.id, playerPosition)
         this.sceneManager.add(newPlayer)
       })
 
@@ -94,36 +99,38 @@ export default class GameScene implements IScene {
         ...data.player,
         id: parseInt(data.player.id)
       }
-      console.log('updating player', player)
+      console.log('updating player', player, 'data', data)
 
       const playerInstance = this.sceneManager.instances.find(inst => inst.id === player.id)
       if (playerInstance == null) {
         throw new Error('No player found')
       }
       const foundPlayer = playerInstance as IPlayer
-      console.log("found player", foundPlayer)
-      foundPlayer.xVel.set(player.xVel.x, player.xVel.y, 0);
-      foundPlayer.yVel.set(player.yVel.x, player.yVel.y, 0);
+      console.log('triggering: ', data.player.keyState ? 'keydown' : 'keyup', data.player.key, 'for player', foundPlayer.id)
+      foundPlayer.playerEvents.emit(data.player.keyState ? 'keydown' : 'keyup', data.player.key)
     });
 
+    setTimeout(() => {
+      this.playerDelayCompleted = true;
+    }, 3000);
   }
 
-  update (): void {
+  update(): void {
     if (!this.matchFound) return;
 
     this.levelGenerator.update()
     this.updateCamera()
     this.removeOuterBullets()
 
-    if (this.player != null) {
+    if (this.player != null && this.playerDelayCompleted) {
       this.checkGameEnd(this.player)
-      this.teleportPlayer(this.player)
+      this.checkPlayersToTeleport()
     }
     this.updateScore()
     this.createUfo()
   }
 
-  private updateCamera (): void {
+  private updateCamera(): void {
     // const desiredPlayer = this.sceneManager.instances.find(inst => inst.name === 'Player')
     // if (desiredPlayer == null) {
     //   throw new Error('No player found')
@@ -133,7 +140,7 @@ export default class GameScene implements IScene {
     this.cameraController.follow = this.player.body.position
   }
 
-  private checkGameEnd (player: IPlayer): void {
+  private checkGameEnd(player: IPlayer): void {
     if (this.gameParams.gameOver) return
 
     if (player.explosionCollision) {
@@ -147,17 +154,22 @@ export default class GameScene implements IScene {
     }
   }
 
-  private teleportPlayer (player: IPlayer): void {
+  private checkPlayersToTeleport(): void {
     const { right, left, position: { x: cameraX } } = this.cameraController.camera
-    if (player.body.position.x > (cameraX + right)) {
-      player.body.position.setX(cameraX + left)
-    }
-    if (player.body.position.x < (cameraX + left)) {
-      player.body.position.setX(cameraX + right)
-    }
+    this.sceneManager.instances.forEach((inst) => {
+      if (inst.name === 'Player') {
+        const player = inst as IPlayer
+        if (player.body.position.x > (cameraX + right)) {
+          player.body.position.setX(cameraX + left)
+        }
+        if (player.body.position.x < (cameraX + left)) {
+          player.body.position.setX(cameraX + right)
+        }
+      }
+    })
   }
 
-  private removeOuterBullets (): void {
+  private removeOuterBullets(): void {
     const bullets = this.sceneManager.instances.filter(inst => inst.name === 'Bullet') as Bullet[]
 
     if (bullets.length === 0) return
@@ -171,11 +183,11 @@ export default class GameScene implements IScene {
     })
   }
 
-  private changeGameOverScreenVisibility (visibility: 'visible' | 'hidden'): void {
+  private changeGameOverScreenVisibility(visibility: 'visible' | 'hidden'): void {
     this.gameOverScreen.style.visibility = visibility
   }
 
-  private createGameOverScreen (): HTMLElement {
+  private createGameOverScreen(): HTMLElement {
     return this.gui.createText('GAME OVER<br><br>Press any key to restart', {
       left: '50%',
       top: '50%',
@@ -184,7 +196,7 @@ export default class GameScene implements IScene {
     })
   }
 
-  private gameRestart (): void {
+  private gameRestart(): void {
     this.player = null
     this.ufo = null
     this.changeGameOverScreenVisibility('hidden')
@@ -196,7 +208,7 @@ export default class GameScene implements IScene {
     this.init()
   }
 
-  private updateScore (): void {
+  private updateScore(): void {
     const lastPlanet = this.player?.planet
     if (lastPlanet == null) return
 
@@ -206,7 +218,7 @@ export default class GameScene implements IScene {
     }
   }
 
-  private createUfo (): void {
+  private createUfo(): void {
     const player = this.player
     if (player == null || this.ufo != null) return
 

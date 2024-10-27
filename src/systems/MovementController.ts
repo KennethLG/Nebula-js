@@ -17,11 +17,23 @@ export default class MovementController implements IMovementController {
   private readonly jumpForce = 0.2
   private readonly moveVel = 0.01
   private readonly friction = 0.9
+  private activeKeys: Record<string, boolean> = {}
 
   constructor(
-    private readonly keyboardManager: IKeyboardManager,
     private readonly eventManager: IEventManager
-  ) { }
+  ) {
+    this.eventManager.on('keydown', this.handleKeyDown.bind(this))
+    this.eventManager.on('keyup', this.handleKeyUp.bind(this))
+  }
+  private handleKeyDown(key: string): void {
+    console.log('key down', key)
+    this.activeKeys[key] = true
+  }
+
+  private handleKeyUp(key: string): void {
+    console.log('key up', key)
+    this.activeKeys[key] = false
+  }
 
 
   handleXMovement(
@@ -31,10 +43,10 @@ export default class MovementController implements IMovementController {
     const right = new THREE.Vector3(1, 0, 0)
     right.applyQuaternion(quaternion)
 
-    if (this.keyboardManager.keys[this.moveRightKey]) {
+    if (this.activeKeys[this.moveRightKey]) {
       xVelocity.add(right.clone().normalize().multiplyScalar(this.moveVel))
       this.eventManager.emit('movementKeydown', 'right')
-    } else if (this.keyboardManager.keys[this.moveLeftKey]) {
+    } else if (this.activeKeys[this.moveLeftKey]) {
       xVelocity.add(right.clone().normalize().multiplyScalar(-this.moveVel))
       this.eventManager.emit('movementKeydown', 'left')
     } else {
@@ -49,7 +61,7 @@ export default class MovementController implements IMovementController {
   }
 
   handleJump(gravityDirection: THREE.Vector3, velocity: THREE.Vector3): void {
-    if (this.keyboardManager.keys[this.jumpKey]) {
+    if (this.activeKeys[this.jumpKey]) {
       const jumpDir = gravityDirection.negate().normalize()
       velocity.copy(jumpDir.multiplyScalar(this.jumpForce))
     }

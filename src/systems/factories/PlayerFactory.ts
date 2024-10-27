@@ -6,20 +6,24 @@ import OrientationController from "@/components/Player/OrientationController";
 import MovementController from "../MovementController";
 import CollisionController from "@/components/Player/CollisionController";
 import KeyboardManager from "../KeyboardManager";
+import { ICameraController } from "../CameraController";
 
 export default class PlayerFactory {
 
     constructor(
         private readonly sceneManager: ISceneManager,
         private readonly eventManager: IEventManager,
-        private readonly gameParams: IGameParams
+        private readonly gameParams: IGameParams,
     ) {}
 
-    createPlayer(controllable: boolean, id?: number) {
+    createPlayer(controllable: boolean, id?: number, position?: THREE.Vector3): Player {
         const playerEvents = new EventManager()
         const orientationController = new OrientationController(playerEvents)
-        const keyboardManager = new KeyboardManager(playerEvents)
-        const movementController = new MovementController(keyboardManager, playerEvents)
+        
+        if (controllable) {
+            new KeyboardManager(playerEvents)
+        }
+        const movementController = new MovementController(playerEvents)
         const collisionController = new CollisionController()
         return new Player(
             this.sceneManager,
@@ -30,7 +34,8 @@ export default class PlayerFactory {
             orientationController,
             collisionController,
             controllable,
-            id
+            id,
+            position
         )
     }
 }

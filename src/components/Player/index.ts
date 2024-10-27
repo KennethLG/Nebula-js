@@ -9,12 +9,13 @@ import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
 import type Explosion from '../UFO/explosion'
-import MovementController, { type IMovementController } from '../../systems/MovementController'
-import OrientationController, { type IOrientationController } from './OrientationController'
-import CollisionController, { type ICollisionController } from './CollisionController'
+import { type IMovementController } from '../../systems/MovementController'
+import { type IOrientationController } from './OrientationController'
+import { type ICollisionController } from './CollisionController'
 import { type ISceneManager } from '@/systems/SceneManager'
 import { type IEventManager } from '@/systems/EventManager'
 import { type IGameParams } from '@/systems/GameParams'
+import { ICameraController } from '@/systems/CameraController'
 
 interface AnimationContext {
   xVel: THREE.Vector3
@@ -31,6 +32,7 @@ export interface IPlayer extends Instance {
   dead: boolean
   explosionCollision: boolean
   controllable: boolean
+  playerEvents: IEventManager
 }
 export default class Player extends Instance implements IPlayer {
   onGround = false
@@ -50,12 +52,13 @@ export default class Player extends Instance implements IPlayer {
     private readonly sceneManager: ISceneManager,
     private readonly eventManager: IEventManager,
     private readonly gameParams: IGameParams,
-    private readonly playerEvents: IEventManager,
+    readonly playerEvents: IEventManager,
     private readonly movementController: IMovementController,
     private readonly orientationController: IOrientationController,
     private readonly collisionController: ICollisionController,
     controllable: boolean,
-    id?: number
+    id?: number,
+    position?: THREE.Vector3,
   ) {
     const sprite = new Sprite({
       name: 'player.png',
@@ -65,7 +68,7 @@ export default class Player extends Instance implements IPlayer {
 
     super({
       name: 'Player',
-      position: new THREE.Vector3(5, 2, 0),
+      position: position || new THREE.Vector3(0, 0, 0),
       radius: 0.5,
       mesh: sprite.sprite,
       id
@@ -97,11 +100,6 @@ export default class Player extends Instance implements IPlayer {
     ], 'idle')
     this.onGameOverBound = this.onGameOver.bind(this)
     this.controllable = controllable
-
-    this.playerEvents.on('movementKeydown', () => {
-      console.log('movementKeyDown')
-      this.eventManager.emit('movementKeydown')
-    })
   }
 
   init (): void {
@@ -140,8 +138,16 @@ export default class Player extends Instance implements IPlayer {
     this.checkDeath()
   }
 
+  // Interpolation for other players
+  private interpolateMovement(): void {
+    const lerpFactor = 0.1; // Smoothing factor; adjust as needed
+    const targetPosition = this.body.position.clone().add(this.xVel);
+
+    this.body.position.lerp(targetPosition, lerpFactor);
+  }
+
   private moveX (): void {
-    if (this.dead || !this.controllable) return
+    if (this.dead) return
     this.movementController.handleXMovement(this.body.quaternion, this.xVel)
   }
 
@@ -191,7 +197,7 @@ export default class Player extends Instance implements IPlayer {
       to: this.planet,
       velocity: this.gravity
     })
-    if (this.dead || !this.controllable) return
+    if (this.dead) return
     this.movementController.handleJump(this.gravityDirection, this.gravity)
   }
 

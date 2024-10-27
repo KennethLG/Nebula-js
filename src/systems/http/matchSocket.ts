@@ -40,7 +40,7 @@ export default class MatchSocket {
 
     private initPlayerStateSocket(matchId: string, player: IPlayer) {
         this.currentPlayer = player
-        this.playerStateSocket = new PlayerStateSocket(this.socket, this.eventManager, player, matchId)
+        this.playerStateSocket = new PlayerStateSocket(this.socket, player.playerEvents, player, matchId)
     }
 
     private joinMatch(id: number) {

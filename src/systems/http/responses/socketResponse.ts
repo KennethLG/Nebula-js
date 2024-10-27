@@ -7,7 +7,13 @@ export interface PlayerSocket {
         x: number;
         y: number;
     };
+    position: {
+        x: number;
+        y: number;
+    },
     id: string;
+    key: string;
+    keyState: boolean;
     socketId: string;
 }
 
