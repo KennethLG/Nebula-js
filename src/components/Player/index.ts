@@ -32,6 +32,7 @@ export interface IPlayer extends Instance {
   explosionCollision: boolean
   controllable: boolean
   playerEvents: IEventManager
+  onGameOver: () => void
 }
 export default class Player extends Instance implements IPlayer {
   onGround = false
@@ -45,7 +46,6 @@ export default class Player extends Instance implements IPlayer {
   controllable: boolean
   private readonly sprite: ISprite
   private readonly animationController: AnimationController<AnimationContext>
-  private readonly onGameOverBound: () => void
 
   constructor (
     private readonly sceneManager: ISceneManager,
@@ -97,16 +97,18 @@ export default class Player extends Instance implements IPlayer {
         }
       }
     ], 'idle')
-    this.onGameOverBound = this.onGameOver.bind(this)
     this.controllable = controllable
   }
 
   init (): void {
     console.log('subscribe gameover')
-    this.eventManager.on('gameOver', this.onGameOverBound)
+    this.eventManager.on('gameOver', (data) => {
+      if (data.playerId !== this.id) return
+      this.onGameOver()
+    })
   }
 
-  private onGameOver (): void {
+  onGameOver = (): void => {
     console.log('onGameOver')
     this.dead = true
   }
@@ -218,6 +220,6 @@ export default class Player extends Instance implements IPlayer {
   }
 
   onDestroy (): void {
-    this.eventManager.off('gameOver', this.onGameOverBound)
+    this.eventManager.off('gameOver', this.onGameOver)
   }
 }

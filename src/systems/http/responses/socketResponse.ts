@@ -1,4 +1,4 @@
-export interface PlayerSocket {
+export interface PlayerSocketResponse {
   xVel: {
     x: number
     y: number
@@ -15,6 +15,7 @@ export interface PlayerSocket {
   key: string
   keyState: boolean
   socketId: string
+  dead: boolean
 }
 
 export interface SocketResponse<T = any> {
@@ -26,9 +27,9 @@ export interface SocketResponse<T = any> {
 export interface MatchFoundResponse {
   seed: string
   id: string
-  players: PlayerSocket[]
+  players: PlayerSocketResponse[]
 }
 
 export interface PlayerUpdatedResponse {
-  player: PlayerSocket
+  player: PlayerSocketResponse
 }

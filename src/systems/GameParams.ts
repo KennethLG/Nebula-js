@@ -17,7 +17,7 @@ export interface IGameParams {
   screenWidth: number
   screenHeight: number
 
-  end: () => void
+  end: (id: number) => void
   restartScores: () => void
 }
 
@@ -41,7 +41,7 @@ export default class GameParams implements IGameParams {
     }
   }
 
-  end (): void {
+  end (id: number): void {
     console.log('game end')
     if (this.scores.planets > this.scores.planetsRecord) {
       setItem('planetsRecord', this.scores.planets)
@@ -49,7 +49,9 @@ export default class GameParams implements IGameParams {
     }
 
     this.gameOver = true
-    this.eventManager.emit('gameOver')
+    this.eventManager.emit('gameOver', {
+      playerId: id
+    })
     setTimeout(() => {
       this.canRestart = true
     }, 1000)

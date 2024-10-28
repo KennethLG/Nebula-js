@@ -97,7 +97,7 @@ export default class GameScene implements IScene {
     if (this.gameParams.gameOver) return
 
     if (player.explosionCollision) {
-      this.gameParams.end()
+      this.gameParams.end(player.id)
       return
     }
 
@@ -106,7 +106,7 @@ export default class GameScene implements IScene {
       bottom
     } = this.cameraController.camera
     if (player.body.position.y < cameraY + bottom) {
-      this.gameParams.end()
+      this.gameParams.end(player.id)
     }
   }
 
@@ -271,6 +271,10 @@ export default class GameScene implements IScene {
       data.player.keyState ? 'keydown' : 'keyup',
       data.player.key
     )
+    if (data.player.dead) {
+      foundPlayer.onGameOver()
+    }
+
     // set foundplayer position based on a threshold
     const threshold = 0.1
     if (Math.abs(foundPlayer.body.position.x - player.position.x) > threshold) {
