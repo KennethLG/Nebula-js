@@ -1,145 +1,161 @@
-import { type IPlanet, type PlanetProperties } from '@/components/Planet'
+import { type IPlanet, type PlanetProperties } from '@/components/Planet';
 
-import { type ISceneManager } from './SceneManager'
-import { type IRandom } from './Random'
-import { type IGameParams } from './GameParams'
-import { type ICameraController } from './CameraController'
-import { type IEventManager } from './EventManager'
+import { type ISceneManager } from './SceneManager';
+import { type IRandom } from './Random';
+import { type IGameParams } from './GameParams';
+import { type ICameraController } from './CameraController';
+import { type IEventManager } from './EventManager';
 
 export interface ILevelGenerator {
-  init: () => void
-  update: () => void
+  init: () => void;
+  update: () => void;
 }
 
 export default class LevelGenerator implements ILevelGenerator {
-  private chunkSize: number
-  private triggerThreshold: number
-  private xRangeBetweenPlanets: number
-  private yRangeBetweenPlanets: number
-  private yMarginBetweenPlanets: number
-  private planetRadius: number
-  private planetRadiusRange: number
-  private lastChunkY: number
-  private hue: number
-  private currentColor: string
+  private chunkSize: number;
+  private triggerThreshold: number;
+  private xRangeBetweenPlanets: number;
+  private yRangeBetweenPlanets: number;
+  private yMarginBetweenPlanets: number;
+  private planetRadius: number;
+  private planetRadiusRange: number;
+  private lastChunkY: number;
+  private hue: number;
+  private currentColor: string;
 
-  constructor (
+  constructor(
     private readonly gameParams: IGameParams,
     private readonly cameraController: ICameraController,
     private readonly sceneManager: ISceneManager,
     private readonly random: IRandom,
     private readonly eventManager: IEventManager,
-    private readonly createPlanet: (x: number, y: number, properties: PlanetProperties) => IPlanet
+    private readonly createPlanet: (
+      x: number,
+      y: number,
+      properties: PlanetProperties,
+    ) => IPlanet,
   ) {
-    this.hue = 0
-    this.currentColor = ''
-    this.lastChunkY = 0
-    this.chunkSize = 4
-    this.triggerThreshold = 3
-    this.xRangeBetweenPlanets = 3
-    this.yRangeBetweenPlanets = 1
-    this.yMarginBetweenPlanets = 2
-    this.planetRadius = 1
-    this.planetRadiusRange = 1
+    this.hue = 0;
+    this.currentColor = '';
+    this.lastChunkY = 0;
+    this.chunkSize = 4;
+    this.triggerThreshold = 3;
+    this.xRangeBetweenPlanets = 3;
+    this.yRangeBetweenPlanets = 1;
+    this.yMarginBetweenPlanets = 2;
+    this.planetRadius = 1;
+    this.planetRadiusRange = 1;
   }
 
-  init (): void {
-    this.hue = this.genHue()
-    this.currentColor = this.genColor()
-    this.lastChunkY = 0
-    this.chunkSize = 4
-    this.triggerThreshold = 3
-    this.xRangeBetweenPlanets = 3
-    this.yRangeBetweenPlanets = 1
-    this.yMarginBetweenPlanets = 2
-    this.planetRadius = 1
-    this.planetRadiusRange = 1
+  init(): void {
+    this.hue = this.genHue();
+    this.currentColor = this.genColor();
+    this.lastChunkY = 0;
+    this.chunkSize = 4;
+    this.triggerThreshold = 3;
+    this.xRangeBetweenPlanets = 3;
+    this.yRangeBetweenPlanets = 1;
+    this.yMarginBetweenPlanets = 2;
+    this.planetRadius = 1;
+    this.planetRadiusRange = 1;
   }
 
-  update (): void {
-    this.random.seed.resetCurrent()
-    this.checkForChunkGeneration()
-    this.removeOuterPlanets()
+  update(): void {
+    this.random.seed.resetCurrent();
+    this.checkForChunkGeneration();
+    this.removeOuterPlanets();
   }
 
-  private removeOuterPlanets (): void {
-    const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet') as IPlanet[]
-    if (planets.length === 0) return
+  private removeOuterPlanets(): void {
+    const planets = this.sceneManager.instances.filter(
+      (inst) => inst.name === 'Planet',
+    ) as IPlanet[];
+    if (planets.length === 0) return;
 
-    const cameraBottom = this.cameraController.camera.position.y - (this.cameraController.camera.top - this.cameraController.camera.bottom) / 2
+    const cameraBottom =
+      this.cameraController.camera.position.y -
+      (this.cameraController.camera.top - this.cameraController.camera.bottom) /
+        2;
 
     const outerPlanets = planets.filter(
-      planet => planet.body.position.y + planet.boundingSphere.radius < cameraBottom
-    )
+      (planet) =>
+        planet.body.position.y + planet.boundingSphere.radius < cameraBottom,
+    );
 
-    outerPlanets.forEach((planet) => { this.sceneManager.destroy(planet.id) })
+    outerPlanets.forEach((planet) => {
+      this.sceneManager.destroy(planet.id);
+    });
   }
 
-  private checkForChunkGeneration (): void {
-    if (this.cameraController.camera.position.y > this.lastChunkY - this.triggerThreshold) {
-      this.generateNewChunk()
+  private checkForChunkGeneration(): void {
+    if (
+      this.cameraController.camera.position.y >
+      this.lastChunkY - this.triggerThreshold
+    ) {
+      this.generateNewChunk();
     }
   }
 
-  private generateNewChunk (): void {
-    this.hue = this.genHue()
-    this.currentColor = this.genColor()
-    const yStart = this.lastChunkY
-    const yEnd = yStart + this.chunkSize
-    let yCurrent = yStart
+  private generateNewChunk(): void {
+    this.hue = this.genHue();
+    this.currentColor = this.genColor();
+    const yStart = this.lastChunkY;
+    const yEnd = yStart + this.chunkSize;
+    let yCurrent = yStart;
 
     while (yCurrent < yEnd) {
-      const planetRadius = this.genPlanetRadius()
-      const xPos = this.genXPos()
-      const yRange = this.yRangeBetweenPlanets * this.random.seed.next()
-      const yPos = this.yMarginBetweenPlanets + yRange + (planetRadius * 2)
-      yCurrent += yPos
-      this.addPlanetAt(xPos, yCurrent, planetRadius)
+      const planetRadius = this.genPlanetRadius();
+      const xPos = this.genXPos();
+      const yRange = this.yRangeBetweenPlanets * this.random.seed.next();
+      const yPos = this.yMarginBetweenPlanets + yRange + planetRadius * 2;
+      yCurrent += yPos;
+      this.addPlanetAt(xPos, yCurrent, planetRadius);
     }
-    this.lastChunkY = yCurrent
+    this.lastChunkY = yCurrent;
   }
 
-  private addPlanetAt (x: number, y: number, radius: number): void {
-    const newPlanet = this.genPlanet(x, y, radius)
-    this.sceneManager.add(newPlanet)
+  private addPlanetAt(x: number, y: number, radius: number): void {
+    const newPlanet = this.genPlanet(x, y, radius);
+    this.sceneManager.add(newPlanet);
 
-    newPlanet.decorations.forEach(decoration => {
-      this.sceneManager.scene.add(decoration.sprite)
-    })
+    newPlanet.decorations.forEach((decoration) => {
+      this.sceneManager.scene.add(decoration.sprite);
+    });
   }
 
-  private genPlanet (x: number, y: number, radius: number): IPlanet {
+  private genPlanet(x: number, y: number, radius: number): IPlanet {
     return this.createPlanet(x, y, {
       radius,
-      color: this.currentColor
-    })
+      color: this.currentColor,
+    });
   }
 
-  private genPlanetRadius (): number {
-    return this.planetRadius + (this.planetRadiusRange * this.random.seed.next())
+  private genPlanetRadius(): number {
+    return this.planetRadius + this.planetRadiusRange * this.random.seed.next();
   }
 
-  private genXPos (): number {
-    const xRange = this.xRangeBetweenPlanets * this.random.seed.next()
-    return this.random.seed.next() < 0.5 ? -xRange : xRange
+  private genXPos(): number {
+    const xRange = this.xRangeBetweenPlanets * this.random.seed.next();
+    return this.random.seed.next() < 0.5 ? -xRange : xRange;
   }
 
-  private genHue (): number {
-    const hueDecreasePerPlanet = 5 // Adjust this value as needed.
-    let newHue = 300 - (this.gameParams.scores.planets * hueDecreasePerPlanet) % 360
+  private genHue(): number {
+    const hueDecreasePerPlanet = 5; // Adjust this value as needed.
+    let newHue =
+      300 - ((this.gameParams.scores.planets * hueDecreasePerPlanet) % 360);
 
     // Ensure the hue stays within the 0-360 range.
     if (newHue < 0) {
-      newHue += 360
+      newHue += 360;
     }
 
-    return newHue
+    return newHue;
   }
 
-  private genColor (): string {
-    const h = Math.round(this.hue)
-    const s = Math.round(this.random.seed.randomRange(30, 100))
-    const l = Math.round(this.random.seed.randomRange(30, 100))
-    return `hsl(${h}, ${s}%, ${l}%)`
+  private genColor(): string {
+    const h = Math.round(this.hue);
+    const s = Math.round(this.random.seed.randomRange(30, 100));
+    const l = Math.round(this.random.seed.randomRange(30, 100));
+    return `hsl(${h}, ${s}%, ${l}%)`;
   }
 }

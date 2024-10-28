@@ -1,5 +1,3 @@
-import IBody from '@/entities/IBody'
+import IBody from '@/entities/IBody';
 
-export class Body extends IBody {
-
-}
+export class Body extends IBody {}

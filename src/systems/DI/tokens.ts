@@ -18,7 +18,7 @@ const TYPES = {
   IMain: Symbol.for('IMain'),
   IHttp: Symbol.for('IHttp'),
   IMatchmakingSocket: Symbol.for('IMatchmakingSocket'),
-  IPlayerDataController: Symbol.for('IPlayerDataController')
-}
+  IPlayerDataController: Symbol.for('IPlayerDataController'),
+};
 
-export default TYPES
+export default TYPES;

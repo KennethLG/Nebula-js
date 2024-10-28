@@ -1,9 +1,9 @@
-import type IBoundingSphere from '@/entities/IBoundingSphere'
+import type IBoundingSphere from '@/entities/IBoundingSphere';
 
 export default class BoundingSphere implements IBoundingSphere {
-  radius: number
+  radius: number;
 
-  constructor (radius: number) {
-    this.radius = radius
+  constructor(radius: number) {
+    this.radius = radius;
   }
 }

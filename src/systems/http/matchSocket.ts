@@ -1,71 +1,83 @@
-import config from '@/config'
-import { io, type Socket } from 'socket.io-client'
-import { type IEventManager } from '../EventManager'
-import { type MatchFoundResponse, type PlayerUpdatedResponse, type SocketResponse } from './responses/socketResponse'
-import { type IPlayer } from '@/components/Player'
-import PlayerStateSocket from './playerStateSocket'
+import config from '@/config';
+import { io, type Socket } from 'socket.io-client';
+import { type IEventManager } from '../EventManager';
+import {
+  type MatchFoundResponse,
+  type PlayerUpdatedResponse,
+  type SocketResponse,
+} from './responses/socketResponse';
+import { type IPlayer } from '@/components/Player';
+import PlayerStateSocket from './playerStateSocket';
 
 export interface IMatchSocket {
-  init: (id: number) => void
+  init: (id: number) => void;
 }
 export default class MatchSocket {
-  private readonly socket: Socket
-  private playerStateSocket: PlayerStateSocket | null
-  private currentPlayer: IPlayer | null
+  private readonly socket: Socket;
+  private playerStateSocket: PlayerStateSocket | null;
+  private currentPlayer: IPlayer | null;
 
-  constructor (
-    private readonly eventManager: IEventManager
-  ) {
-    this.socket = io(config.baseURL)
-    this.playerStateSocket = null
-    this.currentPlayer = null
+  constructor(private readonly eventManager: IEventManager) {
+    this.socket = io(config.baseURL);
+    this.playerStateSocket = null;
+    this.currentPlayer = null;
   }
 
-  init (id: number): void {
+  init(id: number): void {
     this.socket.on('connect', () => {
-      console.log('connection established!')
-      this.joinMatch(id)
-      this.onMatchFound()
-      this.onPlayerUpdated()
-    })
+      console.log('connection established!');
+      this.joinMatch(id);
+      this.onMatchFound();
+      this.onPlayerUpdated();
+    });
 
     this.socket.on('disconnect', () => {
-      console.log('disconnected!')
-    })
+      console.log('disconnected!');
+    });
 
     this.eventManager.on('matchStart', (data) => {
-      this.initPlayerStateSocket(data.matchId, data.player)
-    })
+      this.initPlayerStateSocket(data.matchId, data.player);
+    });
   }
 
-  private initPlayerStateSocket (matchId: string, player: IPlayer): void {
-    this.currentPlayer = player
-    this.playerStateSocket = new PlayerStateSocket(this.socket, player.playerEvents, player, matchId)
+  private initPlayerStateSocket(matchId: string, player: IPlayer): void {
+    this.currentPlayer = player;
+    this.playerStateSocket = new PlayerStateSocket(
+      this.socket,
+      player.playerEvents,
+      player,
+      matchId,
+    );
   }
 
-  private joinMatch (id: number): void {
+  private joinMatch(id: number): void {
     this.socket.emit('joinMatch', {
-      id: id.toString()
-    })
+      id: id.toString(),
+    });
   }
 
-  private onMatchFound (): void {
+  private onMatchFound(): void {
     this.socket.on('matchFound', (data: SocketResponse<MatchFoundResponse>) => {
-      console.log('MatchFound response', data)
+      console.log('MatchFound response', data);
       if (data.status === 'Ok') {
-        this.eventManager.emit('matchFound', data.data); return
+        this.eventManager.emit('matchFound', data.data);
+        return;
       }
-      console.error('Error joining match', data.message)
-    })
+      console.error('Error joining match', data.message);
+    });
   }
 
-  private onPlayerUpdated (): void {
-    this.socket.on('playerUpdated', (data: SocketResponse<PlayerUpdatedResponse>) => {
-      console.log('Player updated', data)
-      if (data.status === 'Ok') {
-        this.eventManager.emit('playerUpdated', data.data); return
-      }
-      console.error('Error updating player', data.message)
-    })
+  private onPlayerUpdated(): void {
+    this.socket.on(
+      'playerUpdated',
+      (data: SocketResponse<PlayerUpdatedResponse>) => {
+        console.log('Player updated', data);
+        if (data.status === 'Ok') {
+          this.eventManager.emit('playerUpdated', data.data);
+          return;
+        }
+        console.error('Error updating player', data.message);
+      },
+    );
   }
 }

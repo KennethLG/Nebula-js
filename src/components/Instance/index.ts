@@ -1,47 +1,41 @@
-import type IBody from '@/entities/IBody'
-import type { IInstance } from '@/entities/Instance'
-import { Body } from '../Body'
-import { BoundingSphere } from '@/systems'
+import type IBody from '@/entities/IBody';
+import type { IInstance } from '@/entities/Instance';
+import { Body } from '../Body';
+import { BoundingSphere } from '@/systems';
 
 interface InstanceConfig {
-  name: string
-  position: THREE.Vector3
-  radius: number
-  mesh: THREE.Object3D
-  id?: number
+  name: string;
+  position: THREE.Vector3;
+  radius: number;
+  mesh: THREE.Object3D;
+  id?: number;
 }
 
 export default class Instance implements IInstance {
-  name: string
-  body: IBody
-  id: number
+  name: string;
+  body: IBody;
+  id: number;
 
-  constructor ({ name, position, radius, mesh, id }: InstanceConfig) {
-    this.name = name
-    const boundingSphere = new BoundingSphere(radius)
+  constructor({ name, position, radius, mesh, id }: InstanceConfig) {
+    this.name = name;
+    const boundingSphere = new BoundingSphere(radius);
     this.body = new Body({
       position,
       boundingSphere,
-      mesh
-    })
-    this.id = id ?? Date.now()
+      mesh,
+    });
+    this.id = id ?? Date.now();
   }
 
-  init (): void {
+  init(): void {}
 
+  baseUpdate(): void {
+    this.body.update();
+    this.update();
+    this.body.mesh.position.copy(this.body.position);
   }
 
-  baseUpdate (): void {
-    this.body.update()
-    this.update()
-    this.body.mesh.position.copy(this.body.position)
-  }
+  update(): void {}
 
-  update (): void {
-
-  }
-
-  onDestroy (): void {
-
-  }
+  onDestroy(): void {}
 }
