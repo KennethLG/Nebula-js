@@ -4,8 +4,7 @@ import { type ISceneManager } from './SceneManager'
 import { type IRandom } from './Random'
 import { type IGameParams } from './GameParams'
 import { type ICameraController } from './CameraController'
-import TYPES from './DI/tokens'
-import { IEventManager } from './EventManager'
+import { type IEventManager } from './EventManager'
 
 export interface ILevelGenerator {
   init: () => void
@@ -24,7 +23,7 @@ export default class LevelGenerator implements ILevelGenerator {
   private hue: number
   private currentColor: string
 
-  constructor(
+  constructor (
     private readonly gameParams: IGameParams,
     private readonly cameraController: ICameraController,
     private readonly sceneManager: ISceneManager,
@@ -44,7 +43,7 @@ export default class LevelGenerator implements ILevelGenerator {
     this.planetRadiusRange = 1
   }
 
-  init(): void {
+  init (): void {
     this.hue = this.genHue()
     this.currentColor = this.genColor()
     this.lastChunkY = 0
@@ -57,13 +56,13 @@ export default class LevelGenerator implements ILevelGenerator {
     this.planetRadiusRange = 1
   }
 
-  update(): void {
+  update (): void {
     this.random.seed.resetCurrent()
     this.checkForChunkGeneration()
     this.removeOuterPlanets()
   }
 
-  private removeOuterPlanets(): void {
+  private removeOuterPlanets (): void {
     const planets = this.sceneManager.instances.filter(inst => inst.name === 'Planet') as IPlanet[]
     if (planets.length === 0) return
 
@@ -76,13 +75,13 @@ export default class LevelGenerator implements ILevelGenerator {
     outerPlanets.forEach((planet) => { this.sceneManager.destroy(planet.id) })
   }
 
-  private checkForChunkGeneration(): void {
+  private checkForChunkGeneration (): void {
     if (this.cameraController.camera.position.y > this.lastChunkY - this.triggerThreshold) {
       this.generateNewChunk()
     }
   }
 
-  private generateNewChunk(): void {
+  private generateNewChunk (): void {
     this.hue = this.genHue()
     this.currentColor = this.genColor()
     const yStart = this.lastChunkY
@@ -100,7 +99,7 @@ export default class LevelGenerator implements ILevelGenerator {
     this.lastChunkY = yCurrent
   }
 
-  private addPlanetAt(x: number, y: number, radius: number): void {
+  private addPlanetAt (x: number, y: number, radius: number): void {
     const newPlanet = this.genPlanet(x, y, radius)
     this.sceneManager.add(newPlanet)
 
@@ -109,23 +108,23 @@ export default class LevelGenerator implements ILevelGenerator {
     })
   }
 
-  private genPlanet(x: number, y: number, radius: number): IPlanet {
+  private genPlanet (x: number, y: number, radius: number): IPlanet {
     return this.createPlanet(x, y, {
       radius,
       color: this.currentColor
     })
   }
 
-  private genPlanetRadius(): number {
+  private genPlanetRadius (): number {
     return this.planetRadius + (this.planetRadiusRange * this.random.seed.next())
   }
 
-  private genXPos(): number {
+  private genXPos (): number {
     const xRange = this.xRangeBetweenPlanets * this.random.seed.next()
     return this.random.seed.next() < 0.5 ? -xRange : xRange
   }
 
-  private genHue(): number {
+  private genHue (): number {
     const hueDecreasePerPlanet = 5 // Adjust this value as needed.
     let newHue = 300 - (this.gameParams.scores.planets * hueDecreasePerPlanet) % 360
 
@@ -137,7 +136,7 @@ export default class LevelGenerator implements ILevelGenerator {
     return newHue
   }
 
-  private genColor(): string {
+  private genColor (): string {
     const h = Math.round(this.hue)
     const s = Math.round(this.random.seed.randomRange(30, 100))
     const l = Math.round(this.random.seed.randomRange(30, 100))

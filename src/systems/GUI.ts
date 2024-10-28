@@ -1,6 +1,5 @@
 import type * as THREE from 'three'
-import { IGameParams } from './GameParams'
-import TYPES from './DI/tokens'
+import { type IGameParams } from './GameParams'
 
 type Style = Partial<CSSStyleDeclaration>
 

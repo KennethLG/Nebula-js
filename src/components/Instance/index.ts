@@ -24,7 +24,7 @@ export default class Instance implements IInstance {
       boundingSphere,
       mesh
     })
-    this.id = id || Date.now()
+    this.id = id ?? Date.now()
   }
 
   init (): void {

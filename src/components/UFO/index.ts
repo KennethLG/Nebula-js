@@ -7,7 +7,6 @@ import Bullet from '../Bullet'
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet'
 import { type ISceneManager } from '@/systems/SceneManager'
 import { type IGameParams } from '@/systems/GameParams'
-import TYPES from '@/systems/DI/tokens'
 
 export interface IUfo extends Instance {
   xVel: THREE.Vector3

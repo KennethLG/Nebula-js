@@ -24,3 +24,7 @@ export default class KeyboardManager implements IKeyboardManager {
     this.eventManager.emit('keyup', event.key)
   }
 }
+
+export const keyboardManagerFactory = (eventManager: IEventManager): IKeyboardManager => {
+  return new KeyboardManager(eventManager)
+}

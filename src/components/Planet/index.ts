@@ -2,10 +2,9 @@ import * as THREE from 'three'
 import Instance from '../Instance'
 import type ISprite from '@/entities/ISprite'
 import Sprite from '../Sprite'
-import TYPES from '@/systems/DI/tokens'
-import { IGameParams } from '@/systems/GameParams'
-import { ISceneManager } from '@/systems/SceneManager'
-import { IRandom } from '@/systems/Random'
+import { type IGameParams } from '@/systems/GameParams'
+import { type ISceneManager } from '@/systems/SceneManager'
+import { type IRandom } from '@/systems/Random'
 
 export interface PlanetProperties {
   radius?: number

@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import { type IEventManager } from './EventManager'
-import { type IKeyboardManager } from './KeyboardManager'
 
 export interface IMovementController {
   handleXMovement: (
@@ -19,24 +18,24 @@ export default class MovementController implements IMovementController {
   private readonly friction = 0.9
   private activeKeys: Record<string, boolean> = {}
 
-  constructor(
+  constructor (
     private readonly eventManager: IEventManager
   ) {
     this.eventManager.on('keydown', this.handleKeyDown.bind(this))
     this.eventManager.on('keyup', this.handleKeyUp.bind(this))
   }
-  private handleKeyDown(key: string): void {
+
+  private handleKeyDown (key: string): void {
     console.log('key down', key)
     this.activeKeys[key] = true
   }
 
-  private handleKeyUp(key: string): void {
+  private handleKeyUp (key: string): void {
     console.log('key up', key)
     this.activeKeys[key] = false
   }
 
-
-  handleXMovement(
+  handleXMovement (
     quaternion: THREE.Quaternion,
     xVelocity: THREE.Vector3
   ): THREE.Vector3 {
@@ -60,7 +59,7 @@ export default class MovementController implements IMovementController {
     return xVelocity
   }
 
-  handleJump(gravityDirection: THREE.Vector3, velocity: THREE.Vector3): void {
+  handleJump (gravityDirection: THREE.Vector3, velocity: THREE.Vector3): void {
     if (this.activeKeys[this.jumpKey]) {
       const jumpDir = gravityDirection.negate().normalize()
       velocity.copy(jumpDir.multiplyScalar(this.jumpForce))

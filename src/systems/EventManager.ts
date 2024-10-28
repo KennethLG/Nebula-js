@@ -1,4 +1,3 @@
-
 export interface IEventManager<T extends string = string> {
   on: (event: T, callback: (...args: any[]) => void) => void
   off: (event: T, callback: (...args: any[]) => void) => void

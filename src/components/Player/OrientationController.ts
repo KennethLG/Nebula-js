@@ -1,4 +1,3 @@
-import TYPES from '@/systems/DI/tokens'
 import { type IEventManager } from '@/systems/EventManager'
 import * as THREE from 'three'
 

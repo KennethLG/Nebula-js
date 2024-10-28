@@ -1,10 +1,9 @@
 import * as THREE from 'three'
-import TYPES from './systems/DI/tokens'
-import { ISceneManager } from './systems/SceneManager'
-import { ICameraController } from './systems/CameraController'
-import { IGameParams } from './systems/GameParams'
-import { IGUI } from './systems/GUI'
-import IScene from './entities/IScene'
+import { type ISceneManager } from './systems/SceneManager'
+import { type ICameraController } from './systems/CameraController'
+import { type IGameParams } from './systems/GameParams'
+import { type IGUI } from './systems/GUI'
+import type IScene from './entities/IScene'
 
 export interface IMain {
   init: () => void

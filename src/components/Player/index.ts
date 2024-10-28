@@ -15,7 +15,6 @@ import { type ICollisionController } from './CollisionController'
 import { type ISceneManager } from '@/systems/SceneManager'
 import { type IEventManager } from '@/systems/EventManager'
 import { type IGameParams } from '@/systems/GameParams'
-import { ICameraController } from '@/systems/CameraController'
 
 interface AnimationContext {
   xVel: THREE.Vector3
@@ -47,7 +46,7 @@ export default class Player extends Instance implements IPlayer {
   private readonly sprite: ISprite
   private readonly animationController: AnimationController<AnimationContext>
   private readonly onGameOverBound: () => void
-  
+
   constructor (
     private readonly sceneManager: ISceneManager,
     private readonly eventManager: IEventManager,
@@ -58,7 +57,7 @@ export default class Player extends Instance implements IPlayer {
     private readonly collisionController: ICollisionController,
     controllable: boolean,
     id?: number,
-    position?: THREE.Vector3,
+    position?: THREE.Vector3
   ) {
     const sprite = new Sprite({
       name: 'player.png',
@@ -68,7 +67,7 @@ export default class Player extends Instance implements IPlayer {
 
     super({
       name: 'Player',
-      position: position || new THREE.Vector3(0, 0, 0),
+      position: position ?? new THREE.Vector3(0, 0, 0),
       radius: 0.5,
       mesh: sprite.sprite,
       id
@@ -139,11 +138,11 @@ export default class Player extends Instance implements IPlayer {
   }
 
   // Interpolation for other players
-  private interpolateMovement(): void {
-    const lerpFactor = 0.1; // Smoothing factor; adjust as needed
-    const targetPosition = this.body.position.clone().add(this.xVel);
+  private interpolateMovement (): void {
+    const lerpFactor = 0.1 // Smoothing factor; adjust as needed
+    const targetPosition = this.body.position.clone().add(this.xVel)
 
-    this.body.position.lerp(targetPosition, lerpFactor);
+    this.body.position.lerp(targetPosition, lerpFactor)
   }
 
   private moveX (): void {
