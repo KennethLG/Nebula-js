@@ -9,7 +9,6 @@ import MatchSocket from '../http/matchSocket';
 import PlayerDataController from '../PlayerDataController';
 import Random from '../Random';
 import { PlanetFactory } from './PlanetFatory';
-import PlayerFactory from './PlayerFactory';
 import UfoFactory from './UfoFactory';
 
 export const mainFactory = (): Main => {
@@ -30,11 +29,6 @@ export const mainFactory = (): Main => {
   );
   const matchmakingSocket = new MatchSocket(eventsManager);
   const playerDataController = new PlayerDataController();
-  const playerFactory = new PlayerFactory(
-    sceneManager,
-    eventsManager,
-    gameParams,
-  );
   const ufoFactory = new UfoFactory(sceneManager, gameParams);
   const currentScene = new GameScene(
     cameraController,
@@ -45,7 +39,6 @@ export const mainFactory = (): Main => {
     gui,
     matchmakingSocket,
     playerDataController,
-    playerFactory.createPlayer,
     ufoFactory.createUfo,
   );
   const main = new Main(

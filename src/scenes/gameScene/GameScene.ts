@@ -10,7 +10,6 @@ import { keyboardManagerFactory } from '@/systems/KeyboardManager';
 import { type ILevelGenerator } from '@/systems/LevelGenerator';
 import { type IPlayerDataController } from '@/systems/PlayerDataController';
 import { type ISceneManager } from '@/systems/SceneManager';
-import { type CreatePlayer } from '@/systems/factories/PlayerFactory';
 import { type IMatchSocket } from '@/systems/http/matchSocket';
 import SceneSync from './SceneSync';
 import { EventTypes } from '@/systems/eventTypes';
@@ -32,7 +31,6 @@ export default class GameScene implements IScene {
     private readonly gui: IGUI,
     private readonly matchSocket: IMatchSocket,
     private readonly playerDataController: IPlayerDataController,
-    private readonly createPlayer: CreatePlayer,
     private readonly createUfoInstance: () => IUfo,
   ) {
     this.gameOverScreen = document.createElement('div');
