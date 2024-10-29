@@ -5,7 +5,7 @@ import {
   type MatchFoundResponse,
   type PlayerUpdatedResponse,
   type SocketResponse,
-} from './responses/socketResponse';
+} from './responses';
 import { type IPlayer } from '@/components/Player';
 import PlayerStateSocket from './playerStateSocket';
 import { EventTypes } from '../eventTypes';

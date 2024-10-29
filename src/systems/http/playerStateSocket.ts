@@ -1,15 +1,8 @@
 import { type Socket } from 'socket.io-client';
 import { type IEventManager } from '../EventManager';
 import { type IPlayer } from '@/components/Player';
-import { type PlayerSocketResponse } from './responses/socketResponse';
 import { EventTypes } from '../eventTypes';
-
-type PlayerSocketRequest = Omit<PlayerSocketResponse, 'socketId'>;
-
-interface PlayerStateRequest {
-  matchId: string;
-  player: PlayerSocketRequest;
-}
+import { type PlayerStateRequest } from './requests';
 
 class PlayerStateAdapter {
   toPlayerStateRequest(

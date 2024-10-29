@@ -2,7 +2,7 @@ import { type IPlayer } from '@/components/Player';
 import {
   type MatchFoundResponse,
   type PlayerUpdatedResponse,
-} from '../http/responses/socketResponse';
+} from '../http/responses';
 
 export const EventTypes = {
   MatchFound: 'matchFound',
