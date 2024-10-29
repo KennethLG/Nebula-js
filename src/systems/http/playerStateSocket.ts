@@ -2,6 +2,7 @@ import { type Socket } from 'socket.io-client';
 import { type IEventManager } from '../EventManager';
 import { type IPlayer } from '@/components/Player';
 import { type PlayerSocketResponse } from './responses/socketResponse';
+import { EventTypes } from '../eventTypes';
 
 type PlayerSocketRequest = Omit<PlayerSocketResponse, 'socketId'>;
 
@@ -40,7 +41,7 @@ export default class PlayerStateSocket {
     matchId: string,
   ) {
     const playerStateAdapter = new PlayerStateAdapter();
-    this.eventManager.on('keyup', (key: string) => {
+    this.eventManager.on(EventTypes.Keyup, (key) => {
       const playerStateRequest = playerStateAdapter.toPlayerStateRequest(
         player,
         matchId,
@@ -49,7 +50,7 @@ export default class PlayerStateSocket {
       );
       this.sendState(playerStateRequest);
     });
-    this.eventManager.on('keydown', (key: string) => {
+    this.eventManager.on(EventTypes.Keydown, (key) => {
       const playerStateRequest = playerStateAdapter.toPlayerStateRequest(
         player,
         matchId,

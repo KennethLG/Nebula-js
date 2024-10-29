@@ -13,6 +13,7 @@ import { type ICollisionController } from './CollisionController';
 import { type ISceneManager } from '@/systems/SceneManager';
 import { type IEventManager } from '@/systems/EventManager';
 import { type IGameParams } from '@/systems/GameParams';
+import { EventTypes } from '@/systems/eventTypes';
 
 interface AnimationContext {
   xVel: THREE.Vector3;
@@ -106,7 +107,7 @@ export default class Player extends Instance implements IPlayer {
 
   init(): void {
     console.log('subscribe gameover');
-    this.eventManager.on('gameOver', (data) => {
+    this.eventManager.on(EventTypes.GameOver, (data) => {
       if (data.playerId !== this.id) return;
       this.onGameOver();
     });
@@ -118,7 +119,6 @@ export default class Player extends Instance implements IPlayer {
   };
 
   update(): void {
-    console.log(this.dead);
     this.planet = getNearestPlanet(this.sceneManager, this.body.position);
 
     if (this.planet == null) return;

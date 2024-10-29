@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { type IEventManager } from './EventManager';
+import { EventTypes } from './eventTypes';
 
 export interface IMovementController {
   handleXMovement: (
@@ -22,8 +23,8 @@ export default class MovementController implements IMovementController {
   private activeKeys: Record<string, boolean> = {};
 
   constructor(private readonly eventManager: IEventManager) {
-    this.eventManager.on('keydown', this.handleKeyDown.bind(this));
-    this.eventManager.on('keyup', this.handleKeyUp.bind(this));
+    this.eventManager.on(EventTypes.Keydown, this.handleKeyDown.bind(this));
+    this.eventManager.on(EventTypes.Keyup, this.handleKeyUp.bind(this));
   }
 
   private handleKeyDown(key: string): void {
@@ -45,10 +46,10 @@ export default class MovementController implements IMovementController {
 
     if (this.activeKeys[this.moveRightKey]) {
       xVelocity.add(right.clone().normalize().multiplyScalar(this.moveVel));
-      this.eventManager.emit('movementKeydown', 'right');
+      this.eventManager.emit(EventTypes.MovementKeydown, 'right');
     } else if (this.activeKeys[this.moveLeftKey]) {
       xVelocity.add(right.clone().normalize().multiplyScalar(-this.moveVel));
-      this.eventManager.emit('movementKeydown', 'left');
+      this.eventManager.emit(EventTypes.MovementKeydown, 'left');
     } else {
       xVelocity.multiplyScalar(this.friction);
     }

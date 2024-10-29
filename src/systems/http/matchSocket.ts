@@ -8,6 +8,7 @@ import {
 } from './responses/socketResponse';
 import { type IPlayer } from '@/components/Player';
 import PlayerStateSocket from './playerStateSocket';
+import { EventTypes } from '../eventTypes';
 
 export interface IMatchSocket {
   init: (id: number) => void;
@@ -35,7 +36,7 @@ export default class MatchSocket {
       console.log('disconnected!');
     });
 
-    this.eventManager.on('matchStart', (data) => {
+    this.eventManager.on(EventTypes.MatchStart, (data) => {
       this.initPlayerStateSocket(data.matchId, data.player);
     });
   }
@@ -60,7 +61,7 @@ export default class MatchSocket {
     this.socket.on('matchFound', (data: SocketResponse<MatchFoundResponse>) => {
       console.log('MatchFound response', data);
       if (data.status === 'Ok') {
-        this.eventManager.emit('matchFound', data.data);
+        this.eventManager.emit(EventTypes.MatchFound, data.data);
         return;
       }
       console.error('Error joining match', data.message);
@@ -69,11 +70,11 @@ export default class MatchSocket {
 
   private onPlayerUpdated(): void {
     this.socket.on(
-      'playerUpdated',
+      EventTypes.PlayerUpdated,
       (data: SocketResponse<PlayerUpdatedResponse>) => {
         console.log('Player updated', data);
         if (data.status === 'Ok') {
-          this.eventManager.emit('playerUpdated', data.data);
+          this.eventManager.emit(EventTypes.PlayerUpdated, data.data);
           return;
         }
         console.error('Error updating player', data.message);

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { getItem, setItem } from './GameStorage';
 import { type IEventManager } from './EventManager';
+import { EventTypes } from './eventTypes';
 
 interface Scores {
   planetsRecord: number;
@@ -47,7 +48,7 @@ export default class GameParams implements IGameParams {
     }
 
     this.gameOver = true;
-    this.eventManager.emit('gameOver', {
+    this.eventManager.emit(EventTypes.GameOver, {
       playerId: id,
     });
     setTimeout(() => {

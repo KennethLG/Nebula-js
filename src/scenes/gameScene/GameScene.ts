@@ -12,11 +12,8 @@ import { type IPlayerDataController } from '@/systems/PlayerDataController';
 import { type ISceneManager } from '@/systems/SceneManager';
 import { type CreatePlayer } from '@/systems/factories/PlayerFactory';
 import { type IMatchSocket } from '@/systems/http/matchSocket';
-import {
-  type MatchFoundResponse,
-  type PlayerUpdatedResponse,
-} from '@/systems/http/responses/socketResponse';
-import { Vector3 } from 'three';
+import SceneSync from './SceneSync';
+import { EventTypes } from '@/systems/eventTypes';
 
 export default class GameScene implements IScene {
   private planetsScore: number[] = [];
@@ -50,10 +47,10 @@ export default class GameScene implements IScene {
     console.log('gamescene init');
     this.gameOverScreen = this.createGameOverScreen();
     this.changeGameOverScreenVisibility('hidden');
-    this.eventManager.on('gameOver', () => {
+    this.eventManager.on(EventTypes.GameOver, () => {
       this.changeGameOverScreenVisibility('visible');
     });
-    this.eventManager.on('keyup', () => {
+    this.eventManager.on(EventTypes.Keyup, () => {
       console.log(
         'keyup on gameover',
         this.gameParams.gameOver,
@@ -64,8 +61,16 @@ export default class GameScene implements IScene {
       }
     });
 
-    this.eventManager.on('matchFound', this.onMatchFound.bind(this));
-    this.eventManager.on('playerUpdated', this.onPlayerUpdated.bind(this));
+    const sceneSync = new SceneSync(
+      this.sceneManager,
+      this.playerDataController,
+      this.eventManager,
+      this.gameParams,
+    );
+
+    sceneSync.init();
+    this.onMatchFound();
+    this.onMatchStart();
 
     setTimeout(() => {
       this.playerDelayCompleted = true;
@@ -198,88 +203,18 @@ export default class GameScene implements IScene {
     }
   }
 
-  private onMatchFound(data: MatchFoundResponse): void {
-    const players = data.players.map((player) => {
-      return {
-        ...player,
-        id: parseInt(player.id),
-      };
-    });
-
-    this.matchFound = true;
-    this.levelGenerator.init();
-    console.log(this.playerDataController.playerData, data.players);
-    const currentPlayer = players.find(
-      (player) => player.id === this.playerDataController.playerData.id,
-    );
-    if (currentPlayer == null) {
-      throw new Error('No player found');
-    }
-    console.log('current player', currentPlayer);
-    const playerPosition = new Vector3(
-      currentPlayer.position.x,
-      currentPlayer.position.y,
-      0,
-    );
-    const player = this.createPlayer(true, currentPlayer.id, playerPosition);
-    this.sceneManager.add(player);
-    this.player = player;
-
-    const otherPlayers = players.filter(
-      (player) => player.id !== this.playerDataController.playerData.id,
-    );
-    otherPlayers.forEach((player) => {
-      const playerPosition = new Vector3(
-        player.position.x,
-        player.position.y,
-        0,
-      );
-      const newPlayer = this.createPlayer(false, player.id, playerPosition);
-      this.sceneManager.add(newPlayer);
-    });
-
-    this.cameraController.camera.position.setY(0);
-    this.planetsScore = [];
-    this.eventManager.emit('matchStart', {
-      matchId: data.id,
-      player,
+  private onMatchStart(): void {
+    this.eventManager.on(EventTypes.MatchStart, (data) => {
+      this.matchFound = true;
+      this.player = data.player;
     });
   }
 
-  private onPlayerUpdated(data: PlayerUpdatedResponse): void {
-    const player = {
-      ...data.player,
-      id: parseInt(data.player.id),
-    };
-    console.log('updating player', player, 'data', data);
-
-    const playerInstance = this.sceneManager.instances.find(
-      (inst) => inst.id === player.id,
-    );
-    if (playerInstance == null) {
-      throw new Error('No player found');
-    }
-    const foundPlayer = playerInstance as IPlayer;
-    console.log(
-      'triggering: ',
-      data.player.keyState ? 'keydown' : 'keyup',
-      data.player.key,
-      'for player',
-      foundPlayer.id,
-    );
-    foundPlayer.playerEvents.emit(
-      data.player.keyState ? 'keydown' : 'keyup',
-      data.player.key,
-    );
-    if (data.player.dead) {
-      foundPlayer.onGameOver();
-    }
-
-    // set foundplayer position based on a threshold
-    const threshold = 0.1;
-    if (Math.abs(foundPlayer.body.position.x - player.position.x) > threshold) {
-      foundPlayer.body.position.setX(player.position.x);
-      foundPlayer.body.position.setY(player.position.y);
-    }
+  private onMatchFound(): void {
+    this.eventManager.on(EventTypes.MatchFound, () => {
+      this.levelGenerator.init();
+      this.cameraController.camera.position.setY(0);
+      this.planetsScore = [];
+    });
   }
 }

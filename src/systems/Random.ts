@@ -1,4 +1,5 @@
 import { type IEventManager } from './EventManager';
+import { EventTypes } from './eventTypes';
 
 export interface IRandom {
   seed: Seed;
@@ -34,7 +35,7 @@ export default class Random implements IRandom {
   constructor(private readonly eventManager: IEventManager) {
     this._seed = null;
 
-    this.eventManager.on('matchFound', (data) => {
+    this.eventManager.on(EventTypes.MatchFound, (data) => {
       this._seed = new Seed(data.seed);
     });
   }
