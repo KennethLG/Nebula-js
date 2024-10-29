@@ -25,7 +25,7 @@ export interface SocketResponse<T = any> {
 }
 
 export interface MatchFoundResponse {
-  seed: string;
+  seed: number;
   id: string;
   players: PlayerSocketResponse[];
 }
