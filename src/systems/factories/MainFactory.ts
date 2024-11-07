@@ -1,51 +1,59 @@
 import { Main } from '@/bootstrap';
-import { EventManager, SceneManager } from '..';
+import { EventManager } from '..';
 import CameraController from '../CameraController';
 import GameParams from '../GameParams';
-import GUI from '../GUI';
-import GameScene from '@/scenes/gameScene/GameScene';
+import MatchGUI from '@/systems/gui/MatchGUI';
 import LevelGenerator from '../LevelGenerator';
 import MatchSocket from '../http/matchSocket';
 import PlayerDataController from '../PlayerDataController';
 import Random from '../Random';
 import { PlanetFactory } from './PlanetFatory';
 import UfoFactory from './UfoFactory';
+import { GUIManager } from '../gui';
+import InstancesManager from '../InstancesManager';
+import { GameSceneFactory } from './GameSceneFactory';
 
 export const mainFactory = (): Main => {
-  const sceneManager = new SceneManager();
+  const instancesManager = new InstancesManager();
   const cameraController = new CameraController();
   const eventsManager = new EventManager();
   const gameParams = new GameParams(eventsManager);
-  const gui = new GUI(gameParams);
+  const gui = new MatchGUI(gameParams);
+  const guiManager = new GUIManager();
   const random = new Random(eventsManager);
-  const planetFactory = new PlanetFactory(sceneManager, gameParams, random);
+  const planetFactory = new PlanetFactory(instancesManager, gameParams, random);
   const levelGenerator = new LevelGenerator(
     gameParams,
     cameraController,
-    sceneManager,
+    instancesManager,
     random,
     eventsManager,
     planetFactory.createPlanet.bind(planetFactory),
   );
   const matchmakingSocket = new MatchSocket(eventsManager);
   const playerDataController = new PlayerDataController();
-  const ufoFactory = new UfoFactory(sceneManager, gameParams);
-  const currentScene = new GameScene(
+  const ufoFactory = new UfoFactory(instancesManager, gameParams);
+  // const currentScene = new GameScene(
+  // );
+  const gameSceneFactory = new GameSceneFactory(
     cameraController,
-    sceneManager,
+    instancesManager,
     gameParams,
     levelGenerator,
     eventsManager,
     gui,
     matchmakingSocket,
     playerDataController,
-    ufoFactory.createUfo,
+    ufoFactory,
   );
+
+  const currentScene = gameSceneFactory.createGameScene();
+
   const main = new Main(
-    sceneManager,
+    instancesManager,
     cameraController,
     gameParams,
-    gui,
+    guiManager,
     currentScene,
   );
   return main;

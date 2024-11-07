@@ -10,7 +10,7 @@ import type Explosion from '../UFO/explosion';
 import { type IMovementController } from '../../systems/MovementController';
 import { type IOrientationController } from './OrientationController';
 import { type ICollisionController } from './CollisionController';
-import { type ISceneManager } from '@/systems/SceneManager';
+import { type IInstancesManager } from '@/systems/InstancesManager';
 import { type IEventManager } from '@/systems/EventManager';
 import { type IGameParams } from '@/systems/GameParams';
 import { EventTypes } from '@/systems/eventTypes';
@@ -47,7 +47,7 @@ export default class Player extends Instance implements IPlayer {
   private readonly animationController: AnimationController<AnimationContext>;
 
   constructor(
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
     private readonly eventManager: IEventManager,
     private readonly gameParams: IGameParams,
     readonly playerEvents: IEventManager,
@@ -119,7 +119,7 @@ export default class Player extends Instance implements IPlayer {
   };
 
   update(): void {
-    this.planet = getNearestPlanet(this.sceneManager, this.body.position);
+    this.planet = getNearestPlanet(this.instancesManager, this.body.position);
 
     if (this.planet == null) return;
 
@@ -207,7 +207,7 @@ export default class Player extends Instance implements IPlayer {
   }
 
   private getCollidingExplosion(): Explosion | undefined {
-    const explosions = this.sceneManager.instances.filter(
+    const explosions = this.instancesManager.instances.filter(
       (inst) => inst.name === 'Explosion',
     ) as Explosion[];
 

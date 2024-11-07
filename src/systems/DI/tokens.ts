@@ -1,6 +1,6 @@
 const TYPES = {
   IScene: Symbol.for('IScene'),
-  ISceneManager: Symbol.for('ISceneManager'),
+  IinstancesManager: Symbol.for('IinstancesManager'),
   ICameraController: Symbol.for('ICameraController'),
   ILevelGenerator: Symbol.for('ILevelGenerator'),
   IRandom: Symbol.for('IRandom'),

@@ -1,5 +1,5 @@
 import Player from '@/components/Player';
-import { type ISceneManager } from '../SceneManager';
+import { type IInstancesManager } from '../InstancesManager';
 import EventManager, { type IEventManager } from '../EventManager';
 import { type IGameParams } from '../GameParams';
 import OrientationController from '@/components/Player/OrientationController';
@@ -15,7 +15,7 @@ export type CreatePlayer = (
 
 export default class PlayerFactory {
   constructor(
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
     private readonly eventManager: IEventManager,
     private readonly gameParams: IGameParams,
   ) {}
@@ -30,7 +30,7 @@ export default class PlayerFactory {
     const movementController = new MovementController(playerEvents);
     const collisionController = new CollisionController();
     return new Player(
-      this.sceneManager,
+      this.instancesManager,
       this.eventManager,
       this.gameParams,
       playerEvents,

@@ -1,7 +1,7 @@
 import type Instance from '@/components/Instance';
 import * as THREE from 'three';
 
-export interface ISceneManager {
+export interface IInstancesManager {
   instances: Instance[];
   scene: THREE.Scene;
   canInitInstances: boolean;
@@ -11,7 +11,7 @@ export interface ISceneManager {
   animate: () => void;
 }
 
-export default class SceneManager implements ISceneManager {
+export default class InstanceManager implements IInstancesManager {
   instances: Instance[] = [];
   scene: THREE.Scene;
   canInitInstances = true;

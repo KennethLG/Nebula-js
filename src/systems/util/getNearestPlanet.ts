@@ -1,12 +1,12 @@
 import type * as THREE from 'three';
 import type Planet from '@/components/Planet';
-import { type ISceneManager } from '../SceneManager';
+import { type IInstancesManager } from '../InstancesManager';
 
 export const getNearestPlanet = (
-  sceneManager: ISceneManager,
+  instancesManager: IInstancesManager,
   from: THREE.Vector3,
 ): Planet | undefined => {
-  const planets = sceneManager.instances.filter(
+  const planets = instancesManager.instances.filter(
     (inst) => inst.name === 'Planet',
   ) as Planet[];
 

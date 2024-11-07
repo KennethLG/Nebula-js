@@ -1,6 +1,6 @@
 import { type IPlanet, type PlanetProperties } from '@/components/Planet';
 
-import { type ISceneManager } from './SceneManager';
+import { type IInstancesManager } from './InstancesManager';
 import { type IRandom } from './Random';
 import { type IGameParams } from './GameParams';
 import { type ICameraController } from './CameraController';
@@ -26,7 +26,7 @@ export default class LevelGenerator implements ILevelGenerator {
   constructor(
     private readonly gameParams: IGameParams,
     private readonly cameraController: ICameraController,
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
     private readonly random: IRandom,
     private readonly eventManager: IEventManager,
     private readonly createPlanet: (
@@ -67,7 +67,7 @@ export default class LevelGenerator implements ILevelGenerator {
   }
 
   private removeOuterPlanets(): void {
-    const planets = this.sceneManager.instances.filter(
+    const planets = this.instancesManager.instances.filter(
       (inst) => inst.name === 'Planet',
     ) as IPlanet[];
     if (planets.length === 0) return;
@@ -83,7 +83,7 @@ export default class LevelGenerator implements ILevelGenerator {
     );
 
     outerPlanets.forEach((planet) => {
-      this.sceneManager.destroy(planet.id);
+      this.instancesManager.destroy(planet.id);
     });
   }
 
@@ -116,10 +116,10 @@ export default class LevelGenerator implements ILevelGenerator {
 
   private addPlanetAt(x: number, y: number, radius: number): void {
     const newPlanet = this.genPlanet(x, y, radius);
-    this.sceneManager.add(newPlanet);
+    this.instancesManager.add(newPlanet);
 
     newPlanet.decorations.forEach((decoration) => {
-      this.sceneManager.scene.add(decoration.sprite);
+      this.instancesManager.scene.add(decoration.sprite);
     });
   }
 

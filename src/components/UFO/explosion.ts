@@ -1,6 +1,6 @@
 import Instance from '../Instance';
 import * as THREE from 'three';
-import { type ISceneManager } from '@/systems/SceneManager';
+import { type IInstancesManager } from '@/systems/InstancesManager';
 
 interface ExplosionConfig {
   position: THREE.Vector3;
@@ -13,7 +13,7 @@ export default class Explosion extends Instance {
   radius: number;
   constructor(
     { position, radius, color }: ExplosionConfig,
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
   ) {
     const geometry = new THREE.CircleGeometry(radius, 32); // Start with a small size
     const material = new THREE.MeshBasicMaterial({
@@ -39,7 +39,7 @@ export default class Explosion extends Instance {
     this.material.opacity -= 0.2;
 
     if (this.material.opacity <= 0) {
-      this.sceneManager.destroy(this.id);
+      this.instancesManager.destroy(this.id);
     }
   }
 }

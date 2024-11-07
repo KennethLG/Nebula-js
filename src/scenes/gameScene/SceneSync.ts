@@ -4,19 +4,19 @@ import { EventTypes } from '@/systems/eventTypes';
 import PlayerFactory from '@/systems/factories/PlayerFactory';
 import { type IGameParams } from '@/systems/GameParams';
 import { type IPlayerDataController } from '@/systems/PlayerDataController';
-import { type ISceneManager } from '@/systems/SceneManager';
+import { type IInstancesManager } from '@/systems/InstancesManager';
 import { Vector3 } from 'three';
 
 export default class SceneSync {
   private readonly playerFactory: PlayerFactory;
   constructor(
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
     private readonly playerDataController: IPlayerDataController,
     private readonly eventManager: IEventManager,
     private readonly gameParams: IGameParams,
   ) {
     this.playerFactory = new PlayerFactory(
-      this.sceneManager,
+      this.instancesManager,
       this.eventManager,
       this.gameParams,
     );
@@ -56,7 +56,7 @@ export default class SceneSync {
         currentPlayer.id,
         playerPosition,
       ); // this.createPlayer(true, currentPlayer.id, playerPosition);
-      this.sceneManager.add(player);
+      this.instancesManager.add(player);
       // this.player = player;
 
       const otherPlayers = players.filter(
@@ -73,7 +73,7 @@ export default class SceneSync {
           player.id,
           playerPosition,
         );
-        this.sceneManager.add(newPlayer);
+        this.instancesManager.add(newPlayer);
       });
 
       // this.cameraController.camera.position.setY(0);
@@ -93,7 +93,7 @@ export default class SceneSync {
       };
       console.log('updating player', player, 'data', data);
 
-      const playerInstance = this.sceneManager.instances.find(
+      const playerInstance = this.instancesManager.instances.find(
         (inst) => inst.id === player.id,
       );
       if (playerInstance == null) {

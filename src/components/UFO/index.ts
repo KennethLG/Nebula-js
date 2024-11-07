@@ -5,7 +5,7 @@ import { randomRange } from '@/systems/util/random';
 import { type IInstance } from '@/entities/Instance';
 import Bullet from '../Bullet';
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet';
-import { type ISceneManager } from '@/systems/SceneManager';
+import { type IInstancesManager } from '@/systems/InstancesManager';
 import { type IGameParams } from '@/systems/GameParams';
 
 export interface IUfo extends Instance {
@@ -27,7 +27,7 @@ export default class Ufo extends Instance implements IUfo {
   private target?: IInstance;
 
   constructor(
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
     private readonly gameParams: IGameParams,
   ) {
     const sprite = new Sprite({
@@ -70,7 +70,7 @@ export default class Ufo extends Instance implements IUfo {
     if (this.gameParams.gameOver) return;
     const position = this.body.position.clone();
 
-    const planet = getNearestPlanet(this.sceneManager, position);
+    const planet = getNearestPlanet(this.instancesManager, position);
 
     if (planet == null) return;
 
@@ -82,10 +82,10 @@ export default class Ufo extends Instance implements IUfo {
         direction,
         speed: 0.1,
       },
-      this.sceneManager,
+      this.instancesManager,
     );
 
-    this.sceneManager.add(bullet);
+    this.instancesManager.add(bullet);
   }
 
   onDestroy(): void {

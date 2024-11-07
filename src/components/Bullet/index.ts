@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import Instance from '../Instance';
 import type Planet from '../Planet';
 import Explosion from '../UFO/explosion';
-import { type ISceneManager } from '@/systems/SceneManager';
+import { type IInstancesManager } from '@/systems/InstancesManager';
 
 interface BulletConfig {
   position: THREE.Vector3;
@@ -15,7 +15,7 @@ export default class Bullet extends Instance {
   private readonly speed: number;
   constructor(
     { position, direction, speed }: BulletConfig,
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
   ) {
     const geometry = new THREE.CircleGeometry(0.1);
     const material = new THREE.MeshBasicMaterial({ color: 'white' });
@@ -36,23 +36,23 @@ export default class Bullet extends Instance {
 
     const collidingPlanet = this.getCollidingPlanet();
     if (collidingPlanet != null) {
-      this.sceneManager.add(
+      this.instancesManager.add(
         new Explosion(
           {
             position: collidingPlanet.body.position,
             radius: collidingPlanet.boundingSphere.radius,
             color: collidingPlanet.color,
           },
-          this.sceneManager,
+          this.instancesManager,
         ),
       );
-      this.sceneManager.destroy(collidingPlanet.id);
-      this.sceneManager.destroy(this.id);
+      this.instancesManager.destroy(collidingPlanet.id);
+      this.instancesManager.destroy(this.id);
     }
   }
 
   private getCollidingPlanet(): Planet | undefined {
-    const planets = this.sceneManager.instances.filter(
+    const planets = this.instancesManager.instances.filter(
       (inst) => inst.name === 'Planet',
     ) as Planet[];
 

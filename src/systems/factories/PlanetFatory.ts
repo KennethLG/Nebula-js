@@ -2,7 +2,7 @@ import Planet, {
   type PlanetProperties,
   type IPlanet,
 } from '@/components/Planet';
-import { type ISceneManager } from '../SceneManager';
+import { type IInstancesManager } from '../InstancesManager';
 import { type IGameParams } from '../GameParams';
 import { type IRandom } from '../Random';
 
@@ -16,7 +16,7 @@ interface IPlanetFactory {
 
 export class PlanetFactory implements IPlanetFactory {
   constructor(
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
     private readonly gameParams: IGameParams,
     private readonly random: IRandom,
   ) {}
@@ -29,7 +29,7 @@ export class PlanetFactory implements IPlanetFactory {
     return new Planet(
       x,
       y,
-      this.sceneManager,
+      this.instancesManager,
       this.gameParams,
       this.random,
       planetProperties,

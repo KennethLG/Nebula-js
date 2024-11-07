@@ -4,12 +4,12 @@ import { type IUfo } from '@/components/UFO';
 import type IScene from '@/entities/IScene';
 import { type ICameraController } from '@/systems/CameraController';
 import { type IEventManager } from '@/systems/EventManager';
-import { type IGUI } from '@/systems/GUI';
+import { type IMatchGUI } from '@/systems/gui/MatchGUI';
 import { type IGameParams } from '@/systems/GameParams';
 import { keyboardManagerFactory } from '@/systems/KeyboardManager';
 import { type ILevelGenerator } from '@/systems/LevelGenerator';
 import { type IPlayerDataController } from '@/systems/PlayerDataController';
-import { type ISceneManager } from '@/systems/SceneManager';
+import { type IInstancesManager } from '@/systems/InstancesManager';
 import { type IMatchSocket } from '@/systems/http/matchSocket';
 import SceneSync from './SceneSync';
 import { EventTypes } from '@/systems/eventTypes';
@@ -24,11 +24,11 @@ export default class GameScene implements IScene {
 
   constructor(
     private readonly cameraController: ICameraController,
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
     private readonly gameParams: IGameParams,
     private readonly levelGenerator: ILevelGenerator,
     private readonly eventManager: IEventManager,
-    private readonly gui: IGUI,
+    private readonly gui: IMatchGUI,
     private readonly matchSocket: IMatchSocket,
     private readonly playerDataController: IPlayerDataController,
     private readonly createUfoInstance: () => IUfo,
@@ -60,7 +60,7 @@ export default class GameScene implements IScene {
     });
 
     const sceneSync = new SceneSync(
-      this.sceneManager,
+      this.instancesManager,
       this.playerDataController,
       this.eventManager,
       this.gameParams,
@@ -119,7 +119,7 @@ export default class GameScene implements IScene {
       left,
       position: { x: cameraX },
     } = this.cameraController.camera;
-    this.sceneManager.instances.forEach((inst) => {
+    this.instancesManager.instances.forEach((inst) => {
       if (inst.name === 'Player') {
         const player = inst as IPlayer;
         if (player.body.position.x > cameraX + right) {
@@ -133,7 +133,7 @@ export default class GameScene implements IScene {
   }
 
   private removeOuterBullets(): void {
-    const bullets = this.sceneManager.instances.filter(
+    const bullets = this.instancesManager.instances.filter(
       (inst) => inst.name === 'Bullet',
     ) as Bullet[];
 
@@ -146,7 +146,7 @@ export default class GameScene implements IScene {
 
     bullets.forEach((bullet) => {
       if (bullet.body.position.y > cameraY + top) {
-        this.sceneManager.destroy(bullet.id);
+        this.instancesManager.destroy(bullet.id);
       }
     });
   }
@@ -171,7 +171,7 @@ export default class GameScene implements IScene {
     this.ufo = null;
     this.changeGameOverScreenVisibility('hidden');
 
-    this.sceneManager.destroyAll();
+    this.instancesManager.destroyAll();
     this.gameParams.gameOver = false;
     this.gameParams.canRestart = false;
     this.gameParams.restartScores();
@@ -197,7 +197,7 @@ export default class GameScene implements IScene {
       this.ufo = ufo;
       ufo.defineTarget(player);
 
-      this.sceneManager.add(ufo);
+      this.instancesManager.add(ufo);
     }
   }
 

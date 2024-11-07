@@ -3,7 +3,7 @@ import Instance from '../Instance';
 import type ISprite from '@/entities/ISprite';
 import Sprite from '../Sprite';
 import { type IGameParams } from '@/systems/GameParams';
-import { type ISceneManager } from '@/systems/SceneManager';
+import { type IInstancesManager } from '@/systems/InstancesManager';
 import { type IRandom } from '@/systems/Random';
 
 export interface PlanetProperties {
@@ -26,7 +26,7 @@ export default class Planet extends Instance implements IPlanet {
   constructor(
     x: number,
     y: number,
-    private readonly sceneManager: ISceneManager,
+    private readonly instancesManager: IInstancesManager,
     private readonly gameParams: IGameParams,
     private readonly random: IRandom,
     properties?: PlanetProperties,
@@ -80,7 +80,7 @@ export default class Planet extends Instance implements IPlanet {
 
   onDestroy(): void {
     this.decorations.forEach((decoration) => {
-      this.sceneManager.scene.remove(decoration.sprite);
+      this.instancesManager.scene.remove(decoration.sprite);
     });
   }
 }
