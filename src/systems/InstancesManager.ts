@@ -1,5 +1,6 @@
 import type Instance from '@/components/Instance';
 import * as THREE from 'three';
+import { Injectable } from './DI/container';
 
 export interface IInstancesManager {
   instances: Instance[];
@@ -11,6 +12,7 @@ export interface IInstancesManager {
   animate: () => void;
 }
 
+@Injectable()
 export default class InstanceManager implements IInstancesManager {
   instances: Instance[] = [];
   scene: THREE.Scene;

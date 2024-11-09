@@ -1,4 +1,4 @@
-import Container, { Injectable } from '.';
+import { Injectable, Inject, Container } from './container';
 
 @Injectable()
 class ServiceA {
@@ -8,7 +8,8 @@ class ServiceA {
 }
 @Injectable()
 class ServiceB {
-  constructor(private readonly serviceA: ServiceA) {}
+  @Inject('ServiceA')
+  private readonly serviceA!: ServiceA;
 
   hello(): void {
     console.log('hello');
@@ -22,8 +23,8 @@ describe('DI Container', () => {
   it('should resolve dependencies correctly', () => {
     const spy = jest.spyOn(ServiceA.prototype, 'hello');
     const container = new Container();
-    container.register('ServiceA', ServiceA);
-    container.register('ServiceB', ServiceB);
+    container.register(ServiceA);
+    container.register(ServiceB);
     const serviceB = container.resolve<ServiceB>('ServiceB');
     serviceB.hello();
     serviceB.dep();

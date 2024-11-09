@@ -1,5 +1,7 @@
-type Style = Partial<CSSStyleDeclaration>;
+import { Injectable } from '../DI/container';
 
+type Style = Partial<CSSStyleDeclaration>;
+@Injectable()
 export abstract class BaseGUI {
   private readonly overlay: HTMLElement;
 

@@ -1,5 +1,6 @@
 import type IScene from '@/entities/IScene';
-
+import { Injectable } from '@/systems/DI/container';
+@Injectable()
 export class SceneManager {
   private currentScene: IScene | null;
   constructor() {

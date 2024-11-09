@@ -1,3 +1,4 @@
+import { Injectable } from './DI/container';
 import { type EventMap, type EventType } from './eventTypes';
 
 export interface IEventManager {
@@ -11,7 +12,7 @@ export interface IEventManager {
   ) => void;
   emit: <T extends keyof EventMap>(event: T, payload?: EventMap[T]) => void;
 }
-
+@Injectable()
 export default class EventManager implements IEventManager {
   private eventMap: Record<EventType, Set<(payload: any) => void>> =
     {} as Record<EventType, Set<(payload: any) => void>>;

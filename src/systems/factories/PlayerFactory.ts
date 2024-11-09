@@ -6,6 +6,7 @@ import OrientationController from '@/components/Player/OrientationController';
 import MovementController from '../MovementController';
 import CollisionController from '@/components/Player/CollisionController';
 import { keyboardManagerFactory } from '../KeyboardManager';
+import { Injectable } from '../DI/container';
 
 export type CreatePlayer = (
   controllable: boolean,
@@ -13,6 +14,7 @@ export type CreatePlayer = (
   position?: THREE.Vector3,
 ) => Player;
 
+@Injectable()
 export default class PlayerFactory {
   constructor(
     private readonly instancesManager: IInstancesManager,
