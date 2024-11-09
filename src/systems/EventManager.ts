@@ -9,7 +9,7 @@ export interface IEventManager {
     event: T,
     callback: (payload: EventMap[T]) => void,
   ) => void;
-  emit: <T extends keyof EventMap>(event: T, payload: EventMap[T]) => void;
+  emit: <T extends keyof EventMap>(event: T, payload?: EventMap[T]) => void;
 }
 
 export default class EventManager implements IEventManager {
@@ -33,7 +33,7 @@ export default class EventManager implements IEventManager {
     this.eventMap[event]?.delete(callback);
   }
 
-  emit<K extends keyof EventMap>(event: K, payload: EventMap[K]): void {
+  emit<K extends keyof EventMap>(event: K, payload?: EventMap[K]): void {
     this.eventMap[event]?.forEach((cb) => {
       cb(payload);
     });
