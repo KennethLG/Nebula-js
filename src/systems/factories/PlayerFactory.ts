@@ -1,12 +1,7 @@
-import Player from '@/components/Player';
-import { type IInstancesManager } from '../InstancesManager';
-import EventManager, { type IEventManager } from '../EventManager';
-import { type IGameParams } from '../GameParams';
-import OrientationController from '@/components/Player/OrientationController';
-import MovementController from '../MovementController';
-import CollisionController from '@/components/Player/CollisionController';
-import { keyboardManagerFactory } from '../KeyboardManager';
-import { Injectable } from '../DI/container';
+import type Player from '@/components/Player';
+import { injectable, type interfaces } from 'inversify';
+import TYPES from '../DI/tokens';
+import { container } from '../DI/servicesRegistry';
 
 export type CreatePlayer = (
   controllable: boolean,
@@ -14,34 +9,14 @@ export type CreatePlayer = (
   position?: THREE.Vector3,
 ) => Player;
 
-@Injectable()
+@injectable()
 export default class PlayerFactory {
-  constructor(
-    private readonly instancesManager: IInstancesManager,
-    private readonly eventManager: IEventManager,
-    private readonly gameParams: IGameParams,
-  ) {}
-
   createPlayer: CreatePlayer = (controllable, id, position): Player => {
-    const playerEvents = new EventManager();
-    const orientationController = new OrientationController(playerEvents);
-
-    if (controllable) {
-      keyboardManagerFactory(playerEvents);
-    }
-    const movementController = new MovementController(playerEvents);
-    const collisionController = new CollisionController();
-    return new Player(
-      this.instancesManager,
-      this.eventManager,
-      this.gameParams,
-      playerEvents,
-      movementController,
-      orientationController,
-      collisionController,
-      controllable,
-      id,
-      position,
+    const playerFactory = container.get<interfaces.Factory<Player>>(
+      TYPES.PlayerFactory,
     );
+    const player = playerFactory(controllable, id, position) as Player;
+
+    return player;
   };
 }

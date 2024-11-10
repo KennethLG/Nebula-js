@@ -1,6 +1,6 @@
 import type Instance from '@/components/Instance';
+import { injectable } from 'inversify';
 import * as THREE from 'three';
-import { Injectable } from './DI/container';
 
 export interface IInstancesManager {
   instances: Instance[];
@@ -12,7 +12,7 @@ export interface IInstancesManager {
   animate: () => void;
 }
 
-@Injectable()
+@injectable()
 export default class InstanceManager implements IInstancesManager {
   instances: Instance[] = [];
   scene: THREE.Scene;

@@ -1,44 +1,66 @@
 import type Bullet from '@/components/Bullet';
 import { type IPlayer } from '@/components/Player';
-import { type IUfo } from '@/components/UFO';
+import type Ufo from '@/components/UFO';
 import type IScene from '@/entities/IScene';
-import { type ICameraController } from '@/systems/CameraController';
-import { type IEventManager } from '@/systems/EventManager';
-import { type IMatchGUI } from '@/systems/gui/MatchGUI';
-import { type IGameParams } from '@/systems/GameParams';
+import CameraController from '@/systems/CameraController';
+import EventManager from '@/systems/EventManager';
+import MatchGUI from '@/systems/gui/MatchGUI';
+import GameParams from '@/systems/GameParams';
 import { keyboardManagerFactory } from '@/systems/KeyboardManager';
-import { type ILevelGenerator } from '@/systems/LevelGenerator';
-import { type IPlayerDataController } from '@/systems/PlayerDataController';
-import { type IInstancesManager } from '@/systems/InstancesManager';
-import { type IMatchSocket } from '@/systems/http/matchSocket';
+import LevelGenerator from '@/systems/LevelGenerator';
+import PlayerDataController from '@/systems/PlayerDataController';
+import InstancesManager from '@/systems/InstancesManager';
+import MatchSocket from '@/systems/http/matchSocket';
 import SceneSync from './SceneSync';
 import { EventTypes } from '@/systems/eventTypes';
+import { inject, injectable } from 'inversify';
+import TYPES from '@/systems/DI/tokens';
+import UfoFactory from '@/systems/factories/UfoFactory';
 
+@injectable()
 export default class GameScene implements IScene {
   private planetsScore: number[] = [];
   private gameOverScreen: HTMLElement;
   private player: IPlayer | null;
-  private ufo: IUfo | null;
+  private ufo: Ufo | null;
   private matchFound = false;
   private playerDelayCompleted = false;
 
-  constructor(
-    private readonly cameraController: ICameraController,
-    private readonly instancesManager: IInstancesManager,
-    private readonly gameParams: IGameParams,
-    private readonly levelGenerator: ILevelGenerator,
-    private readonly eventManager: IEventManager,
-    private readonly gui: IMatchGUI,
-    private readonly matchSocket: IMatchSocket,
-    private readonly playerDataController: IPlayerDataController,
-    private readonly createUfoInstance: () => IUfo,
-  ) {
+  @inject(TYPES.CameraController)
+  private readonly cameraController!: CameraController;
+
+  @inject(TYPES.InstanceManager)
+  private readonly instancesManager!: InstancesManager;
+
+  @inject(TYPES.GameParams)
+  private readonly gameParams!: GameParams;
+
+  @inject(TYPES.LevelGenerator)
+  private readonly levelGenerator!: LevelGenerator;
+
+  @inject(TYPES.EventManager)
+  private readonly eventManager!: EventManager;
+
+  @inject(TYPES.GUI)
+  private readonly gui!: MatchGUI;
+
+  @inject(TYPES.MatchSocket)
+  private readonly matchSocket!: MatchSocket;
+
+  @inject(TYPES.PlayerDataController)
+  private readonly playerDataController!: PlayerDataController;
+  // private readonly createUfoInstance: () => IUfo;
+
+  @inject(TYPES.UfoFactory)
+  private readonly ufoFactory!: UfoFactory;
+
+  constructor() {
     this.gameOverScreen = document.createElement('div');
     this.player = null;
     this.ufo = null;
     this.playerDataController.getPlayerData();
     this.matchSocket.init(this.playerDataController.playerData.id);
-    keyboardManagerFactory(eventManager);
+    keyboardManagerFactory(this.eventManager);
   }
 
   init(): void {
@@ -193,7 +215,7 @@ export default class GameScene implements IScene {
     if (player == null || this.ufo != null) return;
 
     if (this.gameParams.scores.planets === 5) {
-      const ufo = this.createUfoInstance();
+      const ufo = this.ufoFactory.createUfo();
       this.ufo = ufo;
       ufo.defineTarget(player);
 

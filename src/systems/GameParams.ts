@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { getItem, setItem } from './GameStorage';
 import { type IEventManager } from './EventManager';
 import { EventTypes } from './eventTypes';
-import { Injectable } from './DI/container';
+import { injectable } from 'inversify';
 
 interface Scores {
   planetsRecord: number;
@@ -22,7 +22,7 @@ export interface IGameParams {
   end: (id: number) => void;
   restartScores: () => void;
 }
-@Injectable()
+@injectable()
 export default class GameParams implements IGameParams {
   readonly clock: THREE.Clock;
   gameOver = false;

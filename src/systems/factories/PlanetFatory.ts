@@ -1,38 +1,28 @@
-import Planet, {
-  type PlanetProperties,
-  type IPlanet,
-} from '@/components/Planet';
-import { type IInstancesManager } from '../InstancesManager';
-import { type IGameParams } from '../GameParams';
-import { type IRandom } from '../Random';
+import type Planet from '@/components/Planet';
+import { type PlanetProperties } from '@/components/Planet';
+import { container } from '../DI/servicesRegistry';
+import { injectable, type interfaces } from 'inversify';
+import TYPES from '../DI/tokens';
 
 interface IPlanetFactory {
   createPlanet: (
     x: number,
     y: number,
     planetProperties: PlanetProperties,
-  ) => IPlanet;
+  ) => Planet;
 }
 
+@injectable()
 export class PlanetFactory implements IPlanetFactory {
-  constructor(
-    private readonly instancesManager: IInstancesManager,
-    private readonly gameParams: IGameParams,
-    private readonly random: IRandom,
-  ) {}
-
   createPlanet = (
     x: number,
     y: number,
     planetProperties: PlanetProperties,
   ): Planet => {
-    return new Planet(
-      x,
-      y,
-      this.instancesManager,
-      this.gameParams,
-      this.random,
-      planetProperties,
+    const planetFactory = container.get<interfaces.Factory<Planet>>(
+      TYPES.PlanetFactory,
     );
+    const planet = planetFactory(x, y, planetProperties) as Planet;
+    return planet;
   };
 }
