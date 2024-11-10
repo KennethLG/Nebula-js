@@ -1,14 +1,14 @@
-import Ufo from '@/components/UFO';
-import { type IInstancesManager } from '../InstancesManager';
-import { type IGameParams } from '../GameParams';
+import type Ufo from '@/components/UFO';
+import { injectable, type interfaces } from 'inversify';
+import TYPES from '../DI/tokens';
+import { container } from '../DI/servicesRegistry';
 
+@injectable()
 export default class UfoFactory {
-  constructor(
-    private readonly instancesManager: IInstancesManager,
-    private readonly gameParams: IGameParams,
-  ) {}
-
   createUfo = (): Ufo => {
-    return new Ufo(this.instancesManager, this.gameParams);
+    const ufoFactory = container.get<interfaces.Factory<Ufo>>(TYPES.UfoFactory);
+
+    const ufo = ufoFactory() as Ufo;
+    return ufo;
   };
 }

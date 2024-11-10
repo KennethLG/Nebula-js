@@ -1,3 +1,4 @@
+import { injectable } from 'inversify';
 import { type EventMap, type EventType } from './eventTypes';
 
 export interface IEventManager {
@@ -9,9 +10,9 @@ export interface IEventManager {
     event: T,
     callback: (payload: EventMap[T]) => void,
   ) => void;
-  emit: <T extends keyof EventMap>(event: T, payload: EventMap[T]) => void;
+  emit: <T extends keyof EventMap>(event: T, payload?: EventMap[T]) => void;
 }
-
+@injectable()
 export default class EventManager implements IEventManager {
   private eventMap: Record<EventType, Set<(payload: any) => void>> =
     {} as Record<EventType, Set<(payload: any) => void>>;
@@ -33,7 +34,7 @@ export default class EventManager implements IEventManager {
     this.eventMap[event]?.delete(callback);
   }
 
-  emit<K extends keyof EventMap>(event: K, payload: EventMap[K]): void {
+  emit<K extends keyof EventMap>(event: K, payload?: EventMap[K]): void {
     this.eventMap[event]?.forEach((cb) => {
       cb(payload);
     });

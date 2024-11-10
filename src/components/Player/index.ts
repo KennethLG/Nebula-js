@@ -1,19 +1,21 @@
 import * as THREE from 'three';
 import Instance from '../Instance';
-import { applyGravitationalPull } from '../../systems';
+import { applyGravitationalPull, EventManager } from '../../systems';
 import type Planet from '../Planet';
 import AnimationController from './AnimationController';
 import type ISprite from '@/entities/ISprite';
 import Sprite from '../Sprite';
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet';
 import type Explosion from '../UFO/explosion';
-import { type IMovementController } from '../../systems/MovementController';
-import { type IOrientationController } from './OrientationController';
-import { type ICollisionController } from './CollisionController';
-import { type IInstancesManager } from '@/systems/InstancesManager';
+import MovementController from '../../systems/MovementController';
+import OrientationController from './OrientationController';
+import CollisionController from './CollisionController';
 import { type IEventManager } from '@/systems/EventManager';
-import { type IGameParams } from '@/systems/GameParams';
+import GameParams from '@/systems/GameParams';
 import { EventTypes } from '@/systems/eventTypes';
+import { inject } from 'inversify';
+import TYPES from '@/systems/DI/tokens';
+import InstanceManager from '@/systems/InstancesManager';
 
 interface AnimationContext {
   xVel: THREE.Vector3;
@@ -45,19 +47,28 @@ export default class Player extends Instance implements IPlayer {
   controllable: boolean;
   private readonly sprite: ISprite;
   private readonly animationController: AnimationController<AnimationContext>;
+  @inject(TYPES.InstanceManager)
+  private readonly instancesManager!: InstanceManager;
 
-  constructor(
-    private readonly instancesManager: IInstancesManager,
-    private readonly eventManager: IEventManager,
-    private readonly gameParams: IGameParams,
-    readonly playerEvents: IEventManager,
-    private readonly movementController: IMovementController,
-    private readonly orientationController: IOrientationController,
-    private readonly collisionController: ICollisionController,
-    controllable: boolean,
-    id?: number,
-    position?: THREE.Vector3,
-  ) {
+  @inject(TYPES.EventManager)
+  private readonly eventManager!: EventManager;
+
+  @inject(TYPES.GameParams)
+  private readonly gameParams!: GameParams;
+
+  @inject(TYPES.PlayerEventManager)
+  readonly playerEvents!: EventManager;
+
+  @inject(TYPES.MovementController)
+  private readonly movementController!: MovementController;
+
+  @inject(TYPES.OrientationController)
+  private readonly orientationController!: OrientationController;
+
+  @inject(TYPES.CollisionController)
+  private readonly collisionController!: CollisionController;
+
+  constructor(controllable: boolean, id?: number, position?: THREE.Vector3) {
     const sprite = new Sprite({
       name: 'player.png',
       xTiles: 3,

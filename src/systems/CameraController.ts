@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { injectable } from 'inversify';
 
 interface CameraSize {
   width: number;
@@ -12,7 +13,7 @@ export interface ICameraController {
   smoothness: number;
   update: () => void;
 }
-
+@injectable()
 export default class CameraController implements ICameraController {
   camera: THREE.OrthographicCamera;
   follow: THREE.Vector3;

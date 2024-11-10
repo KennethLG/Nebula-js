@@ -11,6 +11,7 @@ export const EventTypes = {
   GameOver: 'gameOver',
   Keydown: 'keydown',
   Keyup: 'keyup',
+  StartGame: 'startGame',
   MovementKeydown: 'movementKeydown',
 } as const;
 
@@ -24,4 +25,5 @@ export interface EventMap {
   [EventTypes.Keydown]: string;
   [EventTypes.Keyup]: string;
   [EventTypes.MovementKeydown]: 'left' | 'right';
+  [EventTypes.StartGame]: undefined;
 }

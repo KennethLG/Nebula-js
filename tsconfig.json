@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
     "lib": ["ES7", "dom"],
     "module": "CommonJS",
     "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src",
@@ -15,10 +16,10 @@
     "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["src/*"]
     },
     "strictPropertyInitialization": true,
-    "types": ["reflect-metadata"]
+    "types": ["reflect-metadata", "jest"]
   },
   "files": ["src/main.ts"],
   "include": ["src/**/*.ts"],

@@ -1,5 +1,7 @@
-type Style = Partial<CSSStyleDeclaration>;
+import { injectable } from 'inversify';
 
+type Style = Partial<CSSStyleDeclaration>;
+@injectable()
 export abstract class BaseGUI {
   private readonly overlay: HTMLElement;
 

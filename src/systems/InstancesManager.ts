@@ -1,4 +1,5 @@
 import type Instance from '@/components/Instance';
+import { injectable } from 'inversify';
 import * as THREE from 'three';
 
 export interface IInstancesManager {
@@ -11,6 +12,7 @@ export interface IInstancesManager {
   animate: () => void;
 }
 
+@injectable()
 export default class InstanceManager implements IInstancesManager {
   instances: Instance[] = [];
   scene: THREE.Scene;

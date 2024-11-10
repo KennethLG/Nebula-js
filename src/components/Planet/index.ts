@@ -2,9 +2,11 @@ import * as THREE from 'three';
 import Instance from '../Instance';
 import type ISprite from '@/entities/ISprite';
 import Sprite from '../Sprite';
-import { type IGameParams } from '@/systems/GameParams';
-import { type IInstancesManager } from '@/systems/InstancesManager';
-import { type IRandom } from '@/systems/Random';
+import GameParams from '@/systems/GameParams';
+import InstanceManager from '@/systems/InstancesManager';
+import Random from '@/systems/Random';
+import { inject } from 'inversify';
+import TYPES from '@/systems/DI/tokens';
 
 export interface PlanetProperties {
   radius?: number;
@@ -23,14 +25,17 @@ export default class Planet extends Instance implements IPlanet {
   geometry: THREE.CircleGeometry;
   color: THREE.ColorRepresentation;
   decorations: ISprite[];
-  constructor(
-    x: number,
-    y: number,
-    private readonly instancesManager: IInstancesManager,
-    private readonly gameParams: IGameParams,
-    private readonly random: IRandom,
-    properties?: PlanetProperties,
-  ) {
+
+  @inject(TYPES.InstanceManager)
+  private readonly instancesManager!: InstanceManager;
+
+  @inject(TYPES.GameParams)
+  private readonly gameParams!: GameParams;
+
+  @inject(TYPES.Random)
+  private readonly random!: Random;
+
+  constructor(x: number, y: number, properties?: PlanetProperties) {
     const geometry = new THREE.CircleGeometry(properties?.radius);
     const color = properties?.color ?? 0x00ff00;
     const material = new THREE.MeshBasicMaterial({ color });
