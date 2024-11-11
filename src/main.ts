@@ -1,7 +1,7 @@
 import 'reflect-metadata';
-import { registerServices } from './systems/DI/servicesRegistry';
-import { mainFactory } from './systems/factories/MainFactory';
+import { container } from './systems/DI/inversify.config';
+import TYPES from './systems/DI/tokens';
+import { Main } from './bootstrap';
 
-registerServices();
-const main = mainFactory();
+const main = container.get<Main>(TYPES.Main);
 main.init();

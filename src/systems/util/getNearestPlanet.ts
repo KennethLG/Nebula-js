@@ -1,9 +1,9 @@
 import type * as THREE from 'three';
 import type Planet from '@/components/Planet';
-import { type IInstancesManager } from '../InstancesManager';
+import InstancesManager from '../InstancesManager';
 
 export const getNearestPlanet = (
-  instancesManager: IInstancesManager,
+  instancesManager: InstancesManager,
   from: THREE.Vector3,
 ): Planet | undefined => {
   const planets = instancesManager.instances.filter(

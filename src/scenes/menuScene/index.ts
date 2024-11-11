@@ -1,10 +1,19 @@
 import type IScene from '@/entities/IScene';
-import { type IMatchGUI } from '@/systems/gui/MatchGUI';
+import { EventManager } from '@/systems';
+import TYPES from '@/systems/DI/tokens';
+import { EventTypes } from '@/systems/eventTypes';
+import { inject, injectable } from 'inversify';
 
+@injectable()
 export class MenuScene implements IScene {
-  constructor(private readonly gui: IMatchGUI) {}
+  @inject(TYPES.EventManager)
+  private readonly eventManager!: EventManager;
 
-  init() {}
+  init(): void {
+    this.eventManager.on(EventTypes.StartGame, () => {
+      this.eventManager.emit(EventTypes.ChangeScene, 'game');
+    });
+  }
 
-  update() {}
+  update(): void {}
 }

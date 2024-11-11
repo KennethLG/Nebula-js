@@ -1,6 +1,8 @@
 import Instance from '../Instance';
 import * as THREE from 'three';
-import { type IInstancesManager } from '@/systems/InstancesManager';
+import InstancesManager from '@/systems/InstancesManager';
+import { inject, injectable } from 'inversify';
+import TYPES from '@/systems/DI/tokens';
 
 interface ExplosionConfig {
   position: THREE.Vector3;
@@ -8,12 +10,14 @@ interface ExplosionConfig {
   color: THREE.ColorRepresentation;
 }
 
+@injectable()
 export default class Explosion extends Instance {
   private readonly material: THREE.MeshBasicMaterial;
   radius: number;
   constructor(
     { position, radius, color }: ExplosionConfig,
-    private readonly instancesManager: IInstancesManager,
+    @inject(TYPES.InstanceManager)
+    private readonly instancesManager: InstancesManager,
   ) {
     const geometry = new THREE.CircleGeometry(radius, 32); // Start with a small size
     const material = new THREE.MeshBasicMaterial({

@@ -1,26 +1,35 @@
 import config from '@/config';
 import { io, type Socket } from 'socket.io-client';
-import { type IEventManager } from '../EventManager';
+import EventManager from '../EventManager';
 import {
   type MatchFoundResponse,
   type PlayerUpdatedResponse,
   type SocketResponse,
 } from './responses';
-import { type IPlayer } from '@/components/Player';
+import Player from '@/components/Player';
 import PlayerStateSocket from './playerStateSocket';
 import { EventTypes } from '../eventTypes';
+import { inject, injectable } from 'inversify';
+import TYPES from '../DI/tokens';
+import { CreatePlayerStateSocket } from '../factories/PlayerStateSocketFactory';
 
 export interface IMatchSocket {
   init: (id: number) => void;
 }
+
+@injectable()
 export default class MatchSocket {
   private readonly socket: Socket;
-  private playerStateSocket: PlayerStateSocket | null;
-  private currentPlayer: IPlayer | null;
-
-  constructor(private readonly eventManager: IEventManager) {
+  private currentPlayer: Player | null;
+  private readonly playerStateSocket: PlayerStateSocket;
+  constructor(
+    @inject(TYPES.EventManager)
+    private readonly eventManager: EventManager,
+    @inject(TYPES.PlayerStateSocketFactory)
+    private readonly playerStateSocketFactory: CreatePlayerStateSocket,
+  ) {
     this.socket = io(config.baseURL);
-    this.playerStateSocket = null;
+    this.playerStateSocket = this.playerStateSocketFactory(this.socket);
     this.currentPlayer = null;
   }
 
@@ -41,14 +50,9 @@ export default class MatchSocket {
     });
   }
 
-  private initPlayerStateSocket(matchId: string, player: IPlayer): void {
+  private initPlayerStateSocket(matchId: string, player: Player): void {
     this.currentPlayer = player;
-    this.playerStateSocket = new PlayerStateSocket(
-      this.socket,
-      player.playerEvents,
-      player,
-      matchId,
-    );
+    this.playerStateSocket.init(player, matchId);
   }
 
   private joinMatch(id: number): void {

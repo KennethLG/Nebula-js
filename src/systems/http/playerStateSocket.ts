@@ -1,8 +1,10 @@
 import { type Socket } from 'socket.io-client';
-import { type IEventManager } from '../EventManager';
-import { type IPlayer } from '@/components/Player';
+import EventManager from '../EventManager';
+import Player, { type IPlayer } from '@/components/Player';
 import { EventTypes } from '../eventTypes';
 import { type PlayerStateRequest } from './requests';
+import { inject } from 'inversify';
+import TYPES from '../DI/tokens';
 
 class PlayerStateAdapter {
   toPlayerStateRequest(
@@ -27,12 +29,12 @@ class PlayerStateAdapter {
 }
 
 export default class PlayerStateSocket {
-  constructor(
-    private readonly io: Socket,
-    private readonly eventManager: IEventManager,
-    player: IPlayer,
-    matchId: string,
-  ) {
+  @inject(TYPES.EventManager)
+  private readonly eventManager!: EventManager;
+
+  constructor(private readonly io: Socket) {}
+
+  init(player: Player, matchId: string): void {
     const playerStateAdapter = new PlayerStateAdapter();
     this.eventManager.on(EventTypes.Keyup, (key) => {
       const playerStateRequest = playerStateAdapter.toPlayerStateRequest(

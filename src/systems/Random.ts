@@ -1,5 +1,7 @@
-import { type IEventManager } from './EventManager';
+import { inject, injectable } from 'inversify';
+import EventManager from './EventManager';
 import { EventTypes } from './eventTypes';
+import TYPES from './DI/tokens';
 
 export interface IRandom {
   seed: Seed;
@@ -29,10 +31,14 @@ class Seed {
   }
 }
 
+@injectable()
 export default class Random implements IRandom {
   private _seed: Seed | null;
 
-  constructor(private readonly eventManager: IEventManager) {
+  constructor(
+    @inject(TYPES.EventManager)
+    private readonly eventManager: EventManager,
+  ) {
     this._seed = null;
 
     this.eventManager.on(EventTypes.MatchFound, (data) => {

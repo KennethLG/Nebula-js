@@ -1,7 +1,6 @@
 import type Player from '@/components/Player';
-import { injectable, type interfaces } from 'inversify';
+import { inject, injectable } from 'inversify';
 import TYPES from '../DI/tokens';
-import { container } from '../DI/servicesRegistry';
 
 export type CreatePlayer = (
   controllable: boolean,
@@ -11,12 +10,12 @@ export type CreatePlayer = (
 
 @injectable()
 export default class PlayerFactory {
-  createPlayer: CreatePlayer = (controllable, id, position): Player => {
-    const playerFactory = container.get<interfaces.Factory<Player>>(
-      TYPES.PlayerFactory,
-    );
-    const player = playerFactory(controllable, id, position) as Player;
+  constructor(
+    @inject(TYPES.PlayerFactory)
+    private readonly playerFactory: CreatePlayer,
+  ) {}
 
-    return player;
+  createPlayer: CreatePlayer = (controllable, id, position): Player => {
+    return this.playerFactory(controllable, id, position);
   };
 }

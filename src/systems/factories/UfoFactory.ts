@@ -1,14 +1,16 @@
 import type Ufo from '@/components/UFO';
-import { injectable, type interfaces } from 'inversify';
+import { inject, injectable } from 'inversify';
 import TYPES from '../DI/tokens';
-import { container } from '../DI/servicesRegistry';
 
+export type CreateUfo = () => Ufo;
 @injectable()
 export default class UfoFactory {
-  createUfo = (): Ufo => {
-    const ufoFactory = container.get<interfaces.Factory<Ufo>>(TYPES.UfoFactory);
+  constructor(
+    @inject(TYPES.UfoFactory)
+    private readonly ufoFactory: CreateUfo,
+  ) {}
 
-    const ufo = ufoFactory() as Ufo;
-    return ufo;
+  createUfo = (): Ufo => {
+    return this.ufoFactory();
   };
 }

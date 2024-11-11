@@ -25,6 +25,7 @@ module.exports = {
   },
   rules: {
     '@typescript-eslint/consistent-type-assertions': 'off',
+    '@typescript-eslint/consistent-type-imports': 'off',
     '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/no-unsafe-argument': 'off',
     'n/no-callback-literal': 'off',

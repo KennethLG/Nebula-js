@@ -1,8 +1,9 @@
-import { type IPlayer } from '@/components/Player';
+import Player from '@/components/Player';
 import {
   type MatchFoundResponse,
   type PlayerUpdatedResponse,
 } from '../http/responses';
+import { SceneType } from '@/scenes/sceneFactory';
 
 export const EventTypes = {
   MatchFound: 'matchFound',
@@ -13,6 +14,7 @@ export const EventTypes = {
   Keyup: 'keyup',
   StartGame: 'startGame',
   MovementKeydown: 'movementKeydown',
+  ChangeScene: 'changeScene',
 } as const;
 
 export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
@@ -20,10 +22,11 @@ export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
 export interface EventMap {
   [EventTypes.MatchFound]: MatchFoundResponse;
   [EventTypes.PlayerUpdated]: PlayerUpdatedResponse;
-  [EventTypes.MatchStart]: { matchId: string; player: IPlayer };
+  [EventTypes.MatchStart]: { matchId: string; player: Player };
   [EventTypes.GameOver]: { playerId: number };
   [EventTypes.Keydown]: string;
   [EventTypes.Keyup]: string;
   [EventTypes.MovementKeydown]: 'left' | 'right';
   [EventTypes.StartGame]: undefined;
+  [EventTypes.ChangeScene]: SceneType;
 }

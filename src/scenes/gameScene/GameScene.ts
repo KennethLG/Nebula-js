@@ -15,7 +15,7 @@ import SceneSync from './SceneSync';
 import { EventTypes } from '@/systems/eventTypes';
 import { inject, injectable } from 'inversify';
 import TYPES from '@/systems/DI/tokens';
-import UfoFactory from '@/systems/factories/UfoFactory';
+import { CreateUfo } from '@/systems/factories/UfoFactory';
 
 @injectable()
 export default class GameScene implements IScene {
@@ -26,35 +26,37 @@ export default class GameScene implements IScene {
   private matchFound = false;
   private playerDelayCompleted = false;
 
-  @inject(TYPES.CameraController)
-  private readonly cameraController!: CameraController;
+  constructor(
+    @inject(TYPES.CameraController)
+    private readonly cameraController: CameraController,
 
-  @inject(TYPES.InstanceManager)
-  private readonly instancesManager!: InstancesManager;
+    @inject(TYPES.InstanceManager)
+    private readonly instancesManager: InstancesManager,
 
-  @inject(TYPES.GameParams)
-  private readonly gameParams!: GameParams;
+    @inject(TYPES.GameParams)
+    private readonly gameParams: GameParams,
 
-  @inject(TYPES.LevelGenerator)
-  private readonly levelGenerator!: LevelGenerator;
+    @inject(TYPES.LevelGenerator)
+    private readonly levelGenerator: LevelGenerator,
 
-  @inject(TYPES.EventManager)
-  private readonly eventManager!: EventManager;
+    @inject(TYPES.EventManager)
+    private readonly eventManager: EventManager,
 
-  @inject(TYPES.GUI)
-  private readonly gui!: MatchGUI;
+    @inject(TYPES.MatchGUI)
+    private readonly gui: MatchGUI,
 
-  @inject(TYPES.MatchSocket)
-  private readonly matchSocket!: MatchSocket;
+    @inject(TYPES.MatchSocket)
+    private readonly matchSocket: MatchSocket,
 
-  @inject(TYPES.PlayerDataController)
-  private readonly playerDataController!: PlayerDataController;
-  // private readonly createUfoInstance: () => IUfo;
+    @inject(TYPES.PlayerDataController)
+    private readonly playerDataController: PlayerDataController,
 
-  @inject(TYPES.UfoFactory)
-  private readonly ufoFactory!: UfoFactory;
+    @inject(TYPES.UfoFactory)
+    private readonly ufoFactory: CreateUfo,
 
-  constructor() {
+    @inject(TYPES.SceneSync)
+    private readonly sceneSync: SceneSync,
+  ) {
     this.gameOverScreen = document.createElement('div');
     this.player = null;
     this.ufo = null;
@@ -81,14 +83,7 @@ export default class GameScene implements IScene {
       }
     });
 
-    const sceneSync = new SceneSync(
-      this.instancesManager,
-      this.playerDataController,
-      this.eventManager,
-      this.gameParams,
-    );
-
-    sceneSync.init();
+    this.sceneSync.init();
     this.onMatchFound();
     this.onMatchStart();
 
@@ -215,7 +210,7 @@ export default class GameScene implements IScene {
     if (player == null || this.ufo != null) return;
 
     if (this.gameParams.scores.planets === 5) {
-      const ufo = this.ufoFactory.createUfo();
+      const ufo = this.ufoFactory();
       this.ufo = ufo;
       ufo.defineTarget(player);
 

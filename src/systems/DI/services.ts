@@ -13,6 +13,14 @@ import * as THREE from 'three';
 import { type PlanetProperties } from '@/components/Planet';
 import { PlanetFactory } from '../factories/PlanetFatory';
 import UfoFactory from '../factories/UfoFactory';
+import MatchGUI from '../gui/MatchGUI';
+import { MenuScene } from '@/scenes/menuScene';
+import GameScene from '@/scenes/gameScene/GameScene';
+import { Main } from '@/bootstrap';
+import { SceneFactory } from '@/scenes/sceneFactory';
+import { MenuGUI } from '../gui/MenuGUI';
+import LevelGenerator from '../LevelGenerator';
+import Random from '../Random';
 
 interface ServiceBinding<T> {
   service: new (...args: any[]) => T;
@@ -29,8 +37,24 @@ export const singletonServices: Array<ServiceBinding<any>> = [
     key: TYPES.EventManager,
   },
   {
+    service: GUIManager,
+    key: TYPES.GUI,
+  },
+  {
+    service: MatchGUI,
+    key: TYPES.MatchGUI,
+  },
+  {
+    service: MenuGUI,
+    key: TYPES.MenuGUI,
+  },
+  {
     service: GameParams,
     key: TYPES.GameParams,
+  },
+  {
+    service: Main,
+    key: TYPES.Main,
   },
 ];
 
@@ -40,8 +64,8 @@ export const transientServices: Array<ServiceBinding<any>> = [
     key: TYPES.CameraController,
   },
   {
-    service: GUIManager,
-    key: TYPES.GUI,
+    service: SceneFactory,
+    key: TYPES.SceneFactory,
   },
   {
     service: SceneManager,
@@ -68,6 +92,14 @@ export const transientServices: Array<ServiceBinding<any>> = [
     key: TYPES.Player,
   },
   {
+    service: MenuScene,
+    key: TYPES.MenuScene,
+  },
+  {
+    service: GameScene,
+    key: TYPES.GameScene,
+  },
+  {
     service: PlanetFactory,
     key: TYPES.PlanetFactory,
   },
@@ -78,6 +110,14 @@ export const transientServices: Array<ServiceBinding<any>> = [
   {
     service: UfoFactory,
     key: TYPES.UfoFactory,
+  },
+  {
+    service: Random,
+    key: TYPES.Random,
+  },
+  {
+    service: LevelGenerator,
+    key: TYPES.LevelGenerator,
   },
 ];
 
@@ -91,5 +131,10 @@ export const factories = [
     key: TYPES.PlanetFactory,
     service: Player,
     params: [Number, Number, Object as unknown as PlanetProperties] as const,
+  },
+  {
+    key: TYPES.UfoFactory,
+    service: Player,
+    params: [Number, Number, Number] as const,
   },
 ];

@@ -1,6 +1,8 @@
 import * as THREE from 'three';
-import { type IEventManager } from './EventManager';
+import EventManager from './EventManager';
 import { EventTypes } from './eventTypes';
+import { inject, injectable } from 'inversify';
+import TYPES from './DI/tokens';
 
 export interface IMovementController {
   handleXMovement: (
@@ -13,6 +15,7 @@ export interface IMovementController {
   ) => void;
 }
 
+@injectable()
 export default class MovementController implements IMovementController {
   private readonly moveLeftKey = 'a';
   private readonly moveRightKey = 'd';
@@ -22,7 +25,10 @@ export default class MovementController implements IMovementController {
   private readonly friction = 0.9;
   private activeKeys: Record<string, boolean> = {};
 
-  constructor(private readonly eventManager: IEventManager) {
+  constructor(
+    @inject(TYPES.EventManager)
+    private readonly eventManager: EventManager,
+  ) {
     this.eventManager.on(EventTypes.Keydown, this.handleKeyDown.bind(this));
     this.eventManager.on(EventTypes.Keyup, this.handleKeyUp.bind(this));
   }

@@ -5,8 +5,10 @@ import { randomRange } from '@/systems/util/random';
 import { type IInstance } from '@/entities/Instance';
 import Bullet from '../Bullet';
 import { getNearestPlanet } from '@/systems/util/getNearestPlanet';
-import { type IInstancesManager } from '@/systems/InstancesManager';
-import { type IGameParams } from '@/systems/GameParams';
+import InstancesManager from '@/systems/InstancesManager';
+import GameParams from '@/systems/GameParams';
+import { inject, injectable } from 'inversify';
+import TYPES from '@/systems/DI/tokens';
 
 export interface IUfo extends Instance {
   xVel: THREE.Vector3;
@@ -17,6 +19,7 @@ export interface IUfo extends Instance {
   defineTarget: (instance: Instance) => void;
 }
 
+@injectable()
 export default class Ufo extends Instance implements IUfo {
   xVel = new THREE.Vector3(0, 0, 0);
   yVel = new THREE.Vector3(0, 0, 0);
@@ -27,8 +30,10 @@ export default class Ufo extends Instance implements IUfo {
   private target?: IInstance;
 
   constructor(
-    private readonly instancesManager: IInstancesManager,
-    private readonly gameParams: IGameParams,
+    @inject(TYPES.InstanceManager)
+    private readonly instancesManager: InstancesManager,
+    @inject(TYPES.GameParams)
+    private readonly gameParams: GameParams,
   ) {
     const sprite = new Sprite({
       name: 'ufo.png',

@@ -1,14 +1,20 @@
-import { type IEventManager } from './EventManager';
+import { inject, injectable } from 'inversify';
+import EventManager from './EventManager';
 import { EventTypes } from './eventTypes';
+import TYPES from './DI/tokens';
 
 export interface IKeyboardManager {
   keys: Record<string, boolean>;
 }
 
+@injectable()
 export default class KeyboardManager implements IKeyboardManager {
   keys: Record<string, boolean> = {};
 
-  constructor(private readonly eventManager: IEventManager) {
+  constructor(
+    @inject(TYPES.EventManager)
+    private readonly eventManager: EventManager,
+  ) {
     window.addEventListener(EventTypes.Keydown, this.onKeyDown.bind(this));
     window.addEventListener(EventTypes.Keyup, this.onKeyUp.bind(this));
   }
@@ -27,7 +33,7 @@ export default class KeyboardManager implements IKeyboardManager {
 }
 
 export const keyboardManagerFactory = (
-  eventManager: IEventManager,
+  eventManager: EventManager,
 ): IKeyboardManager => {
   return new KeyboardManager(eventManager);
 };

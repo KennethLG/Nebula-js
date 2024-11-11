@@ -1,3 +1,5 @@
+import { injectable } from 'inversify';
+
 interface PlayerData {
   id: number;
 }
@@ -7,6 +9,7 @@ export interface IPlayerDataController {
   playerData: PlayerData;
 }
 
+@injectable()
 export default class PlayerDataController {
   _playerData: PlayerData | null;
 

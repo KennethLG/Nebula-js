@@ -1,13 +1,19 @@
+import { inject, injectable } from 'inversify';
 import { BaseGUI } from '.';
-import { type IGameParams } from '../GameParams';
+import GameParams from '../GameParams';
+import TYPES from '../DI/tokens';
 
 export interface IMatchGUI extends BaseGUI {}
 
+@injectable()
 export default class MatchGUI extends BaseGUI implements IMatchGUI {
   private planetsScore?: HTMLElement;
   private planetsRecord?: HTMLElement;
 
-  constructor(private readonly gameParams: IGameParams) {
+  constructor(
+    @inject(TYPES.GameParams)
+    private readonly gameParams: GameParams,
+  ) {
     super();
   }
 

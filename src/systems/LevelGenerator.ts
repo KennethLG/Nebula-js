@@ -1,16 +1,19 @@
-import { type IPlanet, type PlanetProperties } from '@/components/Planet';
+import { type IPlanet } from '@/components/Planet';
 
-import { type IInstancesManager } from './InstancesManager';
+import InstancesManager from './InstancesManager';
 import { type IRandom } from './Random';
-import { type IGameParams } from './GameParams';
-import { type ICameraController } from './CameraController';
-import { type IEventManager } from './EventManager';
+import GameParams from './GameParams';
+import CameraController from './CameraController';
+import { inject, injectable } from 'inversify';
+import TYPES from './DI/tokens';
+import { CreatePlanet } from './factories/PlanetFatory';
 
 export interface ILevelGenerator {
   init: () => void;
   update: () => void;
 }
 
+@injectable()
 export default class LevelGenerator implements ILevelGenerator {
   private chunkSize: number;
   private triggerThreshold: number;
@@ -24,16 +27,16 @@ export default class LevelGenerator implements ILevelGenerator {
   private currentColor: string;
 
   constructor(
-    private readonly gameParams: IGameParams,
-    private readonly cameraController: ICameraController,
-    private readonly instancesManager: IInstancesManager,
+    @inject(TYPES.GameParams)
+    private readonly gameParams: GameParams,
+    @inject(TYPES.CameraController)
+    private readonly cameraController: CameraController,
+    @inject(TYPES.InstanceManager)
+    private readonly instancesManager: InstancesManager,
+    @inject(TYPES.Random)
     private readonly random: IRandom,
-    private readonly eventManager: IEventManager,
-    private readonly createPlanet: (
-      x: number,
-      y: number,
-      properties: PlanetProperties,
-    ) => IPlanet,
+    @inject(TYPES.PlanetFactory)
+    private readonly planetFactory: CreatePlanet,
   ) {
     this.hue = 0;
     this.currentColor = '';
@@ -124,7 +127,7 @@ export default class LevelGenerator implements ILevelGenerator {
   }
 
   private genPlanet(x: number, y: number, radius: number): IPlanet {
-    return this.createPlanet(x, y, {
+    return this.planetFactory(x, y, {
       radius,
       color: this.currentColor,
     });

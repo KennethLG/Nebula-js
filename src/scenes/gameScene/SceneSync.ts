@@ -1,26 +1,25 @@
 import { type IPlayer } from '@/components/Player';
-import { type IEventManager } from '@/systems/EventManager';
+import EventManager from '@/systems/EventManager';
 import { EventTypes } from '@/systems/eventTypes';
-import PlayerFactory from '@/systems/factories/PlayerFactory';
-import { type IGameParams } from '@/systems/GameParams';
-import { type IPlayerDataController } from '@/systems/PlayerDataController';
-import { type IInstancesManager } from '@/systems/InstancesManager';
+import { CreatePlayer } from '@/systems/factories/PlayerFactory';
+import PlayerDataController from '@/systems/PlayerDataController';
+import InstancesManager from '@/systems/InstancesManager';
 import { Vector3 } from 'three';
+import { inject, injectable } from 'inversify';
+import TYPES from '@/systems/DI/tokens';
 
+@injectable()
 export default class SceneSync {
-  private readonly playerFactory: PlayerFactory;
   constructor(
-    private readonly instancesManager: IInstancesManager,
-    private readonly playerDataController: IPlayerDataController,
-    private readonly eventManager: IEventManager,
-    private readonly gameParams: IGameParams,
-  ) {
-    this.playerFactory = new PlayerFactory(
-      this.instancesManager,
-      this.eventManager,
-      this.gameParams,
-    );
-  }
+    @inject(TYPES.InstanceManager)
+    private readonly instancesManager: InstancesManager,
+    @inject(TYPES.PlayerDataController)
+    private readonly playerDataController: PlayerDataController,
+    @inject(TYPES.EventManager)
+    private readonly eventManager: EventManager,
+    @inject(TYPES.PlayerFactory)
+    private readonly playerFactory: CreatePlayer,
+  ) {}
 
   init = (): void => {
     this.onMatchFound();
@@ -51,11 +50,7 @@ export default class SceneSync {
         currentPlayer.position.y,
         0,
       );
-      const player = this.playerFactory.createPlayer(
-        true,
-        currentPlayer.id,
-        playerPosition,
-      ); // this.createPlayer(true, currentPlayer.id, playerPosition);
+      const player = this.playerFactory(true, currentPlayer.id, playerPosition); // this.createPlayer(true, currentPlayer.id, playerPosition);
       this.instancesManager.add(player);
       // this.player = player;
 
@@ -68,11 +63,7 @@ export default class SceneSync {
           player.position.y,
           0,
         );
-        const newPlayer = this.playerFactory.createPlayer(
-          false,
-          player.id,
-          playerPosition,
-        );
+        const newPlayer = this.playerFactory(false, player.id, playerPosition);
         this.instancesManager.add(newPlayer);
       });
 

@@ -1,4 +1,9 @@
 import type IScene from '@/entities/IScene';
+import { EventManager } from '@/systems';
+import TYPES from '@/systems/DI/tokens';
+import { EventTypes } from '@/systems/eventTypes';
+import { inject } from 'inversify';
+import { CreateScene, SceneType } from './sceneFactory';
 
 export interface ISceneManager {
   init: () => void;
@@ -6,12 +11,22 @@ export interface ISceneManager {
   setCurrentScene: (scene: IScene) => void;
 }
 export class SceneManager {
+  @inject(TYPES.EventManager)
+  private readonly eventManager!: EventManager;
+
+  @inject(TYPES.SceneFactory)
+  private readonly sceneFactory!: CreateScene;
+
   private currentScene: IScene | null;
+
   constructor() {
     this.currentScene = null;
   }
 
   init(): void {
+    this.eventManager.on(EventTypes.ChangeScene, (scene: SceneType) => {
+      this.sceneFactory(scene);
+    });
     if (!this.currentScene) {
       throw new Error('Can not init scene. Please define a currentScene');
     }

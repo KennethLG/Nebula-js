@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 
 type Style = Partial<CSSStyleDeclaration>;
-@injectable()
+
 export abstract class BaseGUI {
   private readonly overlay: HTMLElement;
 
@@ -53,6 +53,7 @@ export abstract class BaseGUI {
   abstract postInit(): void;
 }
 
+@injectable()
 export class GUIManager {
   private currentGui: BaseGUI | null = null;
   private renderer: THREE.WebGLRenderer | null = null;

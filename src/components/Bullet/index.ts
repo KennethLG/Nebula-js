@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import Instance from '../Instance';
 import type Planet from '../Planet';
 import Explosion from '../UFO/explosion';
-import { type IInstancesManager } from '@/systems/InstancesManager';
+import InstancesManager from '@/systems/InstancesManager';
+import { inject, injectable } from 'inversify';
+import TYPES from '@/systems/DI/tokens';
 
 interface BulletConfig {
   position: THREE.Vector3;
@@ -10,12 +12,14 @@ interface BulletConfig {
   speed: number;
 }
 
+@injectable()
 export default class Bullet extends Instance {
   private readonly direction: THREE.Vector3;
   private readonly speed: number;
   constructor(
     { position, direction, speed }: BulletConfig,
-    private readonly instancesManager: IInstancesManager,
+    @inject(TYPES.InstanceManager)
+    private readonly instancesManager: InstancesManager,
   ) {
     const geometry = new THREE.CircleGeometry(0.1);
     const material = new THREE.MeshBasicMaterial({ color: 'white' });
