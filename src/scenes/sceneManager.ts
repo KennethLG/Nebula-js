@@ -25,7 +25,7 @@ export class SceneManager {
 
   init(): void {
     this.eventManager.on(EventTypes.ChangeScene, (scene: SceneType) => {
-      this.sceneFactory(scene);
+      this.setCurrentScene(this.sceneFactory(scene));
     });
     if (!this.currentScene) {
       throw new Error('Can not init scene. Please define a currentScene');
@@ -42,5 +42,6 @@ export class SceneManager {
 
   setCurrentScene(scene: IScene): void {
     this.currentScene = scene;
+    this.currentScene.init();
   }
 }

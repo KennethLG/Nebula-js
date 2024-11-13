@@ -3,7 +3,7 @@ import EventManager from '../EventManager';
 import Player, { type IPlayer } from '@/components/Player';
 import { EventTypes } from '../eventTypes';
 import { type PlayerStateRequest } from './requests';
-import { inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import TYPES from '../DI/tokens';
 
 class PlayerStateAdapter {
@@ -28,6 +28,7 @@ class PlayerStateAdapter {
   }
 }
 
+@injectable()
 export default class PlayerStateSocket {
   @inject(TYPES.EventManager)
   private readonly eventManager!: EventManager;

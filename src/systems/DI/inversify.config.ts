@@ -30,12 +30,12 @@ const registerFactory = <T, K extends unknown[]>(
   key: symbol,
   Service: new (...args: K) => T,
 ): void => {
+  console.log('registered factory!', key);
   container.bind<interfaces.Factory<T>>(key).toFactory<T, K>((_context) => {
     return (...params: K) => {
       return new Service(...params);
     };
   });
-  console.log('registered factory!', key);
 };
 
 const registerSingleton = <T>(

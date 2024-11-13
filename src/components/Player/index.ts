@@ -13,7 +13,7 @@ import CollisionController from './CollisionController';
 import { type IEventManager } from '@/systems/EventManager';
 import GameParams from '@/systems/GameParams';
 import { EventTypes } from '@/systems/eventTypes';
-import { inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import TYPES from '@/systems/DI/tokens';
 import InstanceManager from '@/systems/InstancesManager';
 
@@ -35,6 +35,7 @@ export interface IPlayer extends Instance {
   playerEvents: IEventManager;
   onGameOver: () => void;
 }
+@injectable()
 export default class Player extends Instance implements IPlayer {
   onGround = false;
   gravity = new THREE.Vector3(0, 0, 0);
@@ -47,28 +48,23 @@ export default class Player extends Instance implements IPlayer {
   controllable: boolean;
   private readonly sprite: ISprite;
   private readonly animationController: AnimationController<AnimationContext>;
-  @inject(TYPES.InstanceManager)
-  private readonly instancesManager!: InstanceManager;
 
-  @inject(TYPES.EventManager)
-  private readonly eventManager!: EventManager;
-
-  @inject(TYPES.GameParams)
-  private readonly gameParams!: GameParams;
-
-  @inject(TYPES.PlayerEventManager)
-  readonly playerEvents!: EventManager;
-
-  @inject(TYPES.MovementController)
-  private readonly movementController!: MovementController;
-
-  @inject(TYPES.OrientationController)
-  private readonly orientationController!: OrientationController;
-
-  @inject(TYPES.CollisionController)
-  private readonly collisionController!: CollisionController;
-
-  constructor(controllable: boolean, id?: number, position?: THREE.Vector3) {
+  constructor(
+    @inject(TYPES.InstanceManager)
+    private readonly instancesManager: InstanceManager,
+    @inject(TYPES.EventManager) private readonly eventManager: EventManager,
+    @inject(TYPES.GameParams) private readonly gameParams: GameParams,
+    @inject(TYPES.PlayerEventManager) readonly playerEvents: EventManager,
+    @inject(TYPES.MovementController)
+    private readonly movementController: MovementController,
+    @inject(TYPES.OrientationController)
+    private readonly orientationController: OrientationController,
+    @inject(TYPES.CollisionController)
+    private readonly collisionController: CollisionController,
+    controllable: boolean,
+    id?: number,
+    position?: THREE.Vector3,
+  ) {
     const sprite = new Sprite({
       name: 'player.png',
       xTiles: 3,
@@ -130,6 +126,17 @@ export default class Player extends Instance implements IPlayer {
   };
 
   update(): void {
+    console.log('player update');
+
+    console.log(
+      this.instancesManager,
+      this.eventManager,
+      this.gameParams,
+      this.playerEvents,
+      this.movementController,
+      this.orientationController,
+      this.collisionController,
+    );
     this.planet = getNearestPlanet(this.instancesManager, this.body.position);
 
     if (this.planet == null) return;
