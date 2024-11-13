@@ -67,14 +67,21 @@ const registerServices = (): void => {
   registerSingleton(TYPES.SceneManager, SceneManager);
   registerSingleton(TYPES.PlayerDataController, PlayerDataController);
 
-  registerFactory<Planet, [number, number, PlanetProperties]>(
-    TYPES.PlanetFactory,
-    Planet,
-  );
-  // registerFactory<Player, [boolean, number, THREE.Vector3]>(
-  //   TYPES.PlayerFactory,
-  //   Player,
-  // );
+  container
+    .bind<interfaces.Factory<Planet>>(TYPES.PlanetFactory)
+    .toFactory<Planet, any>((context) => {
+      return (x: number, y: number, properties: PlanetProperties) => {
+        return new Planet(
+          context.container.get(TYPES.InstanceManager),
+          context.container.get(TYPES.GameParams),
+          context.container.get(TYPES.Random),
+          x,
+          y,
+          properties,
+        );
+      };
+    });
+
   container
     .bind<Player>(TYPES.PlayerFactory)
     .toFactory<Player, any>((context) => {
@@ -104,10 +111,14 @@ const registerServices = (): void => {
       };
     });
 
-  registerFactory<PlayerStateSocket, [Socket]>(
-    TYPES.PlayerStateSocketFactory,
-    PlayerStateSocket,
-  );
+  container
+    .bind<PlayerStateSocket>(TYPES.PlayerStateSocketFactory)
+    .toFactory<PlayerStateSocket, any>((context) => {
+      return (socket: Socket) => {
+        return new PlayerStateSocket(container.get(TYPES.EventManager), socket);
+      };
+    });
+
   registerTransient(TYPES.MatchSocket, MatchSocket);
   registerSingleton(TYPES.MatchGUI, MatchGUI);
   registerSingleton(TYPES.MenuGUI, MenuGUI);
@@ -115,8 +126,6 @@ const registerServices = (): void => {
 
   registerSingleton(TYPES.SceneSync, SceneSync);
 
-  // registerSingleton(TYPES.MenuScene, MenuScene);
-  // registerTransient(TYPES.GameScene, GameScene);
   container.bind(TYPES.Scene).to(MenuScene).whenTargetNamed('menu');
   container.bind(TYPES.Scene).to(GameScene).whenTargetNamed('game');
   container

@@ -30,10 +30,11 @@ class PlayerStateAdapter {
 
 @injectable()
 export default class PlayerStateSocket {
-  @inject(TYPES.EventManager)
-  private readonly eventManager!: EventManager;
-
-  constructor(private readonly io: Socket) {}
+  constructor(
+    @inject(TYPES.EventManager)
+    private readonly eventManager: EventManager,
+    private readonly io: Socket,
+  ) {}
 
   init(player: Player, matchId: string): void {
     const playerStateAdapter = new PlayerStateAdapter();

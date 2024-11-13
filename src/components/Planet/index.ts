@@ -26,16 +26,19 @@ export default class Planet extends Instance implements IPlanet {
   color: THREE.ColorRepresentation;
   decorations: ISprite[];
 
-  @inject(TYPES.InstanceManager)
-  private readonly instancesManager!: InstanceManager;
+  constructor(
+    @inject(TYPES.InstanceManager)
+    private readonly instancesManager: InstanceManager,
 
-  @inject(TYPES.GameParams)
-  private readonly gameParams!: GameParams;
+    @inject(TYPES.GameParams)
+    private readonly gameParams: GameParams,
 
-  @inject(TYPES.Random)
-  private readonly random!: Random;
-
-  constructor(x: number, y: number, properties?: PlanetProperties) {
+    @inject(TYPES.Random)
+    private readonly random: Random,
+    x: number,
+    y: number,
+    properties?: PlanetProperties,
+  ) {
     const geometry = new THREE.CircleGeometry(properties?.radius);
     const color = properties?.color ?? 0x00ff00;
     const material = new THREE.MeshBasicMaterial({ color });
