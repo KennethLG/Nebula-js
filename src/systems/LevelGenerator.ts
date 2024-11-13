@@ -1,7 +1,7 @@
 import { type IPlanet } from '@/components/Planet';
 
 import InstancesManager from './InstancesManager';
-import { type IRandom } from './Random';
+import Random from './Random';
 import GameParams from './GameParams';
 import CameraController from './CameraController';
 import { inject, injectable } from 'inversify';
@@ -34,10 +34,11 @@ export default class LevelGenerator implements ILevelGenerator {
     @inject(TYPES.InstanceManager)
     private readonly instancesManager: InstancesManager,
     @inject(TYPES.Random)
-    private readonly random: IRandom,
+    private readonly random: Random,
     @inject(TYPES.PlanetFactory)
     private readonly planetFactory: CreatePlanet,
   ) {
+    console.log('LevelGenerator constructor');
     this.hue = 0;
     this.currentColor = '';
     this.lastChunkY = 0;
@@ -64,7 +65,7 @@ export default class LevelGenerator implements ILevelGenerator {
   }
 
   update(): void {
-    this.random.seed.resetCurrent();
+    // this.random.seed.resetCurrent();
     this.checkForChunkGeneration();
     this.removeOuterPlanets();
   }

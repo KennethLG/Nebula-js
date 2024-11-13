@@ -40,9 +40,11 @@ export default class Random implements IRandom {
     private readonly eventManager: EventManager,
   ) {
     this._seed = null;
+    console.log('Random constructor');
 
     this.eventManager.on(EventTypes.MatchFound, (data) => {
       this._seed = new Seed(data.seed);
+      console.log('Seed initialized', this._seed);
     });
   }
 

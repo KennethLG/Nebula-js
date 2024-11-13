@@ -57,6 +57,7 @@ export default class GameScene implements IScene {
     @inject(TYPES.SceneSync)
     private readonly sceneSync: SceneSync,
   ) {
+    console.log('GameScene constructor');
     this.gameOverScreen = document.createElement('div');
     this.player = null;
     this.ufo = null;

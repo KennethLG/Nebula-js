@@ -7,7 +7,6 @@ import { type SceneManager } from './scenes/sceneManager';
 // import EventManager from './systems/EventManager';
 import { inject, injectable } from 'inversify';
 import TYPES from './systems/DI/tokens';
-import { CreateScene } from './scenes/sceneFactory';
 import { container } from './systems/DI/inversify.config';
 
 export interface IMain {
@@ -29,8 +28,6 @@ export class Main implements IMain {
     private readonly guiManager: GUIManager,
     @inject(TYPES.SceneManager)
     private readonly sceneManager: SceneManager,
-    @inject(TYPES.SceneFactory)
-    private readonly sceneFactory: CreateScene,
   ) {
     this.renderer = new THREE.WebGLRenderer();
   }
@@ -52,9 +49,9 @@ export class Main implements IMain {
     window.addEventListener('resize', () => {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
     });
-    const menuScene = this.sceneFactory('menu');
-    this.sceneManager.setCurrentScene(menuScene);
+    console.log('setting menu scene');
     this.sceneManager.init();
+    this.sceneManager.setCurrentScene('menu');
     this.animate();
     this.instanceManager.animate();
   }

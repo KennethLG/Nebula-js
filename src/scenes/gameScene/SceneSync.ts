@@ -57,6 +57,7 @@ export default class SceneSync {
       const otherPlayers = players.filter(
         (player) => player.id !== this.playerDataController.playerData.id,
       );
+      console.log('number of other players', otherPlayers.length);
       otherPlayers.forEach((player) => {
         const playerPosition = new Vector3(
           player.position.x,

@@ -34,6 +34,7 @@ export default class MatchSocket {
   }
 
   init(id: number): void {
+    console.log('MatchSocket init');
     this.socket.on('connect', () => {
       console.log('connection established!');
       this.joinMatch(id);

@@ -26,7 +26,7 @@ export default class MovementController implements IMovementController {
   private activeKeys: Record<string, boolean> = {};
 
   constructor(
-    @inject(TYPES.EventManager)
+    @inject(TYPES.PlayerEventManager)
     private readonly eventManager: EventManager,
   ) {
     this.eventManager.on(EventTypes.Keydown, this.handleKeyDown.bind(this));

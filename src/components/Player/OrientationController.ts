@@ -20,7 +20,7 @@ export interface IOrientationController {
 export default class OrientationController implements IOrientationController {
   face: XMovementDirections = 'right';
   constructor(
-    @inject(TYPES.EventManager)
+    @inject(TYPES.PlayerEventManager)
     private readonly eventManager: EventManager,
   ) {
     this.eventManager.on(
