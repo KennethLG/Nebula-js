@@ -126,17 +126,6 @@ export default class Player extends Instance implements IPlayer {
   };
 
   update(): void {
-    console.log('player update');
-
-    console.log(
-      this.instancesManager,
-      this.eventManager,
-      this.gameParams,
-      this.playerEvents,
-      this.movementController,
-      this.orientationController,
-      this.collisionController,
-    );
     this.planet = getNearestPlanet(this.instancesManager, this.body.position);
 
     if (this.planet == null) return;

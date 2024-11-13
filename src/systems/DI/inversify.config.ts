@@ -23,6 +23,9 @@ import { Socket } from 'socket.io-client';
 import Ufo from '@/components/UFO';
 import { MenuGUI } from '../gui/MenuGUI';
 import IScene from '@/entities/IScene';
+import MovementController from '../MovementController';
+import OrientationController from '@/components/Player/OrientationController';
+import CollisionController from '@/components/Player/CollisionController';
 
 const container = new Container();
 
@@ -68,10 +71,38 @@ const registerServices = (): void => {
     TYPES.PlanetFactory,
     Planet,
   );
-  registerFactory<Player, [boolean, number, THREE.Vector3]>(
-    TYPES.PlayerFactory,
-    Player,
-  );
+  // registerFactory<Player, [boolean, number, THREE.Vector3]>(
+  //   TYPES.PlayerFactory,
+  //   Player,
+  // );
+  container
+    .bind<Player>(TYPES.PlayerFactory)
+    .toFactory<Player, any>((context) => {
+      return (controllable: boolean, id: number, position: THREE.Vector3) => {
+        const childContainer = container.createChild();
+        childContainer
+          .bind(TYPES.PlayerEventManager)
+          .to(EventManager)
+          .inSingletonScope();
+        childContainer.bind(TYPES.MovementController).to(MovementController);
+        childContainer
+          .bind(TYPES.OrientationController)
+          .to(OrientationController);
+        childContainer.bind(TYPES.CollisionController).to(CollisionController);
+        return new Player(
+          context.container.get(TYPES.InstanceManager),
+          context.container.get(TYPES.EventManager),
+          context.container.get(TYPES.GameParams),
+          childContainer.get(TYPES.PlayerEventManager),
+          childContainer.get(TYPES.MovementController),
+          childContainer.get(TYPES.OrientationController),
+          childContainer.get(TYPES.CollisionController),
+          controllable,
+          id,
+          position,
+        );
+      };
+    });
 
   registerFactory<PlayerStateSocket, [Socket]>(
     TYPES.PlayerStateSocketFactory,
