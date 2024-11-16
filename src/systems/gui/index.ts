@@ -32,6 +32,12 @@ export abstract class BaseGUI {
     return textElement;
   }
 
+  removeText(textElement: HTMLElement): void {
+    if (this.overlay.contains(textElement)) {
+      this.overlay.removeChild(textElement);
+    }
+  }
+
   adjustToRenderer(renderer: THREE.WebGLRenderer): void {
     const canvas = renderer.domElement;
     const rect = canvas.getBoundingClientRect();

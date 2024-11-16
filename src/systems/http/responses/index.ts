@@ -33,3 +33,7 @@ export interface MatchFoundResponse {
 export interface PlayerUpdatedResponse {
   player: PlayerSocketResponse;
 }
+
+export interface AddedPlayerResponse {
+  playersCount: number;
+}

@@ -26,6 +26,7 @@ import IScene from '@/entities/IScene';
 import MovementController from '../MovementController';
 import OrientationController from '@/components/Player/OrientationController';
 import CollisionController from '@/components/Player/CollisionController';
+import { keyboardManagerFactory } from '../KeyboardManager';
 
 const container = new Container();
 
@@ -49,6 +50,7 @@ const registerSingleton = <T>(
   console.log('registered singleton!', key);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const registerTransient = <T>(
   key: symbol,
   service: interfaces.Newable<T>,
@@ -60,6 +62,7 @@ const registerTransient = <T>(
 const registerServices = (): void => {
   registerSingleton(TYPES.EventManager, EventManager);
   registerSingleton(TYPES.Random, Random);
+  container.get(TYPES.Random);
   registerSingleton(TYPES.InstanceManager, InstanceManager);
   registerSingleton(TYPES.CameraController, CameraController);
   registerSingleton(TYPES.GameParams, GameParams);
@@ -91,11 +94,16 @@ const registerServices = (): void => {
           .bind(TYPES.PlayerEventManager)
           .to(EventManager)
           .inSingletonScope();
+
+        if (controllable) {
+          keyboardManagerFactory(childContainer.get(TYPES.PlayerEventManager));
+        }
         childContainer.bind(TYPES.MovementController).to(MovementController);
         childContainer
           .bind(TYPES.OrientationController)
           .to(OrientationController);
         childContainer.bind(TYPES.CollisionController).to(CollisionController);
+
         return new Player(
           context.container.get(TYPES.InstanceManager),
           context.container.get(TYPES.EventManager),
@@ -113,13 +121,13 @@ const registerServices = (): void => {
 
   container
     .bind<PlayerStateSocket>(TYPES.PlayerStateSocketFactory)
-    .toFactory<PlayerStateSocket, any>((context) => {
+    .toFactory<PlayerStateSocket, any>((_context) => {
       return (socket: Socket) => {
         return new PlayerStateSocket(container.get(TYPES.EventManager), socket);
       };
     });
 
-  registerTransient(TYPES.MatchSocket, MatchSocket);
+  registerSingleton(TYPES.MatchSocket, MatchSocket);
   registerSingleton(TYPES.MatchGUI, MatchGUI);
   registerSingleton(TYPES.MenuGUI, MenuGUI);
   registerFactory(TYPES.UfoFactory, Ufo);

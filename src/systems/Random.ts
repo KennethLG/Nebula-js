@@ -44,6 +44,7 @@ export default class Random implements IRandom {
 
     this.eventManager.on(EventTypes.MatchFound, (data) => {
       this._seed = new Seed(data.seed);
+      console.log('received seed');
       console.log('Seed initialized', this._seed);
     });
   }

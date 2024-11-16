@@ -2,6 +2,7 @@ import config from '@/config';
 import { io, type Socket } from 'socket.io-client';
 import EventManager from '../EventManager';
 import {
+  AddedPlayerResponse,
   type MatchFoundResponse,
   type PlayerUpdatedResponse,
   type SocketResponse,
@@ -33,13 +34,11 @@ export default class MatchSocket {
     this.currentPlayer = null;
   }
 
-  init(id: number): void {
+  init(): void {
     console.log('MatchSocket init');
     this.socket.on('connect', () => {
       console.log('connection established!');
-      this.joinMatch(id);
-      this.onMatchFound();
-      this.onPlayerUpdated();
+      // this.joinMatch(id);
     });
 
     this.socket.on('disconnect', () => {
@@ -56,7 +55,13 @@ export default class MatchSocket {
     this.playerStateSocket.init(player, matchId);
   }
 
-  private joinMatch(id: number): void {
+  public joinMatch(id: number): void {
+    this.emitJoinMatch(id);
+    this.onMatchFound();
+    this.onPlayerUpdated();
+  }
+
+  private emitJoinMatch(id: number): void {
     this.socket.emit('joinMatch', {
       id: id.toString(),
     });
@@ -83,6 +88,19 @@ export default class MatchSocket {
           return;
         }
         console.error('Error updating player', data.message);
+      },
+    );
+  }
+
+  private onAddedPlayer(): void {
+    this.socket.on(
+      'addedplayer',
+      (data: SocketResponse<AddedPlayerResponse>) => {
+        console.log('Added player', data);
+        if (data.status === 'Ok') {
+          return;
+        }
+        console.error('Error adding player', data.message);
       },
     );
   }

@@ -10,7 +10,6 @@ import { keyboardManagerFactory } from '@/systems/KeyboardManager';
 import LevelGenerator from '@/systems/LevelGenerator';
 import PlayerDataController from '@/systems/PlayerDataController';
 import InstancesManager from '@/systems/InstancesManager';
-import MatchSocket from '@/systems/http/matchSocket';
 import SceneSync from './SceneSync';
 import { EventTypes } from '@/systems/eventTypes';
 import { inject, injectable } from 'inversify';
@@ -23,7 +22,7 @@ export default class GameScene implements IScene {
   private gameOverScreen: HTMLElement;
   private player: IPlayer | null;
   private ufo: Ufo | null;
-  private matchFound = false;
+  private matchFound = true;
   private playerDelayCompleted = false;
 
   constructor(
@@ -45,8 +44,8 @@ export default class GameScene implements IScene {
     @inject(TYPES.MatchGUI)
     private readonly gui: MatchGUI,
 
-    @inject(TYPES.MatchSocket)
-    private readonly matchSocket: MatchSocket,
+    // @inject(TYPES.MatchSocket)
+    // private readonly matchSocket: MatchSocket,
 
     @inject(TYPES.PlayerDataController)
     private readonly playerDataController: PlayerDataController,
@@ -61,8 +60,8 @@ export default class GameScene implements IScene {
     this.gameOverScreen = document.createElement('div');
     this.player = null;
     this.ufo = null;
-    this.playerDataController.getPlayerData();
-    this.matchSocket.init(this.playerDataController.playerData.id);
+    // this.playerDataController.getPlayerData();
+    // this.matchSocket.init();
     keyboardManagerFactory(this.eventManager);
   }
 
@@ -84,8 +83,11 @@ export default class GameScene implements IScene {
       }
     });
 
+    this.cameraController.camera.position.setY(0);
+    this.planetsScore = [];
     this.sceneSync.init();
-    this.onMatchFound();
+    this.levelGenerator.init();
+    // this.onMatchFound();
     this.onMatchStart();
 
     setTimeout(() => {
@@ -229,8 +231,6 @@ export default class GameScene implements IScene {
   private onMatchFound(): void {
     this.eventManager.on(EventTypes.MatchFound, () => {
       this.levelGenerator.init();
-      this.cameraController.camera.position.setY(0);
-      this.planetsScore = [];
     });
   }
 }

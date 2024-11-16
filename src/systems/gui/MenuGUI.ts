@@ -17,28 +17,41 @@ export class MenuGUI extends BaseGUI {
   }
 
   postInit(): void {
-    this.startButton = this.createText('Start', {
+    const startButton = this.createText('Start', {
       left: '50%',
       top: '25px',
       transform: 'translate(-50%, -50%)',
       pointerEvents: 'auto',
       cursor: 'pointer',
     });
-    this.exitButton = this.createText('Exit', {
+    const exitButton = this.createText('Exit', {
       left: '50%',
       top: '40px',
       transform: 'translate(-50%, -50%)',
       pointerEvents: 'auto',
       cursor: 'pointer',
     });
+
+    this.startButton = startButton;
+    this.exitButton = exitButton;
+
     console.log('created buttons');
+
+    this.eventManager.on(EventTypes.FindingMatch, () => {
+      this.removeText(startButton);
+      this.removeText(exitButton);
+
+      this.createText('Finding Players', {
+        left: '50%',
+        top: '25px',
+        transform: 'translate(-50%, -50%)',
+      });
+    });
 
     this.setButtonActions();
   }
 
-  update(): void {
-    // throw new Error('Method not implemented.');
-  }
+  update(): void {}
 
   private setButtonActions(): void {
     if (!this.startButton) {

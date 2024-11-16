@@ -7,6 +7,7 @@ import { SceneType } from '@/scenes/sceneFactory';
 
 export const EventTypes = {
   MatchFound: 'matchFound',
+  FindingMatch: 'findingMatch',
   PlayerUpdated: 'playerUpdated',
   MatchStart: 'matchStart',
   GameOver: 'gameOver',
@@ -29,4 +30,5 @@ export interface EventMap {
   [EventTypes.MovementKeydown]: 'left' | 'right';
   [EventTypes.StartGame]: undefined;
   [EventTypes.ChangeScene]: SceneType;
+  [EventTypes.FindingMatch]: undefined;
 }
