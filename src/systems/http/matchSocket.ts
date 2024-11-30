@@ -29,7 +29,10 @@ export default class MatchSocket {
     @inject(TYPES.PlayerStateSocketFactory)
     private readonly playerStateSocketFactory: CreatePlayerStateSocket,
   ) {
-    this.socket = io(config.baseURL);
+    this.socket = io(config.baseURL, {
+      auth: { token: 'example' },
+      transports: ['websocket'],
+    });
     this.playerStateSocket = this.playerStateSocketFactory(this.socket);
     this.currentPlayer = null;
   }

@@ -1,5 +1,5 @@
 export default {
   assetsPath: '/',
   local: false,
-  baseURL: 'http://localhost:5000',
+  baseURL: 'http://localhost:5001/match',
 };

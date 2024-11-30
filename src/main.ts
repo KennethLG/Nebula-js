@@ -4,4 +4,5 @@ import TYPES from './systems/DI/tokens';
 import { Main } from './bootstrap';
 
 const main = container.get<Main>(TYPES.Main);
+console.log('hello world');
 main.init();
