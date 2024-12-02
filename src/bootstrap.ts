@@ -4,7 +4,6 @@ import CameraController from './systems/CameraController';
 import GameParams from './systems/GameParams';
 import { type GUIManager } from './systems/gui';
 import { type SceneManager } from './scenes/sceneManager';
-// import EventManager from './systems/EventManager';
 import { inject, injectable } from 'inversify';
 import TYPES from './systems/DI/tokens';
 import { container } from './systems/DI/inversify.config';

@@ -34,6 +34,8 @@ export class MenuGUI extends BaseGUI {
 
     this.startButton = startButton;
     this.exitButton = exitButton;
+    this.addItem(this.startButton);
+    this.addItem(this.exitButton);
 
     console.log('created buttons');
 

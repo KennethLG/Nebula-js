@@ -26,11 +26,14 @@ export default class MatchGUI extends BaseGUI implements IMatchGUI {
       top: '25px',
       left: '10px',
     });
+    this.addItem(this.planetsRecord);
+    this.addItem(this.planetsScore);
   }
 
   update(): void {
     const planetsRecord = this.planetsRecord;
     const planetsScore = this.planetsScore;
+
     if (planetsRecord == null || planetsScore == null) return;
 
     planetsScore.innerHTML = `Planets: ${this.gameParams.scores.planets}`;

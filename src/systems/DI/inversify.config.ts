@@ -143,6 +143,7 @@ const registerServices = (): void => {
         return context.container.getNamed<IScene>(TYPES.Scene, sceneType);
       };
     });
+
   registerSingleton(TYPES.LevelGenerator, LevelGenerator);
   registerSingleton(TYPES.Main, Main);
 };
