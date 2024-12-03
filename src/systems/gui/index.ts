@@ -14,6 +14,8 @@ export abstract class BaseGUI {
     this.overlay = document.createElement('div');
     this.overlay.style.position = 'absolute';
     this.items = [];
+
+    this.removeItems = this.removeItems.bind(this);
   }
 
   init(renderer: THREE.WebGLRenderer): void {
@@ -35,20 +37,37 @@ export abstract class BaseGUI {
     this.styleElement(textElement, style);
     textElement.innerHTML = text;
     this.overlay.appendChild(textElement);
+
+    this.addItem(textElement);
+    console.log(`created text: ${text}, items length: ${this.items.length}`);
     return textElement;
   }
 
   removeText(textElement: HTMLElement): void {
-    if (this.overlay.contains(textElement)) {
-      this.overlay.removeChild(textElement);
+    console.log('removing text', textElement.innerHTML);
+    if (!this.overlay.contains(textElement)) {
+      console.log('element not in overlay');
+      return;
     }
+    this.overlay.removeChild(textElement);
+    const index = this.items.indexOf(textElement);
+    if (index === -1) {
+      console.warn('index not found');
+      return;
+    }
+    this.items.splice(index, 1);
   }
 
   removeItems(): void {
-    this.items.forEach((item) => {
-      console.log('removing item', item);
+    console.log(`removing ${this.items.length} items`);
+    [...this.items].forEach((item) => {
+      console.log('removing item', item.innerHTML);
       this.removeText(item);
     });
+  }
+
+  removeItem(item: HTMLElement): void {
+    this.removeText(item);
   }
 
   addItem(item: HTMLElement): void {
@@ -86,11 +105,14 @@ export class GUIManager {
   ) {
     const sceneGuiManager = new SceneGUIManager();
     this.eventManager.on(EventTypes.ChangeScene, (scene) => {
+      console.log(`changing scene to ${scene}`);
       const newGui = sceneGuiManager.setSceneGUI(scene);
       if (newGui) {
         this.setGUI(newGui);
       }
     });
+
+    this.setGUI = this.setGUI.bind(this);
   }
 
   init(): void {
@@ -99,14 +121,14 @@ export class GUIManager {
       console.warn('Please set renderer with setRenderer method');
       return;
     }
-    this.currentGui?.init(this.renderer);
+    console.log('init executed');
   }
 
   update(): void {
     this.currentGui?.update();
   }
 
-  setGUI = (newGui: BaseGUI): void => {
+  setGUI(newGui: BaseGUI): void {
     console.log('setting gui', newGui);
     const renderer = this.renderer;
     if (!renderer) {
@@ -120,11 +142,11 @@ export class GUIManager {
       this.removeItems(currentGui);
     }
     this.currentGui = newGui;
-    this.init();
+    this.currentGui?.init(renderer);
     window.addEventListener('resize', () => {
       this.currentGui?.adjustToRenderer(renderer);
     });
-  };
+  }
 
   removeItems(gui: BaseGUI): void {
     gui.removeItems();

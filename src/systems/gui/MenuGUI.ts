@@ -34,15 +34,11 @@ export class MenuGUI extends BaseGUI {
 
     this.startButton = startButton;
     this.exitButton = exitButton;
-    this.addItem(this.startButton);
-    this.addItem(this.exitButton);
 
     console.log('created buttons');
 
     this.eventManager.on(EventTypes.FindingMatch, () => {
-      this.removeText(startButton);
-      this.removeText(exitButton);
-
+      this.removeItems();
       this.createText('Finding Players', {
         left: '50%',
         top: '25px',

@@ -12,6 +12,7 @@ export class SceneGUIManager {
   }
 
   setSceneGUI(scene: SceneType): BaseGUI {
+    console.log('setting scene gui', scene);
     const gui = this.sceneGUIs.get(scene);
     if (!gui) {
       throw new Error(`No GUI found for scene ${scene}`);
