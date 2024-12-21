@@ -10,17 +10,8 @@ import GameParams from '@/systems/GameParams';
 import { inject, injectable } from 'inversify';
 import TYPES from '@/systems/DI/tokens';
 
-export interface IUfo extends Instance {
-  xVel: THREE.Vector3;
-  yVel: THREE.Vector3;
-  positionTo: THREE.Vector3;
-  update: () => void;
-  onDestroy: () => void;
-  defineTarget: (instance: Instance) => void;
-}
-
 @injectable()
-export default class Ufo extends Instance implements IUfo {
+export default class Ufo extends Instance {
   xVel = new THREE.Vector3(0, 0, 0);
   yVel = new THREE.Vector3(0, 0, 0);
   positionTo = new THREE.Vector3(0, 0, 0);

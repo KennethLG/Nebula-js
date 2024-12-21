@@ -9,6 +9,7 @@ export interface IMatchGUI extends BaseGUI {}
 export default class MatchGUI extends BaseGUI implements IMatchGUI {
   private planetsScore?: HTMLElement;
   private planetsRecord?: HTMLElement;
+  private ufoTiming?: HTMLElement;
 
   constructor(
     @inject(TYPES.GameParams)
@@ -26,8 +27,16 @@ export default class MatchGUI extends BaseGUI implements IMatchGUI {
       top: '25px',
       left: '10px',
     });
+    this.ufoTiming = this.createText(`UFO coming in: ${0}`, {
+      margin: 'center',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)',
+      fontSize: '25px',
+    });
     this.addItem(this.planetsRecord);
     this.addItem(this.planetsScore);
+    this.addItem(this.ufoTiming);
   }
 
   update(): void {

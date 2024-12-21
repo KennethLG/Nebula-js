@@ -67,7 +67,7 @@ export default class LevelGenerator implements ILevelGenerator {
   update(): void {
     // this.random.seed.resetCurrent();
     this.checkForChunkGeneration();
-    this.removeOuterPlanets();
+    // this.removeOuterPlanets();
   }
 
   private removeOuterPlanets(): void {
