@@ -56,6 +56,15 @@ export default class PlayerStateSocket {
       );
       this.sendState(playerStateRequest);
     });
+    this.eventManager.on(EventTypes.PlayerDied, () => {
+      const playerStateRequest = playerStateAdapter.toPlayerStateRequest(
+        player,
+        matchId,
+        '',
+        false,
+      );
+      this.sendState(playerStateRequest);
+    });
   }
 
   private sendState({ matchId, player }: PlayerStateRequest): void {

@@ -16,6 +16,9 @@ export const EventTypes = {
   StartGame: 'startGame',
   MovementKeydown: 'movementKeydown',
   ChangeScene: 'changeScene',
+  UfoTiming: 'ufoTiming',
+  PlayerDied: 'playerDied',
+  DisconnectedPlayer: 'disconnectedPlayer',
 } as const;
 
 export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
@@ -31,4 +34,7 @@ export interface EventMap {
   [EventTypes.StartGame]: undefined;
   [EventTypes.ChangeScene]: SceneType;
   [EventTypes.FindingMatch]: undefined;
+  [EventTypes.UfoTiming]: number;
+  [EventTypes.PlayerDied]: undefined;
+  [EventTypes.DisconnectedPlayer]: undefined;
 }

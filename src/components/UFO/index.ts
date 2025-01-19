@@ -9,6 +9,7 @@ import InstancesManager from '@/systems/InstancesManager';
 import GameParams from '@/systems/GameParams';
 import { inject, injectable } from 'inversify';
 import TYPES from '@/systems/DI/tokens';
+import Random from '@/systems/Random';
 
 @injectable()
 export default class Ufo extends Instance {
@@ -25,6 +26,8 @@ export default class Ufo extends Instance {
     private readonly instancesManager: InstancesManager,
     @inject(TYPES.GameParams)
     private readonly gameParams: GameParams,
+    @inject(TYPES.Random)
+    private readonly random: Random,
   ) {
     const sprite = new Sprite({
       name: 'ufo.png',
@@ -49,6 +52,15 @@ export default class Ufo extends Instance {
   defineTarget(instance: Instance): void {
     this.target = instance;
   }
+
+  // searchTarget() {
+  //   const players = this.instancesManager.instances.filter(
+  //     (instances) => instances.name === 'Player',
+  //   );
+  //   if (players.length === 0) return;
+  //   const index = this.random.seed.randomRange(0, players.length - 1);
+  //   this.defineTarget(players[index]);
+  // }
 
   update(): void {
     if (this.target == null) return;

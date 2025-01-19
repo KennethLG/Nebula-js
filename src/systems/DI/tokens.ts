@@ -33,6 +33,7 @@ const TYPES = {
   PlanetFactory: Symbol.for('Factory<Planet>'),
   PlayerFactory: Symbol.for('Factory<Player>'),
   UfoFactory: Symbol.for('Factory<Ufo>'),
+  UfoManager: Symbol.for('UfoManager'),
 };
 
 export default TYPES;

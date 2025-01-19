@@ -123,6 +123,7 @@ export default class Player extends Instance implements IPlayer {
   onGameOver = (): void => {
     console.log('onGameOver');
     this.dead = true;
+    this.eventManager.emit(EventTypes.PlayerDied);
   };
 
   update(): void {

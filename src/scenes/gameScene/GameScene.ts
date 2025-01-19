@@ -15,6 +15,7 @@ import { EventTypes } from '@/systems/eventTypes';
 import { inject, injectable } from 'inversify';
 import TYPES from '@/systems/DI/tokens';
 import { CreateUfo } from '@/systems/factories/UfoFactory';
+import { UfoManager } from './UfoManager';
 
 @injectable()
 export default class GameScene implements IScene {
@@ -55,6 +56,9 @@ export default class GameScene implements IScene {
 
     @inject(TYPES.SceneSync)
     private readonly sceneSync: SceneSync,
+
+    @inject(TYPES.UfoManager)
+    private readonly ufoManager: UfoManager,
   ) {
     console.log('GameScene constructor');
     this.gameOverScreen = document.createElement('div');
@@ -66,12 +70,13 @@ export default class GameScene implements IScene {
   }
 
   init(): void {
+    this.ufoManager.start();
     console.log('gamescene init');
-    this.gameOverScreen = this.createGameOverScreen();
-    this.changeGameOverScreenVisibility('hidden');
-    this.eventManager.on(EventTypes.GameOver, () => {
-      this.changeGameOverScreenVisibility('visible');
-    });
+    // this.gameOverScreen = this.createGameOverScreen();
+    // this.changeGameOverScreenVisibility('hidden');
+    // this.eventManager.on(EventTypes.GameOver, () => {
+    //   this.changeGameOverScreenVisibility('visible');
+    // });
     this.eventManager.on(EventTypes.Keyup, () => {
       console.log(
         'keyup on gameover',
@@ -79,7 +84,8 @@ export default class GameScene implements IScene {
         this.gameParams.canRestart,
       );
       if (this.gameParams.gameOver && this.gameParams.canRestart) {
-        this.gameRestart();
+        // this.gameRestart();
+        this.eventManager.emit(EventTypes.DisconnectedPlayer);
       }
     });
 

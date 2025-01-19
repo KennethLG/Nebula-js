@@ -27,6 +27,7 @@ import MovementController from '../MovementController';
 import OrientationController from '@/components/Player/OrientationController';
 import CollisionController from '@/components/Player/CollisionController';
 import { keyboardManagerFactory } from '../KeyboardManager';
+import { UfoManager } from '@/scenes/gameScene/UfoManager';
 
 const container = new Container();
 
@@ -127,10 +128,21 @@ const registerServices = (): void => {
       };
     });
 
+  container.bind(TYPES.UfoFactory).toFactory<Ufo, any>((context) => {
+    return () => {
+      return new Ufo(
+        context.container.get(TYPES.InstanceManager),
+        context.container.get(TYPES.GameParams),
+        context.container.get(TYPES.Random),
+      );
+    };
+  });
+
   registerSingleton(TYPES.MatchSocket, MatchSocket);
   registerSingleton(TYPES.MatchGUI, MatchGUI);
   registerSingleton(TYPES.MenuGUI, MenuGUI);
-  registerFactory(TYPES.UfoFactory, Ufo);
+  // registerFactory(TYPES.UfoFactory, Ufo);
+  registerTransient(TYPES.UfoManager, UfoManager);
 
   registerSingleton(TYPES.SceneSync, SceneSync);
 
